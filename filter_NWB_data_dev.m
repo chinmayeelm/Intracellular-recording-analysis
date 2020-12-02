@@ -1,4 +1,4 @@
-nwb_in = nwbRead('M2_N1_all-step.nwb');
+nwb_in = nwbRead('test.nwb');
 
 disp(nwb_in)
 
