@@ -1,4 +1,4 @@
-nwb_in = nwbRead('M1_N1_T1.nwb');
+nwb_in = nwbRead('M1_N4_T1.nwb');
 
 disp(nwb_in)
 
@@ -21,7 +21,7 @@ time = t;
 
 
 %% Run this if the order of the stimulus should be taken from a text file
-fileID = fopen('M1_N1_T1.txt', 'r');
+fileID = fopen('M1_N4_T1.txt', 'r');
 stim_order = fscanf(fileID, '%s');
 
 stim_order = string(stim_order);
@@ -89,9 +89,9 @@ rec_amp_sweep = rec_protocols(2,:);
 rec_white_noise = rec_protocols(3,:);
 
 %% Run this if the stimulus was randomised
-rec_protocols = reshape(filtered_data_bp, [no_of_protocols*no_of_trials, single_trial_length]);
-stim_protocols_hes = reshape(antennal_movement, [no_of_protocols*no_of_trials, single_trial_length]);
-stim_protocols_ifb =  reshape(stim_fb, [no_of_protocols*no_of_trials, single_trial_length]);
+rec_protocols = (reshape(filtered_data_bp, [single_trial_length, no_of_protocols*no_of_trials]))';
+stim_protocols_hes = (reshape(antennal_movement, [single_trial_length, no_of_protocols*no_of_trials]))';
+stim_protocols_ifb =  (reshape(stim_fb,[single_trial_length, no_of_protocols*no_of_trials]))';
 
 rec_protocols_sorted = rec_protocols(idx,:);
 stim_protocols_hes_sorted = stim_protocols_hes(idx, :);
@@ -113,44 +113,69 @@ P3_stim_ifb = stim_protocols_ifb_sorted(2*no_of_trials+1:3*no_of_trials, :);
 %%
 
 
-figure();
-plot(time(1:single_trial_length), 2+3*stim_fb(1:single_trial_length), 'Color', [0.2,0.3,0.49] );
-hold on;
+% figure();
+% plot(time(1:single_trial_length), 2+3*stim_fb(1:single_trial_length), 'Color', [0.2,0.3,0.49] );
+% hold on;
 
-raster_data = zeros(no_of_trials, single_trial_length);
 
-k=4;
-for i=1:no_of_trials
-    [p,l] = findpeaks(rec_chirp(i,:), "MinPeakHeight",0.5*max(rec_chirp(i,:)));
-    raster_data(i,l) = 1;
-    spike_time = l/fs;
-    for j = 1:length(spike_time)
-        line([spike_time(j) spike_time(j)], [k k+0.5], 'Color', 'k');
+plotdata(no_of_trials, single_trial_length, fs, P1_rec, P1_stim_hes, time);
+plotdata(no_of_trials, single_trial_length, fs, P2_rec, P2_stim_hes, time);
+plotdata(no_of_trials, single_trial_length, fs, P3_rec, P3_stim_hes, time);
+
+function Y = plotdata(no_of_trials, single_trial_length, fs, P_rec, P_stim_hes, time)
+    
+    
+
+    raster_data = zeros(no_of_trials, single_trial_length);
+    
+    figure();
+    subplot(4,1,2);
+    k=1;
+    for i=1:no_of_trials
+        [p,l] = findpeaks(P_rec(i,:), "MinPeakHeight",0.5*max(P_rec(i,:)));
+        
+        raster_data(i,l) = 1;
+        spike_time = l/fs;
+        for j = 1:length(spike_time)
+            line([spike_time(j) spike_time(j)], [k k+0.5], 'Color', 'k');
+        end
+        %plot(spiketime_trials(i,:), '.');
+        k = k+1;
     end
-    %plot(spiketime_trials(i,:), '.');
-    k = k+1;
-end
+    
+   % ylim([0 10]);
+    A2 = gca;
+    
+    [p,l] = findpeaks(P_rec(1,:), "MinPeakHeight",0.5*max(P_rec(i,:)));
+    subplot(4,1,1); plot(time(1:single_trial_length), P_rec(1, :), l/fs, p, 'r.');
+    A1 = gca;
+    
 
-ylim([0 10]);
+    sum_of_spikes = sum(raster_data, 1);
 
-sum_of_spikes = sum(raster_data, 1);
-
-L = 500;
-alpha = 8;
-gauss_win = gausswin(L, alpha);
-gcfr = filter(gauss_win, no_of_trials, sum_of_spikes);
-plot(time(1:single_trial_length), 9+gcfr/no_of_trials);
-
-figure;
-stim_fb_norm = stim_fb/ max(stim_fb);
-spike_phase = asin(stim_fb_norm(l));
-plot(time(l), rad2deg(spike_phase), '.');
-xlabel('time (s)')
-ylabel('phase(deg)');
-
-figure;
-histogram(rad2deg(spike_phase), 40);
-xlabel('Phase(deg)');
-ylabel('Frequency');
+    L = 500;
+    alpha = 8;
+    gauss_win = gausswin(L, alpha);
+    gcfr = filter(gauss_win, no_of_trials, sum_of_spikes);
+    subplot(4,1,3); plot(time(1:single_trial_length), 9+gcfr/no_of_trials, 'Color', [0.2,0.3,0.49]);
+    A3 = gca;
+    
+    subplot(4,1,4); plot(time(1:single_trial_length), P_stim_hes(1, :), 'Color', [0.6, 0.2,0]);
+    A4 = gca;
+    
+    linkaxes([A1,A2,A3,A4], 'x');
+    
+end    
+% figure;
+% stim_fb_norm = stim_fb/ max(stim_fb);
+% spike_phase = asin(stim_fb_norm(l));
+% plot(time(l), rad2deg(spike_phase), '.');
+% xlabel('time (s)')
+% ylabel('phase(deg)');
+% 
+% figure;
+% histogram(rad2deg(spike_phase), 40);
+% xlabel('Phase(deg)');
+% ylabel('Frequency');
 
 
