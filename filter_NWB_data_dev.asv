@@ -58,7 +58,7 @@ antennal_movement = (b./(hes_data_filtered -a)).^(1/3) + c;
 % subplot(2,1,2);
 
 
-
+%%
 figure();
 subplot(3,1,1);plot(time, filtered_data_bp*100, 'k');
 A1 = gca;
@@ -90,16 +90,24 @@ rec_white_noise = rec_protocols(3,:);
 
 %% Run this if the stimulus was randomised
 rec_protocols = reshape(filtered_data_bp, [no_of_protocols*no_of_trials, single_trial_length]);
-stim_protocols = reshape(antennal_movement, [no_of_protocols*no_of_trials, single_trial_length]);
+stim_protocols_hes = reshape(antennal_movement, [no_of_protocols*no_of_trials, single_trial_length]);
+stim_protocols_ifb =  reshape(stim_fb, [no_of_protocols*no_of_trials, single_trial_length]);
 
 rec_protocols_sorted = rec_protocols(idx,:);
-stim_protocols_sorted = stim_protocols(idx, :);
+stim_protocols_hes_sorted = stim_protocols_hes(idx, :);
+stim_protocols_ifb_sorted = stim_protocols_ifb(idx, :);
 
-% protocol_1_rec = rec_protocols_sorted(1:no_of_trials,:);
-% protocol_2_rec  = rec_protocols_sorted(no_of_trials+1:2*no_of_trials, :);
-% protocol_3_rec = rec_protocols_sorted(2*no_of_trials+1:3*no_of_trials :);
+P1_rec  = rec_protocols_sorted(1:no_of_trials,:);
+P2_rec  = rec_protocols_sorted(no_of_trials+1:2*no_of_trials, :);
+P3_rec = rec_protocols_sorted(2*no_of_trials+1:3*no_of_trials, :);
 
+P1_stim_hes = stim_protocols_hes_sorted(1:no_of_trials,:);
+P2_stim_hes  = stim_protocols_hes_sorted(no_of_trials+1:2*no_of_trials, :);
+P3_stim_hes = stim_protocols_hes_sorted(2*no_of_trials+1:3*no_of_trials, :);
 
+P1_stim_ifb = stim_protocols_ifb_sorted(1:no_of_trials,:);
+P2_stim_ifb  = stim_protocols_ifb_sorted(no_of_trials+1:2*no_of_trials, :);
+P3_stim_ifb = stim_protocols_ifb_sorted(2*no_of_trials+1:3*no_of_trials, :);
 
 
 %%

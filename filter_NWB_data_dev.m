@@ -58,7 +58,7 @@ antennal_movement = (b./(hes_data_filtered -a)).^(1/3) + c;
 % subplot(2,1,2);
 
 
-
+%%
 figure();
 subplot(3,1,1);plot(time, filtered_data_bp*100, 'k');
 A1 = gca;
@@ -90,41 +90,33 @@ rec_white_noise = rec_protocols(3,:);
 
 %% Run this if the stimulus was randomised
 rec_protocols = reshape(filtered_data_bp, [no_of_protocols*no_of_trials, single_trial_length]);
-stim_protocols = reshape(antennal_movement, [no_of_protocols*no_of_trials, single_trial_length]);
+stim_protocols_hes = reshape(antennal_movement, [no_of_protocols*no_of_trials, single_trial_length]);
+stim_protocols_ifb =  reshape(stim_fb, [no_of_protocols*no_of_trials, single_trial_length]);
 
 rec_protocols_sorted = rec_protocols(idx,:);
-stim_protocols_sorted = stim_protocols(idx, :);
+stim_protocols_hes_sorted = stim_protocols_hes(idx, :);
+stim_protocols_ifb_sorted = stim_protocols_ifb(idx, :);
 
-% protocol_1_rec = rec_protocols_sorted(1:no_of_trials,:);
-% protocol_2_rec  = rec_protocols_sorted(no_of_trials+1:2*no_of_trials, :);
-% protocol_3_rec = rec_protocols_sorted(2*no_of_trials+1:3*no_of_trials :);
+P1_rec  = rec_protocols_sorted(1:no_of_trials,:);
+P2_rec  = rec_protocols_sorted(no_of_trials+1:2*no_of_trials, :);
+P3_rec = rec_protocols_sorted(2*no_of_trials+1:3*no_of_trials, :);
 
+P1_stim_hes = stim_protocols_hes_sorted(1:no_of_trials,:);
+P2_stim_hes  = stim_protocols_hes_sorted(no_of_trials+1:2*no_of_trials, :);
+P3_stim_hes = stim_protocols_hes_sorted(2*no_of_trials+1:3*no_of_trials, :);
 
+P1_stim_ifb = stim_protocols_ifb_sorted(1:no_of_trials,:);
+P2_stim_ifb  = stim_protocols_ifb_sorted(no_of_trials+1:2*no_of_trials, :);
+P3_stim_ifb = stim_protocols_ifb_sorted(2*no_of_trials+1:3*no_of_trials, :);
 
 
 %%
-% p = [];
-% l=[];
-% for i = 1:no_of_trials
-%     [p(i,:),l(i,:)] = findpeaks(rec_trials(i,:), "MinPeakHeight", 0.02);
-% end
 
-%[p,l] = findpeaks(filtered_data_bp, "MinPeakHeight", 0.02);
-%l_spikes = zeros(1,length(filtered_data_bp));
-%l_spikes(l) = 1;
-
-%l_timestamps = l/fs;
-
-%spiketime_trials = reshape(l_spikes, [3,length(l_spikes)/3]);
 
 figure();
 plot(time(1:single_trial_length), 2+3*stim_fb(1:single_trial_length), 'Color', [0.2,0.3,0.49] );
 hold on;
-% chirp_freq = zeros(1, single_trial_length);
-% chirp_freq(3*fs+1:7*fs) = linspace(0,1,4*fs);
-% plot(time(1:single_trial_length), chirp_freq, 'Color', 'r');
 
-%rasterplot(l,3,100001,gca , 10000);
 raster_data = zeros(no_of_trials, single_trial_length);
 
 k=4;
