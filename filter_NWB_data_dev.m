@@ -1,4 +1,4 @@
-filename = "M1_N2_T1";
+filename = "M1_N3_T1";
 filename_str = sprintf("%s.nwb", filename);
 nwb_in = nwbRead(filename_str);
 
@@ -71,57 +71,32 @@ rec_protocols_sorted = reshape_sort_data(filtered_data_bp, single_trial_length, 
 stim_protocols_hes_sorted = reshape_sort_data(antennal_movement, single_trial_length, no_of_protocols, no_of_trials, idx);
 stim_protocols_ifb_sorted =  reshape_sort_data(stim_fb, single_trial_length, no_of_protocols, no_of_trials, idx);
 
+%P = struct();
+P = create_structs(time, rec_protocols_sorted,stim_protocols_hes_sorted,fs,stim_protocols_ifb_sorted,no_of_protocols, no_of_trials, single_trial_length, filename, stim_order_sorted);
 
-
-P1_rec  = rec_protocols_sorted(1:no_of_trials,:);
-P2_rec  = rec_protocols_sorted(no_of_trials+1:2*no_of_trials, :);
-P3_rec = rec_protocols_sorted(2*no_of_trials+1:3*no_of_trials, :);
-
-P1_stim_hes = stim_protocols_hes_sorted(1:no_of_trials,:);
-P2_stim_hes  = stim_protocols_hes_sorted(no_of_trials+1:2*no_of_trials, :);
-P3_stim_hes = stim_protocols_hes_sorted(2*no_of_trials+1:3*no_of_trials, :);
-
-P1_stim_ifb = stim_protocols_ifb_sorted(1:no_of_trials,:);
-P2_stim_ifb  = stim_protocols_ifb_sorted(no_of_trials+1:2*no_of_trials, :);
-P3_stim_ifb = stim_protocols_ifb_sorted(2*no_of_trials+1:3*no_of_trials, :);
 
 
 %%
 
+function P = create_structs(time, rec_protocols_sorted,stim_protocols_hes_sorted,fs, stim_protocols_ifb_sorted, no_of_protocols, no_of_trials, single_trial_length, filename, stim_order_sorted)
 
-% figure();
-% plot(time(1:single_trial_length), 2+3*stim_fb(1:single_trial_length), 'Color', [0.2,0.3,0.49] );
-% hold on;
+    
+    for i=1:no_of_protocols
+       
+        P(i).rec = rec_protocols_sorted(1+(i-1)*no_of_trials:no_of_trials*i,:);
+        P(i).stim_hes = stim_protocols_hes_sorted(1+(i-1)*no_of_trials:no_of_trials*i,:);
+        P(i).stim_ifb = stim_protocols_ifb_sorted(1+(i-1)*no_of_trials:no_of_trials*i,:);
+        
+        P(i).stim_name = stim_order_sorted(i*no_of_trials);
+        
+        [raster_data,gcfr]  = plotdata(no_of_trials, single_trial_length, fs, 100*P(i).rec, P(i).stim_hes, time, filename,  P(i).stim_name);
+        P(i).raster = raster_data;
+        P(i).gcfr = gcfr;
 
+    end
 
-P1 = plotdata(no_of_trials, single_trial_length, fs, 100*P1_rec, P1_stim_hes, time);
-% stim_name = stim_order_sorted(no_of_trials);
-% savefigures(filename, stim_name, P1);
+end
 
-
-P2 = plotdata(no_of_trials, single_trial_length, fs, 100*P2_rec, P2_stim_hes, time);
-% stim_name = stim_order_sorted(no_of_trials*2);
-% savefigures(filename, stim_name, P2);
-% 
-% 
-P3 = plotdata(no_of_trials, single_trial_length, fs, 100*P3_rec, P3_stim_hes, time);
-% stim_name = stim_order_sorted(no_of_trials*3);
-% savefigures(filename, stim_name, P3);
-
-%%
-figure;
-stim_fb_norm = stim_fb/ max(stim_fb);
-spike_phase = asin(stim_fb_norm(l));
-plot(time(l), rad2deg(spike_phase), '.');
-xlabel('time (s)')
-ylabel('phase(deg)');
-
-f igure;
-histogram(rad2deg(spike_phase), 40);
-xlabel('Phase(deg)');
-ylabel('Frequency');
-
-%%
 
 function reshaped_sorted_data = reshape_sort_data(data, single_trial_length, no_of_protocols, no_of_trials, idx)
     reshaped_data = (reshape(data, [single_trial_length, no_of_protocols*no_of_trials]))';
@@ -162,13 +137,13 @@ function P = savefigures(filename, stim_name, figurehandle)
 
 end
 
-function Y = plotdata(no_of_trials, single_trial_length, fs, P_rec, P_stim_hes, time)
+function [raster_data,avg_gcfr]  = plotdata(no_of_trials, single_trial_length, fs, P_rec, P_stim_hes, time, filename, stim_name)
     
     
 
     raster_data = zeros(no_of_trials, single_trial_length);
     
-    figure();
+    fig = figure();
     subplot(4,1,2);
     k=0.5;
     for i=1:no_of_trials
@@ -200,10 +175,10 @@ function Y = plotdata(no_of_trials, single_trial_length, fs, P_rec, P_stim_hes, 
     gauss_win = gausswin(L, alpha);
 %     gcfr = conv(sum_of_spikes, gauss_win);
 %     gcfr = gcfr/no_of_trials;
-    gcfr = (filter(gauss_win, 1, sum_of_spikes))/no_of_trials;
-    subplot(4,1,3); plot(time(1:single_trial_length), 9+gcfr/no_of_trials, 'Color', [0.2,0.3,0.49]);
+    avg_gcfr = (filter(gauss_win, 1, sum_of_spikes))/no_of_trials;
+    subplot(4,1,3); plot(time(1:single_trial_length), avg_gcfr, 'Color', [0.2,0.3,0.49]);
     A3 = gca;
-    ylabel('GCFR');
+    ylabel('Avg. GCFR');
     
     subplot(4,1,4); plot(time(1:single_trial_length), P_stim_hes(1, :), 'Color', [0.6, 0.2,0]);
     A4 = gca;
@@ -212,7 +187,7 @@ function Y = plotdata(no_of_trials, single_trial_length, fs, P_rec, P_stim_hes, 
     
     linkaxes([A1,A2,A3,A4], 'x');
     
-    Y = gcf;
+    savefigures(filename, stim_name, fig);
 end    
 
 
