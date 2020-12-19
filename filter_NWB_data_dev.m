@@ -1,4 +1,4 @@
-filename = "M1_N3_T1";
+filename = "M1_N1_T1";
 filename_str = sprintf("%s.nwb", filename);
 nwb_in = nwbRead(filename_str);
 
@@ -12,7 +12,7 @@ stim_fb = data(:,2);
 hes_data = data(:,3);
 time = rec.timestamps.load;
 
-no_of_protocols = 3;
+no_of_protocols = 10;
 
 no_of_trials = 5;
 single_protocol_length = length(rec_data)/no_of_protocols;
@@ -21,13 +21,8 @@ single_trial_length = single_protocol_length/no_of_trials;
 
 fs = 10000; %sampling freq
 
-% time = 0:1/fs:24.0015;
-% time = time(1:length(time)-1);
-
-
-
 %% Run this if the order of the stimulus should be taken from a text file
-[stim_order_sorted,idx] = sortfromtextfile(filename);
+% [stim_order_sorted,idx] = sortfromtextfile(filename);
 
 
 %% Run this to take stimulus order from nwb file stimulus description
@@ -53,18 +48,6 @@ a= .9258; b=93.15; c=-1.455;
 antennal_movement = (b./(hes_data_filtered -a)).^(1/3) + c;
 
 fig_handle = consolidated_plot(time, filtered_data_bp, antennal_movement, stim_fb); 
-
-
-
-
-%% Run this if the stimulus was not randomised
-rec_protocols = reshape(filtered_data_bp, [no_of_protocols, single_protocol_length]);
-
-rec_chir = filtered_data_bp(1:single_protocol_length);
-rec_chirp = reshape(rec_chir, [no_of_trials, single_trial_length]);
-
-rec_amp_sweep = rec_protocols(2,:);
-rec_white_noise = rec_protocols(3,:);
 
 %% Run this if the stimulus was randomised
 rec_protocols_sorted = reshape_sort_data(filtered_data_bp, single_trial_length, no_of_protocols, no_of_trials, idx);
@@ -187,7 +170,7 @@ function [raster_data,avg_gcfr]  = plotdata(no_of_trials, single_trial_length, f
     
     linkaxes([A1,A2,A3,A4], 'x');
     
-    savefigures(filename, stim_name, fig);
+    %savefigures(filename, stim_name, fig);
 end    
 
 
