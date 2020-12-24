@@ -94,10 +94,18 @@ end
 
 for i = 1:no_of_protocols
         if P(i).stim_type == "frq"
-            zero_crossing(P(i).antennal_movement(1,:), P(i).norm_gcfr, fs, ON_dur, OFF_dur);
+%             zero_crossing(P(i).stim_ifb(1,:), P(i).norm_gcfr, fs, ON_dur, OFF_dur);
+             zero_crossing(freq_chirp, P(i).norm_gcfr, fs, ON_dur, OFF_dur);
         end
 end
 
+%% STA of Band limited white Gaussian Noise
+
+for i = 1:no_of_protocols
+    if P(i).stim_type == "blwgn"
+        [STA_freq, occurances] = STA_analysis(P(i).raster, P(i).antennal_movement, 0.1, fs);
+    end
+end
 %%
 function antennal_movement  = butter_filtfilt(data, fc, fs, order)
     
@@ -366,55 +374,59 @@ end
 function zero_crossing(stim, resp, fs, ON_dur, OFF_dur)
 
     stim = stim(OFF_dur*fs:(OFF_dur+ON_dur)*fs);
-%     stim = sgolayfilt(stim, 1, 11); 
     resp = resp(OFF_dur*fs:(OFF_dur+ON_dur)*fs);
-
     mean_pos = mean(stim);
 
     locs = [];
     zc = [];
     for j = 2:length(stim)
-%       if ((stim(j-1)<= mean_pos-(0.01*mean_pos)) && (stim(j) >= mean_pos+(mean_pos*0.01)))
       if (stim(j-1)<=mean_pos && stim(j)>=mean_pos && stim(j+1)>mean_pos)
           zc(j) = 1;
-%         loc = loc+1;
       end
     end
     [val,locs ]= find(zc==1); 
-%     figure(1);
+
     A1 =  subplot(2,1,1); plot(stim);hold on; plot(locs, stim(locs), 'rx'); yline(mean_pos); hold off;
     
     stim_clips = [];
     resp_clips = [];
-
+    stim_freq = 1 ./ (diff(locs) / fs);
     for k= 2:length(locs)
          stim_clips = stim(locs(k-1):locs(k)); %figure(); subplot(2,1,1); plot(stim_clips) ;
          resp_clips = resp(locs(k-1):locs(k));% subplot(2,1,2); plot(resp_clips);
 
-         stim_freq(k-1) = fft_stim(stim_clips, fs, length(stim_clips));
+         %stim_freq(k-1) = fft_stim(stim_clips, fs, length(stim_clips));
          max_FR(k-1) = max(resp_clips);
 
          [r,lags] = xcorr(stim_clips- mean(stim_clips), resp_clips-mean(resp_clips), 'coeff');
-    %          figure();
-%          A3 = subplot(3,1,3); stem(lags,r);
     end
     
-    length(stim_freq)
-    figure(1); subplot(2,1,2); plot(stim_freq, max_FR, 'o');
+    size(stim_freq)
+    size(max_FR)
+    A2 = subplot(2,1,2); plot(stim_freq, max_FR, 'o');
+    
+%     linkaxes([A1, A2],'x');
+ 
+end
 
-%     if length(locs)<2
-% 
-%     %          length(stim_filt)
-%     %          length(gcfr)
-%         [r,lags] = xcorr(stim_filt,gcfr);
-%         A3 = subplot(3,1,3); stem(lags,r);
-%     %          lags
-%     end
-%     linkaxes([A1,A2,A3], 'x');
+function [STA_freq, occurances] = STA_analysis(raster_data, stimulus, window, fs)
 
-    
-    
-    
+    [m,n] = size(raster_data);
+    STA_freq = [];
+    for i=1:m
+        spike_locs = find(raster_data(i,:)==1);
+        for j=1:length(spike_locs)
+            if (spike_locs(j)-window*fs)< 0 
+                continue;
+            end
+            STA = stimulus((spike_locs(j)-window*fs):spike_locs(j));
+            STA_freq(i,j) = fft_stim(STA, fs, window*fs);
+        end
+        
+    end
+    histogram(STA_freq);
+        
+
 end
 
 
