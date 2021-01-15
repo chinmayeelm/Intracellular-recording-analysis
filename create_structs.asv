@@ -1,4 +1,4 @@
-function P = create_structs(rec_protocols_sorted,stim_protocols_hes_sorted,fs, stim_protocols_ifb_sorted, no_of_protocols, no_of_trials, single_trial_length, stim_order_sorted, max_chirp_frq,amp_sweep_frq, blwgn_fc, max_sqr_sin_frq)
+function P = create_structs(rec_protocols_sorted,stim_protocols_hes_sorted,fs, stim_protocols_ifb_sorted, no_of_protocols, no_of_trials, single_trial_length, stim_order_sorted, max_chirp_frq,amp_sweep_frq, blwgn_fc)
 
     for i=1:no_of_protocols
         
@@ -16,7 +16,7 @@ function P = create_structs(rec_protocols_sorted,stim_protocols_hes_sorted,fs, s
             P(i).stim_period = 1/str2num(type_frq(2));
             order=3;
             for j=1:no_of_trials
-                P(i).antennal_movement(j,:) =  butter_filtfilt(P(i).hes_data_unfilt(j,:), max_sqr_sin_frq, fs, order);
+                P(i).antennal_movement(j,:) =  butter_filtfilt(P(i).hes_data_unfilt(j,:), 25, fs, order);
             end
             
         elseif P(i).stim_type == "frq"

@@ -1,7 +1,7 @@
 [~,yymm,dd] = fileparts(pwd);
 date = strcat(yymm, dd);
 
-filename = "M1_N5_T1";
+filename = "M1_N1_T2";
 filename_str = sprintf("%s.nwb", filename);
 nwb_in = nwbRead(filename_str);
 
@@ -14,8 +14,14 @@ rec_data = data(:,1);
 stim_fb = data(:,2);
 hes_data = data(:,3);
 time = rec.timestamps.load;
+
 % time = time(1:end-2);
-max_chirp_frq = 60;% 120;
+% rec_data = data(1:end-2,1);
+% stim_fb = data(1:end-2,2);
+% hes_data = data(1:end-2,3);
+
+max_chirp_frq =  120;
+max_sqr_sin_frq = 120;
 amp_sweep_frq = 5;
 blwgn_fc = 300;
 
@@ -72,7 +78,7 @@ stim_protocols_ifb_sorted = sort_data(stim_protocols_ifb_reshaped, idx);
 
 
 %% Create structs 
-P = create_structs(rec_protocols_sorted,stim_protocols_hes_sorted,fs, stim_protocols_ifb_sorted, no_of_protocols, no_of_trials, single_trial_length, stim_order_sorted,max_chirp_frq, amp_sweep_frq, blwgn_fc);
+P = create_structs(rec_protocols_sorted,stim_protocols_hes_sorted,fs, stim_protocols_ifb_sorted, no_of_protocols, no_of_trials, single_trial_length, stim_order_sorted,max_chirp_frq, amp_sweep_frq, blwgn_fc, max_sqr_sin_frq);
 
 % gcfr_all = extractfield(P, "avg_gcfr");
 gcfr_all = extractfield(P, "gcfr");
