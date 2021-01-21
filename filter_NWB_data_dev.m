@@ -1,7 +1,7 @@
 [~,yymm,dd] = fileparts(pwd);
 date = strcat(yymm, dd);
 
-filename = "M1_N1_T2";
+filename = "M2_N4_T2";
 filename_str = sprintf("%s.nwb", filename);
 nwb_in = nwbRead(filename_str);
 
@@ -25,7 +25,7 @@ max_sqr_sin_frq = 120;
 amp_sweep_frq = 5;
 blwgn_fc = 300;
 
-ON_dur = 10;
+ON_dur = 30;
 OFF_dur =3;
 
 no_of_trials = 5;
