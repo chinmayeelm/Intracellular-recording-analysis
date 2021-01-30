@@ -20,9 +20,9 @@ function [stim_freq, power_fft, frq_fft] = fft_stim(stim_matrix, Fs, L)
         f = Fs*(0:(L/2))/L;
 %         f = f(2:end-1);
         length(f)
-        figure(1);
+        figure();
 %         plot(f,P1(2:end-1)); hold on;
-%         plot(f,P1); hold on;
+        plot(f,P1); %hold on;
         title('Single-Sided Amplitude Spectrum of X(t)')
         xlabel('f (Hz)')
         ylabel('|P1(f)|')

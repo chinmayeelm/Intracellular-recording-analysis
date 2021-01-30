@@ -23,7 +23,10 @@ function [STA_freq, power_fft, frq_fft,STA] = STA_analysis(raster_data, stimulus
 
     STA = mean(all_spike_triggers);
     t_STA = linspace(-(window*1000),0,length(STA));%-100:0.1:0;
-%     figure(2); plot(t_STA, STA); hold on;
+    figure(); plot(t_STA, STA); %hold on;
+    title ('Spike triggered average');
+    ylabel 'Antennal movement (mm)';
+    xlabel 'time (ms)';
     [STA_freq, power_fft, frq_fft] = fft_stim(STA, fs, window*fs);
 %     histogram(STA_freq);
         

@@ -4,10 +4,14 @@ function P = plot_data(single_trial_length,no_of_protocols, fs, time, filename, 
         
         fig = figure(i);
         [p,l] = findpeaks(P(i).rec(1,:), "MinPeakHeight",0.2*max(P(i).rec(1,:)));
-        A1 = subplot(4,1,1); plot(time(1:single_trial_length), P(i).rec(1, :),'LineWidth', 0.01, 'Color', '#0072BD');
-        hold on; plot(l/fs, p, '.', 'MarkerEdgeColor', '#A2142F');
+        A1 = subplot(4,1,1); plot(time(1:single_trial_length), P(i).rec(1, :),'LineWidth', 0.01, 'Color', 'k'); %#0072BD');
+        hold on; plot(l/fs, p, '.', 'MarkerEdgeColor', 'r'); %'#A2142F');
         ylabel('Voltage (mV)');
-        title((join(split(P(i).stim_name,"_")," ")) +" Hz");
+        if (P(i).stim_name == "sin" || P(i).stim_name == "sqr" || P(i).stim_name == "sum_sine")
+            title((join(split(P(i).stim_name,"_")," ")) +" Hz");
+        else
+            title((join(split(P(i).stim_name,"_"))));
+        end
         
         A2 = subplot(4,1,2);
         k = 0.5;

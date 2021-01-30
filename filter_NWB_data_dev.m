@@ -1,7 +1,7 @@
 [~,yymm,dd] = fileparts(pwd);
 date = strcat(yymm, dd);
 
-filename = "M1_N1_T1";
+filename = "M1_N3_T3";
 filename_str = sprintf("%s.nwb", filename);
 nwb_in = nwbRead(filename_str);
 
@@ -25,23 +25,23 @@ max_sqr_sin_frq = 120;
 amp_sweep_frq = 5;
 blwgn_fc = 300;
 
-ON_dur = 30;
-OFF_dur =3;
+ON_dur = 10;
+OFF_dur =5;
 
-no_of_trials = 5;
+no_of_trials = 20;
 
 fs = 10000; %sampling freq
 
 % stim_frequencies = find_stim_freq(stim_fb,ON_dur, OFF_dur, fs)
 
 %% Run this if the order of the stimulus should be taken from a text file
-[stim_order_vector, stim_order_sorted,idx] = sortfromtextfile(filename);
+% [stim_order_vector, stim_order_sorted,idx] = sortfromtextfile(filename);
 
 
 %% Run this to take stimulus order from nwb file stimulus description
-% [stim_order_sorted,idx] = sortfromnwb(nwb_in);
+[stim_order_sorted,stim_order_vector, idx] = sortfromnwb(nwb_in);
 
-%%
+%
 
 rec_fc_low = 10;
 rec_fc_high = 2000;
@@ -53,7 +53,7 @@ d_rec = designfilt('bandpassiir','FilterOrder',rec_filt_order, ...
 
 filtered_data_bp = filtfilt(d_rec, rec_data);
 
-no_of_protocols = length(stim_order_vector)/no_of_trials;
+no_of_protocols = length(stim_order_sorted)/no_of_trials;
 
 single_protocol_length = length(rec_data)/no_of_protocols;
 single_trial_length = single_protocol_length/no_of_trials;
@@ -70,7 +70,7 @@ rec_protocols_reshaped = reshape_data(filtered_data_bp, single_trial_length, no_
 stim_protocols_hes_reshaped = reshape_data(hes_data, single_trial_length, no_of_protocols, no_of_trials); %hes data not filtered. Antennal movement not calculated
 stim_protocols_ifb_reshaped = reshape_data(stim_fb, single_trial_length, no_of_protocols, no_of_trials);
 
-%% sort reshaped data
+% sort reshaped data
 
 rec_protocols_sorted = sort_data(rec_protocols_reshaped,idx);
 stim_protocols_hes_sorted = sort_data(stim_protocols_hes_reshaped, idx); %hes data not filtered. Antennal movement not calculated
@@ -128,6 +128,13 @@ for i = 1:no_of_protocols
              [stim_freq, max_FR] = tuning_curve(P(i).antennal_movement, P(i).norm_gcfr, fs, ON_dur, OFF_dur); %require edit in the function to take all rows
              [I_spike_phase, II_spike_phase, III_spike_phase, I_spike_freq, II_spike_freq, III_spike_freq] = spike_phase(P(i).antennal_movement(1,:), P(i).raster(1,:), fs, ON_dur, OFF_dur);
              figure(); scatter(I_spike_freq,I_spike_phase,100, 'k.'); hold on; 
+             pmin = min(I_spike_phase);
+             pmax = max(I_spike_phase);
+             pimin = floor(pmin/pi);
+             pimax = ceil(pmax/pi);
+%              yticks(0:pi/4:2*pi);
+             yticks((pimin:pimax) * pi);
+             yticklabels( string(pimin:pimax) + "\pi" )
              scatter(II_spike_freq,II_spike_phase, 100,  'b.');  
              scatter(III_spike_freq,III_spike_phase, 100, 'r.')
              ylabel('Spike phase (rad)');
