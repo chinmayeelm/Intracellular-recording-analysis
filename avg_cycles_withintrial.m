@@ -1,7 +1,7 @@
 ON_dur = 10;
 OFF_dur = 5; 
 fs = 10000;
-idx = 3;
+idx = 8;
 start = fs*OFF_dur; stop = (ON_dur+OFF_dur)*fs;
 % time = M1N3_sqr.time(idx);
 % t = time{1,1}(1:M1N3_sqr.single_trial_length(5));
@@ -22,7 +22,8 @@ stim = stim - mean(stim,2);
 %     figure;
 
     %%
-
+    mean_resp_clips = [];
+    mean_stim_clips = [];
 
     for i=1:rows
         locs = [];
@@ -46,31 +47,39 @@ stim = stim - mean(stim,2);
         for k= locs(1):period:length(stim)-period
              stim_clips(within_trial_cycle,:)  = stim(i, k:k+period);
              resp_clips(within_trial_cycle,:) = resp(i, k:k+period);
-
-%              t = linspace(0,period/fs,period+1);
-%              subplot(2,1,1); plot(t, resp_clips(within_trial_cycle,:)); hold on;
-%              ylabel 'GCFR';
-%               
-%                  
-%              subplot(2,1,2); plot(t, stim_clips(within_trial_cycle,:)); hold on;
-%              ylabel 'Antennal movement'
-%              xlabel 'time (s)'
-%              fig_name = sprintf('M1N3_sqr_%0.0001fs',M1N3_sqr.stim_period(idx))
              within_trial_cycle = within_trial_cycle +1;
 
         end 
-               
-        figure;
-        subplot(2,1,1); stdshade(resp_clips, 0.6, [0.4660 0.6740 0.1880], t); hold on;
-         ylabel 'GCFR';
+        
+%          t = linspace(0,period/fs,period+1);
+%          a1 = subplot(2,1,1); plot(t, mean(resp_clips)); hold on;
+%          ylabel 'Avg GCFR';
+%          title (strcat("stim period=", num2str(M1N3_sqr.stim_period(idx)), " s"));
+% 
+% 
+%          a2 = subplot(2,1,2); plot(t, mean(stim_clips)); hold on;
+%          ylabel 'Antennal movement'
+%          xlabel 'time (s)'
 %          
-        subplot(2,1,2); stdshade(stim_clips, 0.6, [0.6, 0.2,0], t); hold on;
+%          linkaxes([a1,a2], 'x');
+         
+         mean_resp_clips(i,:) = mean(resp_clips);
+         mean_stim_clips(i,:) = mean(stim_clips);
+   end     
+        figure;
+        t = linspace(0,period/fs,period+1);
+        subplot(2,1,1); stdshade(mean_resp_clips, 0.6, [0.4660 0.6740 0.1880], t); hold on;
+        ylabel 'Avg. GCFR';
+        title (strcat("Avg. of cycles within trials.   ", "stim period=", num2str(M1N3_sqr.stim_period(idx)), " s"));
+
+%          
+        subplot(2,1,2); stdshade(mean_stim_clips, 0.6, [0.6, 0.2,0], t); hold on;
          ylabel 'Antennal movement'
          xlabel 'time (s)'
          
 %          filename = sprintf('M1N3_sqr_%0.0001fs_t%d.png', M1N3_sqr.stim_period(idx), i);
 %          saveas(gcf, filename, 'png');
-    end
+    
     
                  
 

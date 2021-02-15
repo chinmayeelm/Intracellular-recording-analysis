@@ -39,11 +39,11 @@ function [stim_freq, max_FR]  = tuning_curve(stim, resp, fs, ON_dur, OFF_dur)
        
     end
 %     A2 = subplot(2,1,2); plot(stim_freq, mean(max_FR));
-    figure();
-    [lineOut, fillOut] = stdshade(max_FR,0.2,'k',stim_freq);
-    lineOut.LineWidth = 0.5;
-    ylabel('Normalised firing rate (spike/s)');
-    xlabel('Stimulus frequency (Hz)');
+%     figure();
+%     [lineOut, fillOut] = stdshade(max_FR,0.2,'k',stim_freq);
+%     lineOut.LineWidth = 0.5;
+%     ylabel('Normalised firing rate (spike/s)');
+%     xlabel('Stimulus frequency (Hz)');
     %         time_lag = abs(lags)./fs;
     %         phase_lag = (time_lag/diff(locs)).*360; %in degrees
     % 

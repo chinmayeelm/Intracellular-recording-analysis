@@ -19,13 +19,18 @@ function P = create_structs(rec_protocols_sorted,stim_protocols_hes_sorted,fs, s
                 P(i).antennal_movement(j,:) =  butter_filtfilt(P(i).hes_data_unfilt(j,:), str2double(type_frq(2)), fs, order);
             end
             
-        elseif P(i).stim_type == "frq"
+        elseif P(i).stim_type == "frq" || P(i).stim_type == "dec"
             order=8;
             for j=1:no_of_trials
                 P(i).antennal_movement(j, :) =  butter_filtfilt(P(i).hes_data_unfilt(j,:), max_chirp_frq, fs, order);
                 P(i).max_chirp_frq = max_chirp_frq;
             end
-        
+            
+        elseif P(i).stim_type == "impulse"
+            order=4;
+            for j=1:no_of_trials
+                P(i).antennal_movement(j,:) =  butter_filtfilt(P(i).hes_data_unfilt(j,:), 30, fs, order);
+            end
             
         elseif P(i).stim_type == "blwgn"
             order=8;

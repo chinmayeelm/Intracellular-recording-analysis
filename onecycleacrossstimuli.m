@@ -1,18 +1,18 @@
 ON_dur = 10;
-OFF_dur = 3; 
+OFF_dur = 5; 
 fs = 10000;
 % idx = 17;
 start = fs*OFF_dur; stop = (ON_dur+OFF_dur)*fs;
 
-for z=1:9
+for z=2:8
 
         idx = z;
-%         time = T_N6.time(idx);
-        period = (round(T_N6.stim_period(idx),4))*fs;
+%         time = M1N3_sqr.time(idx);
+        period = (round(M1N3_sqr.stim_period(idx),4))*fs;
         t = 0:period;
 
-        stim = T_N6.antennal_movement{idx}(1, start:stop);
-        resp = T_N6.avg_gcfr(idx, start:stop);
+        stim = M1N3_sqr.antennal_movement{idx}(1, start:stop);
+        resp = M1N3_sqr.avg_gcfr(idx, start:stop);
 
         stim = stim - mean(stim,2);
 
@@ -36,7 +36,7 @@ for z=1:9
                 stim_clips = [];
                 resp_clips = [];
 
-                figure;
+%                 figure;
 %                 within_trial_cycle = 1;
 %                 for k= locs(1)%:period:length(stim)-period
                      k = locs(1);
@@ -47,15 +47,17 @@ for z=1:9
                      t = linspace(0,period/fs,length(resp_clips));
                      A1 = subplot(2,1,1); plot(t, resp_clips(1,:)/ max(resp_clips(1,:))); hold on;
                      ylabel 'GCFR';
-
+                     title ('One cycle across different stimuli');
 
                      A2 = subplot(2,1,2); plot(t, stim_clips(1,:)); hold on;
                      ylabel 'Antennal movement'
                      xlabel 'time (s)'
-        %              fig_name = sprintf('T_N6_%0.0001fs',T_N6.stim_period(idx))
-                     within_trial_cycle = within_trial_cycle +1;
+        %              fig_name = sprintf('M1N3_sqr_%0.0001fs',M1N3_sqr.stim_period(idx))
+%                      within_trial_cycle = within_trial_cycle +1;
                      
                      linkaxes([A1,A2],'x');
+                     
+                     
 
 %                 end 
         %         figure;
@@ -66,7 +68,7 @@ for z=1:9
         %          ylabel 'Antennal movement'
         %          xlabel 'time (s)'
 
-        %          filename = sprintf('T_N6_%0.0001fs_t%d.png', T_N6.stim_period(idx), i);
+        %          filename = sprintf('M1N3_sqr_%0.0001fs_t%d.png', M1N3_sqr.stim_period(idx), i);
         %          saveas(gcf, filename, 'png');
             end
     

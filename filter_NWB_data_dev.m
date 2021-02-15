@@ -1,7 +1,7 @@
 [~,yymm,dd] = fileparts(pwd);
 date = strcat(yymm, dd);
 
-filename = "M1_N3_T3";
+filename = "M1_N1_T3_step";
 filename_str = sprintf("%s.nwb", filename);
 nwb_in = nwbRead(filename_str);
 
@@ -25,10 +25,10 @@ max_sqr_sin_frq = 120;
 amp_sweep_frq = 5;
 blwgn_fc = 300;
 
-ON_dur = 10;
+ON_dur = 1;
 OFF_dur =5;
 
-no_of_trials = 20;
+no_of_trials = 5;
 
 fs = 10000; %sampling freq
 
