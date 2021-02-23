@@ -1,18 +1,19 @@
 ON_dur = 10;
-OFF_dur = 5; 
+OFF_dur = 3; 
 fs = 10000;
 % idx = 17;
 start = fs*OFF_dur; stop = (ON_dur+OFF_dur)*fs;
 
-for z=2:8
-
+for z=1:18
+        
         idx = z;
-%         time = M1N3_sqr.time(idx);
-        period = (round(M1N3_sqr.stim_period(idx),4))*fs;
+%         time = T_sqr.time(idx);
+        period = (round(T_sqr.stim_period(idx),4))*fs;
+%         period = T_sqr.stim_period(idx)*fs;
         t = 0:period;
 
-        stim = M1N3_sqr.antennal_movement{idx}(1, start:stop);
-        resp = M1N3_sqr.avg_gcfr(idx, start:stop);
+        stim = T_sqr.antennal_movement{idx}(1, start:stop);
+        resp = T_sqr.avg_gcfr(idx, start:stop);
 
         stim = stim - mean(stim,2);
 
@@ -30,7 +31,7 @@ for z=2:8
                   end
                 end
 
-                [~,locs ]= find(zc==1);
+                [~,locs]= find(zc==1);
         %         figure; plot(stim(i,:)); hold on; plot(locs, stim(i,locs), 'rx');
         %         figure; plot(resp(i,:)); 
                 stim_clips = [];
@@ -41,9 +42,28 @@ for z=2:8
 %                 for k= locs(1)%:period:length(stim)-period
                      k = locs(1);
                      disp(k+period);
+                     
+                     if k+period > ON_dur*fs
+%                          figure;
+                         t = linspace(0,10,ON_dur*fs+1);
+                         A1 = subplot(2,1,1); plot(t, resp(1,:)/ max(resp(1,:))); hold on;
+%                          A1 = subplot(2,1,1); plot(resp); hold on;
+                         ylabel 'GCFR';
+                         title ('One cycle across different stimuli');
+
+                         A2 = subplot(2,1,2); plot(t, stim(1,:)); hold on;
+%                          A2 = subplot(2,1,2); plot(stim);
+                         ylabel 'Antennal movement'
+                         xlabel 'time (s)'
+                         
+                         linkaxes([A1,A2],'x');
+                         
+                         continue
+                     end
+                         
                      stim_clips  = stim(i, k:k+period);
                      resp_clips = resp(i, k:k+period);
-        %              figure;
+%                      figure;
                      t = linspace(0,period/fs,length(resp_clips));
                      A1 = subplot(2,1,1); plot(t, resp_clips(1,:)/ max(resp_clips(1,:))); hold on;
                      ylabel 'GCFR';
@@ -52,10 +72,11 @@ for z=2:8
                      A2 = subplot(2,1,2); plot(t, stim_clips(1,:)); hold on;
                      ylabel 'Antennal movement'
                      xlabel 'time (s)'
-        %              fig_name = sprintf('M1N3_sqr_%0.0001fs',M1N3_sqr.stim_period(idx))
+        %              fig_name = sprintf('T_sqr_%0.0001fs',T_sqr.stim_period(idx))
 %                      within_trial_cycle = within_trial_cycle +1;
                      
                      linkaxes([A1,A2],'x');
+                     xlim([0 4]);
                      
                      
 
@@ -68,7 +89,7 @@ for z=2:8
         %          ylabel 'Antennal movement'
         %          xlabel 'time (s)'
 
-        %          filename = sprintf('M1N3_sqr_%0.0001fs_t%d.png', M1N3_sqr.stim_period(idx), i);
+        %          filename = sprintf('T_sqr_%0.0001fs_t%d.png', T_sqr.stim_period(idx), i);
         %          saveas(gcf, filename, 'png');
             end
     

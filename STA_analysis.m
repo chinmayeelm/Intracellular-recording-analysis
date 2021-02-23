@@ -20,6 +20,11 @@ function [STA_freq, power_fft, frq_fft,STA] = STA_analysis(raster_data, stimulus
         all_spike_triggers = [all_spike_triggers; spike_triggers];
 
     end
+    
+%     [r,lags] =  xcorr(all_spike_triggers);
+%     figure;
+%     stem(lags,r);
+    
 
     STA = mean(all_spike_triggers);
     t_STA = linspace(-(window*1000),0,length(STA));%-100:0.1:0;

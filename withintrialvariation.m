@@ -1,17 +1,17 @@
 ON_dur = 10;
-OFF_dur = 5; 
+OFF_dur = 3; 
 fs = 10000;
-idx = 3;
+idx = 1;
 start = fs*OFF_dur; stop = (ON_dur+OFF_dur)*fs;
-% time = M1N3_sqr.time(idx);
-% t = time{1,1}(1:M1N3_sqr.single_trial_length(5));
-period = (round(M1N3_sqr.stim_period(idx),4))*fs;
+% time = T_sqr.time(idx);
+% t = time{1,1}(1:T_sqr.single_trial_length(5));
+period = (round(T_sqr.stim_period(idx),4))*fs;
 t = 0:period;
 % trial_num = 1;
 
-stim = M1N3_sqr.antennal_movement{idx}(:, start:stop);
+stim = T_sqr.antennal_movement{idx}(:, start:stop);
 % stim(4:5,:) = [];
-resp = M1N3_sqr.gcfr{idx}(:, start:stop);
+resp = T_sqr.gcfr{idx}(:, start:stop);
 % resp(4:5,:) = [];
 
 stim = stim - mean(stim,2);
@@ -55,7 +55,7 @@ stim = stim - mean(stim,2);
 %              subplot(2,1,2); plot(t, stim_clips(within_trial_cycle,:)); hold on;
 %              ylabel 'Antennal movement'
 %              xlabel 'time (s)'
-%              fig_name = sprintf('M1N3_sqr_%0.0001fs',M1N3_sqr.stim_period(idx))
+%              fig_name = sprintf('T_sqr_%0.0001fs',T_sqr.stim_period(idx))
              within_trial_cycle = within_trial_cycle +1;
 
         end 
@@ -68,7 +68,7 @@ stim = stim - mean(stim,2);
          ylabel 'Antennal movement'
          xlabel 'time (s)'
          
-%          filename = sprintf('M1N3_sqr_%0.0001fs_t%d.png', M1N3_sqr.stim_period(idx), i);
+%          filename = sprintf('T_sqr_%0.0001fs_t%d.png', T_sqr.stim_period(idx), i);
 %          saveas(gcf, filename, 'png');
     end
     

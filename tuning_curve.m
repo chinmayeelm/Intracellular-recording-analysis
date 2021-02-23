@@ -1,10 +1,11 @@
-function [stim_freq, max_FR]  = tuning_curve(stim, resp, fs, ON_dur, OFF_dur)
+function [stim_freq, max_FR]  = tuning_curve(stim, resp, fs, ON_dur, OFF_dur, max_chirp_frq)
 
     stim = mean(stim(:,OFF_dur*fs:(OFF_dur+ON_dur)*fs));
     resp = resp(:,OFF_dur*fs:(OFF_dur+ON_dur)*fs);
     mean_pos = mean(stim);
     [rows, cols] = size(resp);
     stim_freq = [];
+    max_FR=[];
 
     for i=1:rows
         locs = [];
@@ -20,12 +21,12 @@ function [stim_freq, max_FR]  = tuning_curve(stim, resp, fs, ON_dur, OFF_dur)
 
         stim_clips = [];
         resp_clips = [];
-        freq = 1 ./ ((diff(locs) / fs));
+%         freq = 1 ./ ((diff(locs) / fs));
     %     figure(); plot(stim_freq);
-        stim_freq = sgolayfilt(freq, 1,51);
+%         stim_freq = sgolayfilt(freq, 1,51);
     %     figure(); plot(stim_freq);
         for k= 2:length(locs)
-             stim_clips = stim(locs(k-1):locs(k)); %figure(); subplot(2,1,1); plot(stim_clips) ;
+%              stim_clips = stim(locs(k-1):locs(k)); %figure(); subplot(2,1,1); plot(stim_clips) ;
              resp_clips = resp(i, locs(k-1):locs(k));% subplot(2,1,2); plot(resp_clips);
 
              %stim_freq(k-1) = fft_stim(stim_clips, fs, length(stim_clips));
@@ -34,16 +35,18 @@ function [stim_freq, max_FR]  = tuning_curve(stim, resp, fs, ON_dur, OFF_dur)
     %          [r(k-1,:),lags(k-1,:)] = xcorr(stim_clips(k-1,:)- mean(stim_clips(k-1,:)), resp_clips(k-1,:)-mean(resp_clips(k-1,:)), 'coeff');
         end
 
-        size(stim_freq)
+%         size(stim_freq)
         size(max_FR)
        
     end
+    stim_freq = linspace(1,max_chirp_frq,length(max_FR));
+    
 %     A2 = subplot(2,1,2); plot(stim_freq, mean(max_FR));
-%     figure();
-%     [lineOut, fillOut] = stdshade(max_FR,0.2,'k',stim_freq);
-%     lineOut.LineWidth = 0.5;
-%     ylabel('Normalised firing rate (spike/s)');
-%     xlabel('Stimulus frequency (Hz)');
+    figure();
+    [lineOut, fillOut] = stdshade(max_FR,0.2,'k',stim_freq);
+    lineOut.LineWidth = 0.5;
+    ylabel('Normalised firing rate (spike/s)');
+    xlabel('Stimulus frequency (Hz)');
     %         time_lag = abs(lags)./fs;
     %         phase_lag = (time_lag/diff(locs)).*360; %in degrees
     % 

@@ -1,14 +1,14 @@
 ON_dur = 10;
-OFF_dur = 5; 
+OFF_dur = 3; 
 fs = 10000;
-idx = 2;
+idx = 4;
 
 start = fs*OFF_dur; stop = (ON_dur+OFF_dur)*fs;
-period = (round(M1N3_sqr.stim_period(idx),4))*fs;
+period = (round(T_sqr.stim_period(idx),4))*fs;
 
-stim = M1N3_sqr.antennal_movement{idx}(:, start:stop);
-resp = M1N3_sqr.raster{idx}(:, start:stop);
-gcfr = M1N3_sqr.gcfr{idx}(:,start:stop);
+stim = T_sqr.antennal_movement{idx}(:, start:stop);
+resp = T_sqr.raster{idx}(:, start:stop);
+gcfr = T_sqr.gcfr{idx}(:,start:stop);
 
 stim = stim - mean(stim,2);
 
@@ -43,7 +43,7 @@ for i=1:rows
              
              subplot(3,1,1); plot(spike_locs(2:end)/fs, isi); hold on; 
              ylabel 'ISI';
-             title (strcat("stim period = ", num2str(M1N3_sqr.stim_period(idx)), " s"));
+             title (strcat("stim period = ", num2str(T_sqr.stim_period(idx)), " s"));
              xlim ([0 period/fs]);
              
              t = linspace(0,period/fs,period+1);
@@ -54,7 +54,7 @@ for i=1:rows
              subplot(3,1,3); plot(t, stim_clips(within_trial_cycle,:)); hold on;
              ylabel 'Antennal movement'
              xlabel 'time (s)'
-%              fig_name = sprintf('M1N3_sqr_%0.0001fs',M1N3_sqr.stim_period(idx))
+%              fig_name = sprintf('T_sqr_%0.0001fs',T_sqr.stim_period(idx))
          within_trial_cycle = within_trial_cycle +1;
 
     end 
