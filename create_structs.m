@@ -34,7 +34,7 @@ function P = create_structs(rec_protocols_sorted,stim_protocols_hes_sorted,fs, s
             end
             
         elseif P(i).stim_type == "blwgn"
-            order=8;
+            order=4;
             for j=1:no_of_trials
                 P(i).antennal_movement(j,:) = butter_filtfilt(P(i).hes_data_unfilt(j,:), blwgn_fc, fs, order);
                 P(i).blwgn_fc = blwgn_fc;

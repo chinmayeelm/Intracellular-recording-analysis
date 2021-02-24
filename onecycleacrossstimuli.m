@@ -4,16 +4,16 @@ fs = 10000;
 % idx = 17;
 start = fs*OFF_dur; stop = (ON_dur+OFF_dur)*fs;
 
-for z=1:18
+for z=1:8
         
         idx = z;
-%         time = T_sqr.time(idx);
-        period = (round(T_sqr.stim_period(idx),4))*fs;
-%         period = T_sqr.stim_period(idx)*fs;
+%         time = T_sqr_27_01.time(idx);
+        period = (round(T_sqr_27_01.stim_period(idx),4))*fs;
+%         period = T_sqr_27_01.stim_period(idx)*fs;
         t = 0:period;
 
-        stim = T_sqr.antennal_movement{idx}(1, start:stop);
-        resp = T_sqr.avg_gcfr(idx, start:stop);
+        stim = T_sqr_27_01.antennal_movement{idx}(1, start:stop);
+        resp = T_sqr_27_01.avg_gcfr(idx, start:stop);
 
         stim = stim - mean(stim,2);
 
@@ -44,7 +44,7 @@ for z=1:18
                      disp(k+period);
                      
                      if k+period > ON_dur*fs
-%                          figure;
+                         figure;
                          t = linspace(0,10,ON_dur*fs+1);
                          A1 = subplot(2,1,1); plot(t, resp(1,:)/ max(resp(1,:))); hold on;
 %                          A1 = subplot(2,1,1); plot(resp); hold on;
@@ -63,7 +63,7 @@ for z=1:18
                          
                      stim_clips  = stim(i, k:k+period);
                      resp_clips = resp(i, k:k+period);
-%                      figure;
+                     figure;
                      t = linspace(0,period/fs,length(resp_clips));
                      A1 = subplot(2,1,1); plot(t, resp_clips(1,:)/ max(resp_clips(1,:))); hold on;
                      ylabel 'GCFR';
@@ -72,11 +72,11 @@ for z=1:18
                      A2 = subplot(2,1,2); plot(t, stim_clips(1,:)); hold on;
                      ylabel 'Antennal movement'
                      xlabel 'time (s)'
-        %              fig_name = sprintf('T_sqr_%0.0001fs',T_sqr.stim_period(idx))
+        %              fig_name = sprintf('T_sqr_27_01_%0.0001fs',T_sqr_27_01.stim_period(idx))
 %                      within_trial_cycle = within_trial_cycle +1;
                      
                      linkaxes([A1,A2],'x');
-                     xlim([0 4]);
+%                      xlim([0 4]);
                      
                      
 
@@ -89,7 +89,7 @@ for z=1:18
         %          ylabel 'Antennal movement'
         %          xlabel 'time (s)'
 
-        %          filename = sprintf('T_sqr_%0.0001fs_t%d.png', T_sqr.stim_period(idx), i);
+        %          filename = sprintf('T_sqr_27_01_%0.0001fs_t%d.png', T_sqr_27_01.stim_period(idx), i);
         %          saveas(gcf, filename, 'png');
             end
     

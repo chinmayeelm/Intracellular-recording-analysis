@@ -1,7 +1,7 @@
 [~,yymm,dd] = fileparts(pwd);
 date = strcat(yymm, dd);
 
-filename = "M1_N1_FAB";
+filename = "M1_N1_T1";
 filename_str = sprintf("%s.nwb", filename);
 nwb_in = nwbRead(filename_str);
 
@@ -15,13 +15,13 @@ time = rec.timestamps.load;
 
 fs = 10000; %sampling freq
 
-max_chirp_frq =  120;
+max_chirp_frq =  300;
 max_sqr_sin_frq = 120;
-amp_sweep_frq = 5;
+amp_sweep_frq = 30;
 blwgn_fc = 300;
 
 ON_dur = 10;
-OFF_dur =5;
+OFF_dur =3;
 start_stim = OFF_dur*fs;
 stop_stim = (ON_dur+OFF_dur)*fs;
 
@@ -100,8 +100,8 @@ for i=1:no_of_protocols
 end
 
 %% Plot data
-
-% P = plot_data(single_trial_length,no_of_protocols, fs, time, filename,  P);
+% figure;
+P = plot_data(single_trial_length,no_of_protocols, fs, time, filename,  P);
 
 %% Phase plot             Not working
 
@@ -119,7 +119,7 @@ for i=1:no_of_protocols
     end
 end
 %}
-%% Tuning curve and spike phase Vs Frequency
+%% GCFR Vs frequency and spike phase Vs Frequency
 
 for i = 1:no_of_protocols
         if P(i).stim_type == "frq" || P(i).stim_type =="dec"
@@ -160,7 +160,7 @@ for i = 1:no_of_protocols
              P(i).dec_frq_chirp_f = linspace(max_chirp_frq,1,ON_dur*fs+1);
              
              figure;
-             [lineOut, ~] = stdshade(P(i).norm_gcfr(:,start_stim:stop_stim),0.2,'k',P(i).inc_frq_chirp_f);
+             [lineOut, ~] = stdshade(P(i).norm_gcfr(:,start_stim:stop_stim),0.2,'k',P(i).dec_frq_chirp_f);
              lineOut.LineWidth  = 0.05;
              ylabel 'Normalised GCFR';
              xlabel 'Frequency (Hz)';
@@ -176,7 +176,7 @@ end
 
 for i = 1:no_of_protocols
     if P(i).stim_type == "blwgn"
-        STA_window = 0.1;
+        STA_window = 0.05;
         [~, power_fft, frq_fft, STA]  = STA_analysis(P(i).raster, P(i).antennal_movement, STA_window, fs);
         P(i).power_fft = power_fft;
         P(i).frq_fft = frq_fft;

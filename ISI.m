@@ -1,7 +1,7 @@
 ON_dur = 10;
 OFF_dur = 3; 
 fs = 10000;
-idx = 4;
+idx = 1;
 
 start = fs*OFF_dur; stop = (ON_dur+OFF_dur)*fs;
 period = (round(T_sqr.stim_period(idx),4))*fs;
