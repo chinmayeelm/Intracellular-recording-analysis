@@ -16,7 +16,7 @@ function P = create_structs(rec_protocols_sorted,stim_protocols_hes_sorted,fs, s
             P(i).stim_period = 1/str2num(type_frq(2));
             order=4;
             for j=1:no_of_trials
-                P(i).antennal_movement(j,:) =  butter_filtfilt(P(i).hes_data_unfilt(j,:), 1.5*str2double(type_frq(2)), fs, order);
+                P(i).antennal_movement(j,:) =  butter_filtfilt(P(i).hes_data_unfilt(j,:), 1, fs, order); %2*str2double(type_frq(2))
             end
             
         elseif P(i).stim_type == "frq" || P(i).stim_type == "dec"
@@ -33,7 +33,7 @@ function P = create_structs(rec_protocols_sorted,stim_protocols_hes_sorted,fs, s
                 P(i).antennal_movement(j,:) =  butter_filtfilt(P(i).hes_data_unfilt(j,:), 1/P(i).imp_dur, fs, order);
             end
             
-        elseif P(i).stim_type == "blwgn"
+        elseif P(i).stim_type == "blwgn" || P(i).stim_type == "blwgn2"
             order=4;
             for j=1:no_of_trials
                 P(i).antennal_movement(j,:) = butter_filtfilt(P(i).hes_data_unfilt(j,:), blwgn_fc, fs, order);
@@ -59,9 +59,16 @@ function P = create_structs(rec_protocols_sorted,stim_protocols_hes_sorted,fs, s
             P(i).stim_period = 1/str2num(type_frq(3));
             order=4;
             for j=1:no_of_trials
-                P(i).antennal_movement(j,:) =  butter_filtfilt(P(i).hes_data_unfilt(j,:), 2*str2double(type_frq(3)), fs, order);
+                P(i).antennal_movement(j,:) =  butter_filtfilt(P(i).hes_data_unfilt(j,:), 2.5*str2double(type_frq(3)), fs, order);
             end
             
+        elseif (P(i).stim_type == "noisySin")
+            noisySin_frq = 30;
+            max_noise_frq = 300;
+            order = 4;
+            for j=1:no_of_trials
+                P(i).antennal_movement(j,:) = butter_filtfilt(P(i).hes_data_unfilt(j,:), max_noise_frq, fs, order);
+            end
             
         end
 

@@ -1,7 +1,7 @@
 [~,yymm,dd] = fileparts(pwd);
 date = strcat(yymm, dd);
 
-filename = "M1_N1_T1";
+filename = "M2_N1_T1";
 filename_str = sprintf("%s.nwb", filename);
 nwb_in = nwbRead(filename_str);
 
@@ -16,16 +16,20 @@ time = rec.timestamps.load;
 fs = 10000; %sampling freq
 
 max_chirp_frq =  300;
-max_sqr_sin_frq = 120;
-amp_sweep_frq = 30;
+max_sqr_sin_frq = 10;
+amp_sweep_frq = 5;
 blwgn_fc = 300;
 
-ON_dur = 10;
-OFF_dur =3;
+parameters = nwb_in.general_stimulus.load;
+ON_dur = str2num(parameters(4));
+OFF_dur =str2num(parameters(5));
+no_of_trials = str2num(parameters(6));
+
+
 start_stim = OFF_dur*fs;
 stop_stim = (ON_dur+OFF_dur)*fs;
 
-no_of_trials = 5;
+
 
 
 
@@ -56,8 +60,8 @@ no_of_protocols = length(stim_order_sorted)/no_of_trials;
 single_protocol_length = length(rec_data)/no_of_protocols;
 single_trial_length = single_protocol_length/no_of_trials;
 %%
-
-%  fig_handle = consolidated_plot(time, filtered_data_bp, hes_data, stim_fb); 
+    
+ fig_handle = consolidated_plot(time, filtered_data_bp, hes_data, stim_fb); 
 
 
 %% Run this if the stimulus was randomised
@@ -175,8 +179,8 @@ end
 %% STA of Band limited white Gaussian Noise
 
 for i = 1:no_of_protocols
-    if P(i).stim_type == "blwgn"
-        STA_window = 0.05;
+    if P(i).stim_type == "blwgn" 
+        STA_window = 0.1;
         [~, power_fft, frq_fft, STA]  = STA_analysis(P(i).raster, P(i).antennal_movement, STA_window, fs);
         P(i).power_fft = power_fft;
         P(i).frq_fft = frq_fft;

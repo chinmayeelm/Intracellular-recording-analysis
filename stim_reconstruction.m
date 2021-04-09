@@ -1,9 +1,9 @@
 % idx = 1;
 fs =10000;
-for idx=1:13
-    raster_data = blwgn(idx).raster(1,:);
-    actual_stim = blwgn(idx).antennal_movement(1,:);
-    sta = blwgn(idx).STA(0.04*fs:end);
+%for idx=1
+    raster_data = blwgn(2).raster(1,:);
+    actual_stim = blwgn(2).antennal_movement(1,:);
+    sta = blwgn(1).STA(0.04*fs:end);
 
     t = linspace(0,15,length(raster_data));
 
@@ -23,9 +23,9 @@ for idx=1:13
 
     actual_stim = actual_stim-mean(actual_stim);
     actual_stim_norm = (actual_stim-mean(actual_stim))/max(actual_stim);
-    figure;
-    plot(t,actual_stim_norm); hold on;
-    plot(t,recon_stim_norm);
+    figure; 
+    plot(t,actual_stim_norm/max(actual_stim_norm)); hold on;
+    plot(t,recon_stim_norm/max(recon_stim_norm));
     ylabel 'Antennal movement';
     xlabel 'time (s)'
     legend ('Actual stimulus','Reconstructed stimulus');
@@ -33,4 +33,4 @@ for idx=1:13
     [r,lags] = xcorr(actual_stim,recon_stim);
     figure();
     stem(lags,r);
-end
+% end

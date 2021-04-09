@@ -17,6 +17,9 @@ function [STA_freq, power_fft, frq_fft,STA] = STA_analysis(raster_data, stimulus
 %             plot(STA); hold on;
             
         end
+%         [r,lags] =  xcorr(spike_triggers);
+%         figure;
+%         stem(lags,r);
         all_spike_triggers = [all_spike_triggers; spike_triggers];
 
     end
@@ -32,8 +35,19 @@ function [STA_freq, power_fft, frq_fft,STA] = STA_analysis(raster_data, stimulus
     title ('Spike triggered average');
     ylabel 'Antennal movement (mm)';
     xlabel 'time (ms)';
-    [STA_freq, power_fft, frq_fft] = fft_stim(STA, fs, window*fs);
+    [power_fft, frq_fft] = fft_stim(STA, fs, window*fs);
 %     histogram(STA_freq);
-        
-
+    
+%     rng('default');
+% 
+%     [cidx, ctrs] = kmeans(all_spike_triggers(1:50,:),2,'dist','corr','rep',3,'disp','final');
+%     figure
+%     for c = 1:16
+%         subplot(4,4,c);
+%         plot(times,all_spike_triggers((cidx == c),:)');
+%         axis tight
 end
+
+
+
+
