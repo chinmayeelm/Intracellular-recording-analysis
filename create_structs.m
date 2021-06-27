@@ -13,10 +13,10 @@ function P = create_structs(rec_protocols_sorted,stim_protocols_hes_sorted,fs, s
         
         
         if (P(i).stim_type == "sin" ) || (P(i).stim_type == "sqr")
-            P(i).stim_period = 1/str2num(type_frq(2));
-            order=4;
+            P(i).stim_period = 1/str2double(type_frq(2));
+            order=1;
             for j=1:no_of_trials
-                P(i).antennal_movement(j,:) =  butter_filtfilt(P(i).hes_data_unfilt(j,:), 1, fs, order); %2*str2double(type_frq(2))
+                P(i).antennal_movement(j,:) =  butter_filtfilt(P(i).hes_data_unfilt(j,:), str2double(type_frq(2)), fs, order); %2*str2double(type_frq(2))
             end
             
         elseif P(i).stim_type == "frq" || P(i).stim_type == "dec"

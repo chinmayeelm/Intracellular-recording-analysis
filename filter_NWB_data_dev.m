@@ -1,7 +1,7 @@
 [~,yymm,dd] = fileparts(pwd);
 date = strcat(yymm, dd);
 
-filename = "M2_N1_T1";
+filename = "M3_N1_T1";
 filename_str = sprintf("%s.nwb", filename);
 nwb_in = nwbRead(filename_str);
 
@@ -11,9 +11,10 @@ data = rec.data.load;
 rec_data = data(:,1);
 stim_fb = data(:,2);
 hes_data = data(:,3);
+% time = linspace(0,length(data),1);
 time = rec.timestamps.load;
 
-fs = 10000; %sampling freq
+%sampling freq
 
 max_chirp_frq =  300;
 max_sqr_sin_frq = 10;
@@ -24,14 +25,19 @@ parameters = nwb_in.general_stimulus.load;
 ON_dur = str2num(parameters(4));
 OFF_dur =str2num(parameters(5));
 no_of_trials = str2num(parameters(6));
+fs = str2num(parameters(1)); 
+
+
+% ON_dur = 10;
+% OFF_dur =5;
+% no_of_trials = 10;
+% fs = 10000;
 
 
 start_stim = OFF_dur*fs;
 stop_stim = (ON_dur+OFF_dur)*fs;
 
-
-
-
+% single_trial_length = start_stim + stop_stim;
 
 % stim_frequencies = find_stim_freq(stim_fb,ON_dur, OFF_dur, fs)
 
@@ -126,24 +132,24 @@ end
 %% GCFR Vs frequency and spike phase Vs Frequency
 
 for i = 1:no_of_protocols
-        if P(i).stim_type == "frq" || P(i).stim_type =="dec"
-
-
-             [I_spike_phase, II_spike_phase, III_spike_phase, I_spike_freq, II_spike_freq, III_spike_freq] = spike_phase(P(i).antennal_movement(1,:), P(i).raster(1,:), fs, ON_dur, OFF_dur);
-             figure(); scatter(I_spike_freq,I_spike_phase,100, 'k.'); hold on; 
-             pmin = min(I_spike_phase);
-             pmax = max(I_spike_phase);
-             pimin = floor(pmin/pi);
-             pimax = ceil(pmax/pi);
-%              yticks(0:pi/4:2*pi);
-             yticks((pimin:pimax) * pi);
-             yticklabels( string(pimin:pimax) + "\pi" )
-             scatter(II_spike_freq,II_spike_phase, 100,  'b.');  
-             scatter(III_spike_freq,III_spike_phase, 100, 'r.')
-             ylabel('Spike phase (rad)');
-             xlabel('Stimulus frequency (Hz)');
-             legend('I spike','II spike', 'III spike');
-        end
+%         if P(i).stim_type == "frq" || P(i).stim_type =="dec"
+% 
+% 
+%              [I_spike_phase, II_spike_phase, III_spike_phase, I_spike_freq, II_spike_freq, III_spike_freq] = spike_phase(P(i).antennal_movement(1,:), P(i).raster(1,:), fs, ON_dur, OFF_dur);
+%              figure(); scatter(I_spike_freq,I_spike_phase,100, 'k.'); hold on; 
+%              pmin = min(I_spike_phase);
+%              pmax = max(I_spike_phase);
+%              pimin = floor(pmin/pi);
+%              pimax = ceil(pmax/pi);
+% %              yticks(0:pi/4:2*pi);
+%              yticks((pimin:pimax) * pi);
+%              yticklabels( string(pimin:pimax) + "\pi" )
+%              scatter(II_spike_freq,II_spike_phase, 100,  'b.');  
+%              scatter(III_spike_freq,III_spike_phase, 100, 'r.')
+%              ylabel('Spike phase (rad)');
+%              xlabel('Stimulus frequency (Hz)');
+%              legend('I spike','II spike', 'III spike');
+%         end
         
         if P(i).stim_type == "frq"
 
@@ -188,6 +194,19 @@ for i = 1:no_of_protocols
     end
 end
 
+
+
+%% Covariance analysis
+
+for i = 1:no_of_protocols
+    if P(i).stim_type == "blwgn" 
+        window = 0.03;
+        [cov_matrix, ~, ~] = cov_analysis(P(i).raster, P(i).antennal_movement, window, fs);        
+        P(i).cov_matrix = cov_matrix;
+%         P(i).ev1 = ev1;
+%         P(i).ev2 = ev2;
+    end
+end
 %% Latency to spike in square or step wave stimulus
 %{
 for i = 1:no_of_protocols

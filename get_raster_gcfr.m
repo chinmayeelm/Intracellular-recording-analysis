@@ -3,8 +3,8 @@ function [raster_data,avg_gcfr,no_of_true_trials, gcfr]   = get_raster_gcfr(no_o
 
         no_of_true_trials = 0;
         raster_data = zeros(no_of_trials, single_trial_length);
-        L = 1000;
-        alpha = 4;
+        L = 1000; %5000
+        alpha = 4;%8;
         gauss_win = gausswin(L, alpha);
         for i=1:no_of_trials
 %             p=[]; l=[];

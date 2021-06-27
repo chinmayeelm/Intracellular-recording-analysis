@@ -4,7 +4,7 @@ fs = 10000;
 % idx = 17;
 start = fs*OFF_dur; stop = (ON_dur+OFF_dur)*fs;
 
-for idx=1:9
+for idx=2:7
     
     
     %         time = T_sqr.time(idx);
@@ -44,35 +44,9 @@ for idx=1:9
         %                 for k= locs(1)%:period:length(stim)-period
         k = locs(1);
         disp(k+period);
-        
-        
-        if k+period > ON_dur*fs
-            %             figure;
-            t = linspace(0,10,ON_dur*fs+1);
-            
-            A1 = subplot(2,1,1); 
-            plot(t, mean(resp)./max(mean(resp))); hold on;
-            %stdshade(resp, 0.6, [0.4660 0.6740 0.1880], t); hold on;
-            ylabel 'Avg. GCFR';
-            title (strcat("One stimulus cycle", "stim period=", num2str(T_sqr.stim_period(idx)), " s   ", T_sqr.filename(idx)," ", T_sqr.date(idx)), 'interpreter', 'none');
-            
-            
-            A2 = subplot(2,1,2); 
-            plot(t,stim(i,:)); hold on;
-%             stdshade(stim, 0.6, [0.6, 0.2,0], t); hold on;
-            ylabel 'Antennal movement'
-            xlabel 'time (s)'
-            
-            linkaxes([A1,A2],'x');
-            
-%             filename = strcat("First cycle avg_", "stim period", join(split(num2str(T_sqr.stim_period(idx)), '.')), " s_", T_sqr.filename(idx),"t",num2str(i));
-%             saveas(gcf, filename, 'png');
-            
-            break
-        end
-        
-        stim_clips  = stim(i, k:k+period);
-        resp_clips = mean(resp(:, k:k+period));
+         
+        stim_clips  = stim(i, k:k+round(period/2));
+        resp_clips = mean(resp(:, k:k+round(period/2)));
         %         figure;
         %         t = linspace(0,period/fs,length(resp_clips));
         %         A1 = subplot(2,1,1); plot(t, resp_clips(1,:)/ max(resp_clips(1,:))); hold on;
@@ -91,7 +65,7 @@ for idx=1:9
         
     end
     
-    t = linspace(0,period/fs,length(resp_clips));
+    t = linspace(0,round(period/(2*fs)),length(resp_clips));
     subplot(2,1,1); plot(t, resp_clips./max(resp_clips)); hold on;
 %     stdshade(resp_clips, 0.6, [0.4660 0.6740 0.1880], t); hold on;
     ylabel 'GCFR';
