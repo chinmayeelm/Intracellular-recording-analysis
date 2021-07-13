@@ -1,4 +1,4 @@
-function P = create_structs(rec_protocols_sorted,stim_protocols_hes_sorted,fs, stim_protocols_ifb_sorted, no_of_protocols, no_of_trials, single_trial_length, stim_order_sorted, max_chirp_frq,amp_sweep_frq, blwgn_fc, max_sqr_sin_frq, impulse_dur)
+function P = create_structs(rec_protocols_sorted,stim_protocols_hes_sorted,fs, stim_protocols_ifb_sorted, no_of_protocols, no_of_trials, single_trial_length, stim_order_sorted, max_chirp_frq,amp_sweep_frq, blwgn_fc, impulse_dur, a, b, c)
 
     for i=1:no_of_protocols
         
@@ -16,13 +16,13 @@ function P = create_structs(rec_protocols_sorted,stim_protocols_hes_sorted,fs, s
             P(i).stim_period = 1/str2double(type_frq(2));
             order=1;
             for j=1:no_of_trials
-                P(i).antennal_movement(j,:) =  butter_filtfilt(P(i).hes_data_unfilt(j,:), str2double(type_frq(2)), fs, order); %2*str2double(type_frq(2))
+                P(i).antennal_movement(j,:) =  butter_filtfilt(P(i).hes_data_unfilt(j,:), str2double(type_frq(2)), fs, order, a, b, c); %2*str2double(type_frq(2))
             end
             
         elseif P(i).stim_type == "frq" || P(i).stim_type == "dec"
             order=8;
             for j=1:no_of_trials
-                P(i).antennal_movement(j, :) =  butter_filtfilt(P(i).hes_data_unfilt(j,:), max_chirp_frq, fs, order);
+                P(i).antennal_movement(j, :) =  butter_filtfilt(P(i).hes_data_unfilt(j,:), max_chirp_frq, fs, order, a, b, c);
                 P(i).max_chirp_frq = max_chirp_frq;
             end
             
@@ -30,20 +30,20 @@ function P = create_structs(rec_protocols_sorted,stim_protocols_hes_sorted,fs, s
             P(i).imp_dur = impulse_dur;
             order=4;
             for j=1:no_of_trials
-                P(i).antennal_movement(j,:) =  butter_filtfilt(P(i).hes_data_unfilt(j,:), 1/P(i).imp_dur, fs, order);
+                P(i).antennal_movement(j,:) =  butter_filtfilt(P(i).hes_data_unfilt(j,:), 1/P(i).imp_dur, fs, order, a, b, c);
             end
             
         elseif P(i).stim_type == "blwgn" || P(i).stim_type == "blwgn2"
             order=4;
             for j=1:no_of_trials
-                P(i).antennal_movement(j,:) = butter_filtfilt(P(i).hes_data_unfilt(j,:), blwgn_fc, fs, order);
+                P(i).antennal_movement(j,:) = butter_filtfilt(P(i).hes_data_unfilt(j,:), blwgn_fc, fs, order, a, b, c);
                 P(i).blwgn_fc = blwgn_fc;
             end
             
         elseif (P(i).stim_type == "amp")
             order=3;
             for j=1:no_of_trials
-                P(i).antennal_movement(j,:) =  butter_filtfilt(P(i).hes_data_unfilt(j,:), amp_sweep_frq, fs, order);
+                P(i).antennal_movement(j,:) =  butter_filtfilt(P(i).hes_data_unfilt(j,:), amp_sweep_frq, fs, order, a, b, c);
                 P(i).amp_sweep_frq = amp_sweep_frq; 
                 P(i).stim_period = 1/amp_sweep_frq;
             end
@@ -52,14 +52,14 @@ function P = create_structs(rec_protocols_sorted,stim_protocols_hes_sorted,fs, s
             P(i).step_dur = type_frq(2);
             order=4;
             for j=1:no_of_trials
-                P(i).antennal_movement(j,:) =  butter_filtfilt(P(i).hes_data_unfilt(j,:), 2/str2double(type_frq(2)), fs, order);
+                P(i).antennal_movement(j,:) =  butter_filtfilt(P(i).hes_data_unfilt(j,:), 2/str2double(type_frq(2)), fs, order, a, b, c);
             end
             
         elseif (P(i).stim_type == "sum")
             P(i).stim_period = 1/str2num(type_frq(3));
             order=4;
             for j=1:no_of_trials
-                P(i).antennal_movement(j,:) =  butter_filtfilt(P(i).hes_data_unfilt(j,:), 2.5*str2double(type_frq(3)), fs, order);
+                P(i).antennal_movement(j,:) =  butter_filtfilt(P(i).hes_data_unfilt(j,:), 2.5*str2double(type_frq(3)), fs, order, a, b, c);
             end
             
         elseif (P(i).stim_type == "noisySin")
@@ -67,7 +67,7 @@ function P = create_structs(rec_protocols_sorted,stim_protocols_hes_sorted,fs, s
             max_noise_frq = 300;
             order = 4;
             for j=1:no_of_trials
-                P(i).antennal_movement(j,:) = butter_filtfilt(P(i).hes_data_unfilt(j,:), max_noise_frq, fs, order);
+                P(i).antennal_movement(j,:) = butter_filtfilt(P(i).hes_data_unfilt(j,:), max_noise_frq, fs, order, a, b, c);
             end
             
         end

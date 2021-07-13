@@ -1,10 +1,6 @@
 
-function [stim_order_sorted,stim_order_vector, idx] = sortfromnwb(nwb_in)
+function [stim_order_sorted,stim_order_vector, idx] = sortfromnwb(stim_order)
    
-    idx = 0;
-    stim = nwb_in.stimulus_presentation.get('mechanical_stimulus');
-    stim_order = stim.stimulus_description;
-
     stim_order = string(stim_order);
     stim_order_vector = split(stim_order, ','); 
 

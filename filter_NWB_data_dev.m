@@ -1,7 +1,7 @@
 [~,yymm,dd] = fileparts(pwd);
-date = strcat(yymm, dd);
+expt_date = strcat(yymm, dd);
 
-filename = "M3_N1_T1";
+filename = "M2_N2_T1"; %change HES parameters if required.
 filename_str = sprintf("%s.nwb", filename);
 nwb_in = nwbRead(filename_str);
 
@@ -16,22 +16,22 @@ time = rec.timestamps.load;
 
 %sampling freq
 
-max_chirp_frq =  300;
-max_sqr_sin_frq = 10;
+max_chirp_frq =  60;
+% max_sqr_sin_frq = 10;
 amp_sweep_frq = 5;
 blwgn_fc = 300;
 
-parameters = nwb_in.general_stimulus.load;
-ON_dur = str2num(parameters(4));
-OFF_dur =str2num(parameters(5));
-no_of_trials = str2num(parameters(6));
-fs = str2num(parameters(1)); 
+% parameters = nwb_in.general_stimulus.load;
+% ON_dur = str2num(parameters(4));
+% OFF_dur =str2num(parameters(5));
+% no_of_trials = str2num(parameters(6));
+% fs = str2num(parameters(1)); 
 
 
-% ON_dur = 10;
-% OFF_dur =5;
-% no_of_trials = 10;
-% fs = 10000;
+ON_dur = 30;
+OFF_dur =5;
+no_of_trials = 5;
+fs = 1e4;
 
 
 start_stim = OFF_dur*fs;
@@ -41,13 +41,15 @@ stop_stim = (ON_dur+OFF_dur)*fs;
 
 % stim_frequencies = find_stim_freq(stim_fb,ON_dur, OFF_dur, fs)
 
-%% Run this if the order of the stimulus should be taken from a text file
+% Run this if the order of the stimulus should be taken from a text file
 % [stim_order_vector, stim_order_sorted,idx] = sortfromtextfile(filename);
 
 
-%% Run this to take stimulus order from nwb file stimulus description
+% Run this to take stimulus order from nwb file stimulus description
 
-[stim_order_sorted,stim_order_vector, idx] = sortfromnwb(nwb_in);
+stim = nwb_in.stimulus_presentation.get('mechanical_stimulus');
+stim_order = stim.stimulus_description;
+[stim_order_sorted,stim_order_vector, idx] = sortfromnwb(stim_order);
 
 
 
@@ -65,12 +67,12 @@ no_of_protocols = length(stim_order_sorted)/no_of_trials;
 
 single_protocol_length = length(rec_data)/no_of_protocols;
 single_trial_length = single_protocol_length/no_of_trials;
-%%
+%
     
  fig_handle = consolidated_plot(time, filtered_data_bp, hes_data, stim_fb); 
 
-
-%% Run this if the stimulus was randomised
+%%
+% Run this if the stimulus was randomised
 % [rec_protocols_reshaped, rec_protocols_sorted] = reshape_sort_data(filtered_data_bp, single_trial_length, no_of_protocols, no_of_trials, idx);
 % [stim_protocols_hes_reshaped, stim_protocols_hes_sorted] = reshape_sort_data(antennal_movement, single_trial_length, no_of_protocols, no_of_trials, idx);
 % [stim_protocols_ifb_reshaped,stim_protocols_ifb_sorted ]=  reshape_sort_data(stim_fb, single_trial_length, no_of_protocols, no_of_trials, idx);
@@ -86,8 +88,18 @@ stim_protocols_hes_sorted = sort_data(stim_protocols_hes_reshaped, idx); %hes da
 stim_protocols_ifb_sorted = sort_data(stim_protocols_ifb_reshaped, idx);
 
 
-%% Create structs 
-P = create_structs(rec_protocols_sorted,stim_protocols_hes_sorted,fs, stim_protocols_ifb_sorted, no_of_protocols, no_of_trials, single_trial_length, stim_order_sorted,max_chirp_frq, amp_sweep_frq, blwgn_fc, max_sqr_sin_frq, ON_dur);
+% Create structs 
+
+d_ref = datetime('2021.06.01', 'InputFormat', 'yyyy.MM.dd');
+d_check = datetime(expt_date, 'InputFormat', 'yyyy.MM.dd');
+
+if d_check < d_ref
+    a= .9258; b=93.15; c=-1.455; %before 1 June 2021
+else
+    a=0.5334; b=516.5; c = -3.233;
+end
+
+P = create_structs(rec_protocols_sorted,stim_protocols_hes_sorted,fs, stim_protocols_ifb_sorted, no_of_protocols, no_of_trials, single_trial_length, stim_order_sorted,max_chirp_frq, amp_sweep_frq, blwgn_fc, ON_dur, a, b, c);
 
 % gcfr_all = extractfield(P, "avg_gcfr");
 gcfr_all = extractfield(P,"gcfr");
@@ -97,7 +109,7 @@ gcfr_max = max(gcfr_all);
 [P(:).OFF_dur] = deal(OFF_dur);
 [P(:).time] = deal(time);
 [P(:).filename] = deal(filename);
-[P(:).date] = deal(date);
+[P(:).date] = deal(expt_date);
 [P(:).no_of_trials] = deal(no_of_trials);
 [P(:).fs] = deal(fs);
 [P(:).no_of_protocols] = deal(no_of_protocols);
@@ -109,11 +121,11 @@ for i=1:no_of_protocols
 
 end
 
-%% Plot data
+% Plot data
 % figure;
-P = plot_data(single_trial_length,no_of_protocols, fs, time, filename,  P);
+% P = plot_data(single_trial_length,no_of_protocols, fs, time, filename,  P);
 
-%% Phase plot             Not working
+% Phase plot             Not working
 
 % Write code to select only sine, frq_chirp and amp_sweep protocols
 % No :P
@@ -129,7 +141,7 @@ for i=1:no_of_protocols
     end
 end
 %}
-%% GCFR Vs frequency and spike phase Vs Frequency
+% GCFR Vs frequency and spike phase Vs Frequency
 
 for i = 1:no_of_protocols
 %         if P(i).stim_type == "frq" || P(i).stim_type =="dec"
@@ -153,9 +165,9 @@ for i = 1:no_of_protocols
         
         if P(i).stim_type == "frq"
 
-             P(i).I_spike = [I_spike_freq', I_spike_phase'];
-             P(i).II_spike = [II_spike_freq', II_spike_phase'];
-             P(i).III_spike = [III_spike_freq', III_spike_phase'];
+%              P(i).I_spike = [I_spike_freq', I_spike_phase'];
+%              P(i).II_spike = [II_spike_freq', II_spike_phase'];
+%              P(i).III_spike = [III_spike_freq', III_spike_phase'];
              
              P(i).inc_frq_chirp_f = linspace(1,max_chirp_frq,ON_dur*fs+1);
              figure;
@@ -176,9 +188,9 @@ for i = 1:no_of_protocols
              xlabel 'Frequency (Hz)';
              title ('Response to decreasing frequency chirp');
 %              
-             P(i).dec_chirp_I_spike = [I_spike_freq', I_spike_phase'];
-             P(i).dec_chirp_II_spike = [II_spike_freq', II_spike_phase'];
-             P(i).dec_chirp_III_spike = [III_spike_freq', III_spike_phase'];
+%              P(i).dec_chirp_I_spike = [I_spike_freq', I_spike_phase'];
+%              P(i).dec_chirp_II_spike = [II_spike_freq', II_spike_phase'];
+%              P(i).dec_chirp_III_spike = [III_spike_freq', III_spike_phase'];
         end
 end
 
@@ -200,7 +212,7 @@ end
 
 for i = 1:no_of_protocols
     if P(i).stim_type == "blwgn" 
-        window = 0.03;
+        window = 0.05;
         [cov_matrix, ~, ~] = cov_analysis(P(i).raster, P(i).antennal_movement, window, fs);        
         P(i).cov_matrix = cov_matrix;
 %         P(i).ev1 = ev1;
