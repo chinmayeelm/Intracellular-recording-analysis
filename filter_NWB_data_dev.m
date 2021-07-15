@@ -1,7 +1,7 @@
 % [~,yymm,dd] = fileparts(pwd);
 % expt_date = strcat(yymm, dd);
 LUT.expt_date = datetime(LUT.expt_date, 'Format', 'yyyy.MM.dd');
-for LUT_row_idx = 1:105
+for LUT_row_idx = 7
     
     LUT_row_idx
     cd ..
@@ -46,7 +46,7 @@ for LUT_row_idx = 1:105
     start_stim = OFF_dur*fs; 
     stop_stim = (ON_dur+OFF_dur)*fs;
     
-    single_trial_length =start_stim + stop_stim;
+    single_trial_length =start_stim + stop_stim+1;
 
     
     % Run this if the order of the stimulus should be taken from a text file
@@ -68,8 +68,8 @@ for LUT_row_idx = 1:105
     
     if time(end)==0
         
-        stop_point = find(data(:,2)==0,1) - 1
-        clip_point = stop_point-mod(stop_point,single_trial_length)
+        stop_point = find(data(:,2)==0,1) - 1;
+        clip_point = stop_point-mod(stop_point,single_trial_length);
         
         data = data(1:clip_point,:);
         time = time(1:clip_point);
@@ -81,7 +81,7 @@ for LUT_row_idx = 1:105
         
         prompt = 'Enter stop point for data';
         stop_point = input(prompt);
-        clip_point = stop_point-mod(stop_point,single_trial_length)
+        clip_point = stop_point-mod(stop_point,single_trial_length);
         
         data = data(1:clip_point,:);
         valid_trials = length(data)/single_trial_length;
@@ -93,7 +93,7 @@ for LUT_row_idx = 1:105
     [stim_order_sorted,idx] = sort(stim_order_vector);
 %     no_of_protocols = length(stim_order_sorted)/no_of_trials;
     no_of_protocols = length(unique(stim_order_sorted));
-    valid_trials = length(data)/single_trial_length;
+    valid_trials = round(length(data)/single_trial_length);
     
 %     single_protocol_length = length(rec_data)/no_of_protocols;
 %     single_trial_length = single_protocol_length/no_of_trials;
@@ -115,7 +115,7 @@ for LUT_row_idx = 1:105
     
     %
     
-%     fig_handle = consolidated_plot(time, filtered_data_bp, hes_data, stim_fb);
+    fig_handle = consolidated_plot(time, filtered_data_bp, hes_data, stim_fb);
 %     pause;
     %
     % Run this if the stimulus was randomised
@@ -133,10 +133,12 @@ for LUT_row_idx = 1:105
     
     % sort reshaped data
     
-    rec_protocols_sorted = sort_data(rec_protocols_reshaped,idx);
-    stim_protocols_hes_sorted = sort_data(stim_protocols_hes_reshaped, idx); %hes data not filtered. Antennal movement not calculated
-    stim_protocols_ifb_sorted = sort_data(stim_protocols_ifb_reshaped, idx);
-    
+%     rec_protocols_sorted = sort_data(rec_protocols_reshaped,idx);
+%     stim_protocols_hes_sorted = sort_data(stim_protocols_hes_reshaped, idx); %hes data not filtered. Antennal movement not calculated
+%     stim_protocols_ifb_sorted = sort_data(stim_protocols_ifb_reshaped, idx);
+    rec_protocols_sorted = rec_protocols_reshaped(idx,:);
+    stim_protocols_hes_sorted = stim_protocols_hes_reshaped(idx,:); %hes data not filtered. Antennal movement not calculated
+    stim_protocols_ifb_sorted = stim_protocols_ifb_reshaped(idx,:);
     
     % Create structs
     
@@ -170,6 +172,9 @@ for LUT_row_idx = 1:105
         P(i).norm_gcfr = P(i).gcfr/gcfr_max;
         
     end
+
+
+   
     
     % Plot data
     % figure;

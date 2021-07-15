@@ -82,13 +82,15 @@ function P = create_structs(rec_protocols_sorted,stim_protocols_hes_sorted,fs, s
             
         end
 
-        
+        mean_movement = mean(P(i).antennal_movement,1);
         disp("protocol="); disp(P(i).stim_name);
+        disp("Max. antennal movement in mm ="); disp(max(mean_movement)-min(mean_movement));
         [raster,avg_gcfr,complete_trials, gcfr]  = get_raster_gcfr(no_of_trials, P(i).rec, single_trial_length);
         P(i).gcfr = gcfr;
         P(i).raster = raster;
         P(i).avg_gcfr = avg_gcfr;
         P(i).complete_trials = complete_trials;
+        P(i).mean_movement = mean_movement;
 
     end
 

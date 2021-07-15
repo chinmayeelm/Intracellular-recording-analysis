@@ -15,7 +15,9 @@ function P = create_structs(rec_protocols_sorted,stim_protocols_hes_sorted,fs, s
         trial_idx = find(stim_order_sorted == P(i).stim_name,1);
         
         P(i).rec = 100*(rec_protocols_sorted(trial_idx: trial_idx+ no_of_trials-1, :));
-
+        P(i).hes_data_unfilt = stim_protocols_hes_sorted(trial_idx: trial_idx+ no_of_trials-1, :);
+        P(i).stim_ifb = stim_protocols_ifb_sorted(trial_idx: trial_idx+ no_of_trials-1, :);
+        
         type_frq = split(P(i).stim_name, '_');
         P(i).stim_type = type_frq(1);
         
@@ -80,13 +82,15 @@ function P = create_structs(rec_protocols_sorted,stim_protocols_hes_sorted,fs, s
             
         end
 
-        
+        mean_movement = mean(P(i).antennal_movement,1);
         disp("protocol="); disp(P(i).stim_name);
+        disp("Max. antennal movement in mm ="); disp(max(mean_movement)-min(mean_movement));
         [raster,avg_gcfr,complete_trials, gcfr]  = get_raster_gcfr(no_of_trials, P(i).rec, single_trial_length);
         P(i).gcfr = gcfr;
         P(i).raster = raster;
         P(i).avg_gcfr = avg_gcfr;
         P(i).complete_trials = complete_trials;
+        P
 
     end
 

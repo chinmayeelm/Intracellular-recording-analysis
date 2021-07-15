@@ -1,7 +1,7 @@
 % [~,yymm,dd] = fileparts(pwd);
 % expt_date = strcat(yymm, dd);
 LUT.expt_date = datetime(LUT.expt_date, 'Format', 'yyyy.MM.dd');
-for LUT_row_idx = 79
+for LUT_row_idx = 1:105
     
     LUT_row_idx
     cd ..
@@ -43,10 +43,10 @@ for LUT_row_idx = 79
 %     total_dur = length(data)/fs;
 %     time = linspace(0,total_dur,length(data));
     
-    start_stim = OFF_dur*fs;
+    start_stim = OFF_dur*fs; 
     stop_stim = (ON_dur+OFF_dur)*fs;
     
-    single_trial_length =start_stim + stop_stim;
+    single_trial_length =start_stim + stop_stim+1;
 
     
     % Run this if the order of the stimulus should be taken from a text file
@@ -61,20 +61,21 @@ for LUT_row_idx = 79
         stim_order_vector = split(stim.stimulus_description, ',');
     else
         stim_order = parameters.stim_order;
+        stim_order_vector = split(parameters.stim_order, ',');
     end
     
     clip_data_flag = 0;
     
     if time(end)==0
         
-        stop_point = find(data(:,2)==0,1) - 1
-        clip_point = stop_point-mod(stop_point,single_trial_length)
+        stop_point = find(data(:,2)==0,1) - 1;
+        clip_point = stop_point-mod(stop_point,single_trial_length);
         
         data = data(1:clip_point,:);
         time = time(1:clip_point);
         valid_trials = length(data)/single_trial_length;
         
-        stim_order = stim_order(1:valid_trials);
+        stim_order_vector = stim_order_vector(1:valid_trials);
     
     elseif clip_data_flag == 1
         
@@ -85,14 +86,14 @@ for LUT_row_idx = 79
         data = data(1:clip_point,:);
         valid_trials = length(data)/single_trial_length;
         
-        stim_order = stim_order(1:valid_trials);
+        stim_order_vector = stim_order_vector(1:valid_trials);
     end
     
-    [stim_order_sorted,stim_order_vector, idx] = sortfromnwb(stim_order);
-    
+%     [stim_order_sorted,stim_order_vector, idx] = sortfromnwb(stim_order);
+    [stim_order_sorted,idx] = sort(stim_order_vector);
 %     no_of_protocols = length(stim_order_sorted)/no_of_trials;
-    no_of_protocols = length(unique(stim_order));
-    valid_trials = length(data)/single_trial_length;
+    no_of_protocols = length(unique(stim_order_sorted));
+    valid_trials = round(length(data)/single_trial_length);
     
 %     single_protocol_length = length(rec_data)/no_of_protocols;
 %     single_trial_length = single_protocol_length/no_of_trials;
@@ -114,7 +115,7 @@ for LUT_row_idx = 79
     
     %
     
-%     fig_handle = consolidated_plot(time, filtered_data_bp, hes_data, stim_fb);
+    fig_handle = consolidated_plot(time, filtered_data_bp, hes_data, stim_fb);
 %     pause;
     %
     % Run this if the stimulus was randomised
@@ -132,10 +133,12 @@ for LUT_row_idx = 79
     
     % sort reshaped data
     
-    rec_protocols_sorted = sort_data(rec_protocols_reshaped,idx);
-    stim_protocols_hes_sorted = sort_data(stim_protocols_hes_reshaped, idx); %hes data not filtered. Antennal movement not calculated
-    stim_protocols_ifb_sorted = sort_data(stim_protocols_ifb_reshaped, idx);
-    
+%     rec_protocols_sorted = sort_data(rec_protocols_reshaped,idx);
+%     stim_protocols_hes_sorted = sort_data(stim_protocols_hes_reshaped, idx); %hes data not filtered. Antennal movement not calculated
+%     stim_protocols_ifb_sorted = sort_data(stim_protocols_ifb_reshaped, idx);
+    rec_protocols_sorted = rec_protocols_reshaped(idx,:);
+    stim_protocols_hes_sorted = stim_protocols_hes_reshaped(idx,:); %hes data not filtered. Antennal movement not calculated
+    stim_protocols_ifb_sorted = stim_protocols_ifb_reshaped(idx,:);
     
     % Create structs
     
@@ -172,7 +175,7 @@ for LUT_row_idx = 79
     
     % Plot data
     % figure;
-%     P = plot_data(single_trial_length,no_of_protocols, fs, time, filename,  P);
+    P = plot_data(single_trial_length,no_of_protocols, fs, time, filename,  P);
     
     % Phase plot             Not working
     
