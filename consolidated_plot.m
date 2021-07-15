@@ -11,14 +11,14 @@ function fig_handle = consolidated_plot(time, filtered_data_bp, hes_data, stim_f
     ylabel('Antennal movement (mm)')
     A2 = gca;
 
-%     subplot(3,1,3); hold on; plot(time, stim_fb,'Color', [0.2,0.3,0.49]);
-    subplot(3,1,3); hold on; plot(time, stim_fb,'k');
+    subplot(3,1,3); hold on; plot(time, stim_fb,'Color', [0.2,0.3,0.49]);
+%     subplot(3,1,3); hold on; plot(time, stim_fb,'k');
     ylabel('Indenter feedback (V)')
     xlabel('time (s)')
     A3 = gca;
 
     linkaxes([A1 A2 A3], 'x');
 
-    net_movement_antenna = max(hes_data) - min(hes_data)
+%     net_movement_antenna = max(hes_data) - min(hes_data)
 
 end

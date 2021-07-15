@@ -2,7 +2,11 @@ function P = plot_data(single_trial_length,no_of_protocols, fs, time, filename, 
 
     for i=1:no_of_protocols
         
-        fig = figure(i);
+        if isempty(P(i).gcfr)
+            continue;
+        end
+        
+        fig = figure(i+1);
         [p,l] = findpeaks(P(i).rec(1,:), "MinPeakHeight",0.2*max(P(i).rec(1,:)));
         A1 = subplot(4,1,1); plot(time(1:single_trial_length), P(i).rec(1, :),'LineWidth', 0.01, 'Color', 'k'); %#0072BD');
         hold on; plot(l/fs, p, '.', 'MarkerEdgeColor', 'r'); %'#A2142F');
