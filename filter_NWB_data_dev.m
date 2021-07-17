@@ -1,7 +1,11 @@
 % [~,yymm,dd] = fileparts(pwd);
 % expt_date = strcat(yymm, dd);
+
+meta_table = [];
 LUT.expt_date = datetime(LUT.expt_date, 'Format', 'yyyy.MM.dd');
-for LUT_row_idx = 7
+
+clip_data_flag = 0;
+for LUT_row_idx = 6
     
     LUT_row_idx
     cd ..
@@ -58,13 +62,13 @@ for LUT_row_idx = 7
     if parameters.stim_order == ""
         stim = nwb_in.stimulus_presentation.get('mechanical_stimulus');
 %         stim_order = stim.stimulus_description;
-        stim_order_vector = split(stim.stimulus_description, ',');
+        stim_order_vector = string(split(stim.stimulus_description, ','));
     else
         stim_order = parameters.stim_order;
         stim_order_vector = split(parameters.stim_order, ',');
     end
     
-    clip_data_flag = 0;
+    
     
     if time(end)==0
         
@@ -80,10 +84,11 @@ for LUT_row_idx = 7
     elseif clip_data_flag == 1
         
         prompt = 'Enter stop point for data';
-        stop_point = input(prompt);
+        stop_point = input(prompt)*fs;
         clip_point = stop_point-mod(stop_point,single_trial_length);
         
         data = data(1:clip_point,:);
+        time = time(1:clip_point);
         valid_trials = length(data)/single_trial_length;
         
         stim_order_vector = stim_order_vector(1:valid_trials);
@@ -115,7 +120,7 @@ for LUT_row_idx = 7
     
     %
     
-    fig_handle = consolidated_plot(time, filtered_data_bp, hes_data, stim_fb);
+%     fig_handle = consolidated_plot(time, filtered_data_bp, hes_data, stim_fb);
 %     pause;
     %
     % Run this if the stimulus was randomised
@@ -172,13 +177,17 @@ for LUT_row_idx = 7
         P(i).norm_gcfr = P(i).gcfr/gcfr_max;
         
     end
-
-
-   
     
-    % Plot data
-    % figure;
-    P = plot_data(single_trial_length,no_of_protocols, fs, time, filename,  P);
+        % Plot data
+
+%     P = plot_data(single_trial_length,no_of_protocols, fs, time, filename,  P);
+
+%     T = struct2table(P,'AsArray', true);
+%     meta_table = [meta_table; T];
+end
+   
+ %%   
+
     
     % Phase plot             Not working
     
@@ -253,7 +262,7 @@ end
     
     pause;
     
-end
+% end
     %% STA of Band limited white Gaussian Noise
     
     for i = 1:no_of_protocols
