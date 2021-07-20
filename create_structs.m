@@ -22,11 +22,19 @@ function P = create_structs(rec_protocols_sorted,stim_protocols_hes_sorted,fs, s
         P(i).stim_type = type_frq(1);
         
         
-        if (P(i).stim_type == "sin" ) || (P(i).stim_type == "sqr")
+        if (P(i).stim_type == "sin" )
             P(i).stim_period = 1/str2double(type_frq(2));
-            order=1;
+            order=4;
             for j=1:no_of_trials
                 P(i).antennal_movement(j,:) =  butter_filtfilt(P(i).hes_data_unfilt(j,:), str2double(type_frq(2)), fs, order, a, b, c); %2*str2double(type_frq(2))
+%              
+            end
+            
+        elseif (P(i).stim_type == "sqr")
+            P(i).stim_period = 1/str2double(type_frq(2));
+            order=4;
+            for j=1:no_of_trials
+                P(i).antennal_movement(j,:) =  butter_filtfilt(P(i).hes_data_unfilt(j,:), 5, fs, order, a, b, c); %2*str2double(type_frq(2))
             end
             
         elseif P(i).stim_type == "frq" || P(i).stim_type == "dec"
@@ -83,8 +91,8 @@ function P = create_structs(rec_protocols_sorted,stim_protocols_hes_sorted,fs, s
         end
 
         mean_movement = mean(P(i).antennal_movement,1);
-        disp("protocol="); disp(P(i).stim_name);
-        disp("Max. antennal movement in mm ="); disp(max(mean_movement)-min(mean_movement));
+%         disp("protocol="); disp(P(i).stim_name);
+%         disp("Max. antennal movement in mm ="); disp(max(mean_movement)-min(mean_movement));
         [raster,avg_gcfr,complete_trials, gcfr]  = get_raster_gcfr(no_of_trials, P(i).rec, single_trial_length);
         P(i).gcfr = gcfr;
         P(i).raster = raster;

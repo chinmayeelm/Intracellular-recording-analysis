@@ -1,19 +1,19 @@
 ON_dur = 10;
-OFF_dur = 3;
+OFF_dur = 5;
 fs = 10000;
 % idx = 17;
 start = fs*OFF_dur; stop = (ON_dur+OFF_dur)*fs;
 
-for z=1:18
+for z=1:5
     
     idx = z;
-    %         time = T_sqr.time(idx);
-    period = (round(T_sqr.stim_period(idx),4))*fs;
-    %         period = T_sqr.stim_period(idx)*fs;
+    %         time = P.time(idx);
+    period = (round(P.stim_period(idx),4))*fs;
+    %         period = P.stim_period(idx)*fs;
     t = 0:period;
     
-    stim = T_sqr.antennal_movement{idx}(1, start:stop);
-    resp = T_sqr.avg_gcfr(idx, start:stop);
+    stim = P.antennal_movement{idx}(1, start:stop);
+    resp = P.avg_gcfr(idx, start:stop);
     
     stim = stim - mean(stim,2);
     
@@ -49,7 +49,7 @@ for z=1:18
             A1 = subplot(2,1,1); plot(t, resp(1,:)/ max(resp(1,:))); hold on;
             %                          A1 = subplot(2,1,1); plot(resp); hold on;
             ylabel 'GCFR';
-            title (strcat("One stimulus cycle", "stim period=", num2str(T_sqr.stim_period(idx)), " s   ", T_sqr.filename(idx)), 'interpreter', 'none');
+            title (strcat("One stimulus cycle", "stim period=", num2str(P.stim_period(idx)), " s   ", P.filename(idx)), 'interpreter', 'none');
             
             A2 = subplot(2,1,2); plot(t, stim(1,:)); hold on;
             %                          A2 = subplot(2,1,2); plot(stim);
@@ -67,12 +67,12 @@ for z=1:18
         t = linspace(0,period/fs,length(resp_clips));
         A1 = subplot(2,1,1); plot(t, resp_clips(1,:)/ max(resp_clips(1,:))); hold on;
         ylabel 'GCFR';
-        title (strcat("One stimulus cycle", "stim period=", num2str(T_sqr.stim_period(idx)), " s   ", T_sqr.filename(idx)), 'interpreter', 'none');
+        title (strcat("One stimulus cycle", "stim period=", num2str(P.stim_period(idx)), " s   ", P.filename(idx)), 'interpreter', 'none');
         
         A2 = subplot(2,1,2); plot(t, stim_clips(1,:)); hold on;
         ylabel 'Antennal movement'
         xlabel 'time (s)'
-        %              fig_name = sprintf('T_sqr_27_01_%0.0001fs',T_sqr.stim_period(idx))
+        %              fig_name = sprintf('P_27_01_%0.0001fs',P.stim_period(idx))
         %                      within_trial_cycle = within_trial_cycle +1;
         linkaxes([A1,A2],'x');
         %                      xlim([0 4]);
@@ -88,7 +88,7 @@ for z=1:18
         %          ylabel 'Antennal movement'
         %          xlabel 'time (s)'
         
-        %          filename = sprintf('T_sqr_27_01_%0.0001fs_t%d.png', T_sqr.stim_period(idx), i);
+        %          filename = sprintf('P_27_01_%0.0001fs_t%d.png', P.stim_period(idx), i);
         %          saveas(gcf, filename, 'png');
     end
     

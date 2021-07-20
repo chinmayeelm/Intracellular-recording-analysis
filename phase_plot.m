@@ -1,58 +1,72 @@
-function [gain,phase_lag] = phase_plot(stimulus, response, OFF_dur, ON_dur, fs, period)
+function [gain, phase] = phase_plot(stimulus, response, raster,start_stim, stop_stim, fs, period)
+
+stimulus = stimulus(:,start_stim : stop_stim);
+resp = response(:,start_stim : stop_stim);
+raster = raster(:,start_stim : stop_stim);
+
+stimulus_filt = sgolayfilt(stimulus, 1, 5);
+stim = stimulus_filt - mean(stimulus_filt,2);
+[m,n] = size(stim);
+mean_positions = mean(stim, 2);
+resp = resp - mean(resp,2);
+% plot(stim(1,:));
+% plot(resp(1,:));
+phase = [];
+gain = [];
+
+count = 1;
+for i =1:m
     
-    stim = stimulus(:,OFF_dur*fs:(OFF_dur+ON_dur)*fs);
-    resp = response(:,OFF_dur*fs:(OFF_dur+ON_dur)*fs);
-    mean_pos = mean(stim,2);
-    [rows, cols] = size(resp);
-    stim_freq = [];
-
-    for i=1%:rows
-        locs = [];
-        zc = [];
-        for j = 2:cols-1
-          if (stim(i,j-1)<=mean_pos(i) && stim(i,j)>=mean_pos(i) && stim(i,j+1)>mean_pos(i))
-              zc(j) = 1;
-          end
+    mean_pos  =mean_positions(i);
+    
+    zc = [];
+    for j = 2:n
+        if (stim(i,j-1)<=mean_pos && stim(i,j)>=mean_pos && stim(i,j+1)>mean_pos)
+            zc(j) = 1;
         end
-        [~,locs ]= find(zc==1); 
+    end
+    [~,locs ]= find(zc==1);
+    
+    %     figure; plot(stim(i,:));hold on; plot(locs, stim(i,locs), 'rx'); yline(mean_pos); hold off;
 
-%         A1 =  subplot(2,1,1); plot(stim(i,:));hold on; plot(locs, stim(i,locs), 'rx'); yline(mean_pos(i)); hold off;
+    for k= 2:length(locs)
+        
+        
+        stim_clips = stim(i, locs(k-1):locs(k));% figure(); subplot(2,1,1); plot(stim_clips) ;
+        resp_clips = resp(i, locs(k-1):locs(k)); %subplot(2,1,2); plot(resp_clips);
+        raster_clips = raster(i, locs(k-1):locs(k));
+        [~,peak_ind] = max(stim_clips);
+        if period > 0.2
 
-        stim_clips = [];
-        resp_clips = [];
-        freq = 1 ./ ((diff(locs) / fs));
-    %     figure(); plot(stim_freq);
-        if mod(length(freq),2)==0
-            L=length(freq)-1;
+            [r,lags] = xcorr((stim_clips-mean(stim_clips)), (resp_clips-mean(resp_clips)),'coeff');
+            %         figure; stem(lags,r);
+            [~,ind] = max(r);
+            time_lag = lags(ind)/fs;
+            phase(count) = time_lag*2*pi/period;
+            
+            gain(count) = (max(resp_clips)-mean(resp_clips))/(max(stim_clips)-mean(stim_clips));
+            
+            count = count + 1;
+            
         else
-            L=length(freq);
+            %             figure; plot(stim_clips);
+            %             figure; plot(raster_clips);
+            
+            ind = find(raster_clips == 1);
+            
+            if length(ind)>=1
+%                 phase(count) = get_spike_phase(ind(1), fs, period);
+                phase(count) = (ind(1)/fs)*((2*pi)/period);
+                
+                gain(count) = sqrt(cos(((2*pi*(ind(1)-peak_ind)/fs)/period)^2)+sin(((2*pi*(ind(1)-peak_ind)/fs)/period)^2));
+                count = count+1;
+                
+            end
         end
-        
-        stim_freq(i,:) = sgolayfilt(freq, 1,L);
-    %     figure(); plot(stim_freq);
-        for k= 2:length(locs)
-             stim_clips = stim(i,locs(k-1):locs(k)); %figure(); subplot(2,1,1); plot(stim_clips) ;
-             resp_clips = resp(i, locs(k-1):locs(k));% subplot(2,1,2); plot(resp_clips);
+    end
+end
+% figure;
+% polarscatter(phase, gain);
+% title("sin" + string(1/period));
 
-             %stim_freq(k-1) = fft_stim(stim_clips, fs, length(stim_clips));
-             max_FR(i, k-1) = max(resp_clips);
-
-             [r(i,k-1,:),lags(i,k-1,:)] = xcorr(stim_clips(k-1,:)- mean(stim_clips(k-1,:)), resp_clips(k-1,:)-mean(resp_clips(k-1,:)), 'coeff');
-            [~, ind] = max(r(i,k-1,:));
-
-
-            time_lag = abs(lags(i,k-1,ind))/fs;
-            phase_lag = (time_lag/period)*360; %in degrees
-
-            gain = (max(resp_clips)-min(resp_clips))/(max(stim_clips)-min(stim_clips));
-
-
-
-%             figure();
-            polarscatter(phase_lag, gain);hold on;
-
-        end
-
-        
-%         title('Useless plot');
 end

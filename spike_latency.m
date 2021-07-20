@@ -1,9 +1,9 @@
-function [latency, mean_latency] = spike_latency(stimulus,raster_data,ON_dur,OFF_dur,fs, trials)
+function latency = spike_latency(stimulus,raster_data,start_stim, stop_stim,fs, trials)
 %SPIKE_LATENCY Summary of this function goes here
 %   Detailed explanation goes here
-    stim = stimulus(:, OFF_dur*fs:(OFF_dur+ON_dur)*fs);
-    resp = raster_data(:, OFF_dur*fs:(OFF_dur+ON_dur)*fs);
-    stim_SD = std(stim(1,1:(OFF_dur)*fs));
+    stim = stimulus(:, start_stim : stop_stim);
+    resp = raster_data(:, start_stim : stop_stim);
+    stim_SD = std(stim(1,1:start_stim));
     
 %     [m,~] = size(stim);
     
@@ -13,7 +13,7 @@ function [latency, mean_latency] = spike_latency(stimulus,raster_data,ON_dur,OFF
         
         stim_on_loc = stim_on(1);
         spike_locs = (find(resp(i,:)==1));
-        if length(spike_locs)==0
+        if isempty(spike_locs)
             continue;
         end
         

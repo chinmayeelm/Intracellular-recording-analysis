@@ -1,86 +1,143 @@
-function [cov_matrix, ev1, ev2] = cov_analysis(raster_data, stimulus, window, fs)
+function [ev1, ev2] = cov_analysis(raster, antennal_movement, window, fs,start_stim,stop_stim)
 
-    [m,~] = size(raster_data);
-    all_spike_triggers = [];
-    for i=1
-        spike_locs = find(raster_data(i,:)==1);
-        if isempty(spike_locs)
-            continue;
-        end
-        for j=1:100 %length(spike_locs)
-            if (spike_locs(j)-window*fs)<= 0 
-                continue;
-            end
-            spike_triggers(j,:) = stimulus(i,(spike_locs(j)-window*fs):spike_locs(j));
-            spike_triggers(j,:) = spike_triggers(j,:)-mean(spike_triggers(j,:));
- 
-        end
+    % function [cov_matrix, ev1, ev2] = cov_analysis(raster_data, stimulus, window, fs)
+% 
+raster_data = raster(:,start_stim:stop_stim);
+stimulus = antennal_movement(:,start_stim:stop_stim);
+window = 0.04;
 
-        all_spike_triggers = [all_spike_triggers; spike_triggers];
 
+[m,~] = size(raster_data);
+STA_freq = [];
+all_spike_triggers = [];
+for i=1:m
+    spike_locs = find(raster_data(i,:)==1);
+    if isempty(spike_locs)
+        continue;
     end
-    pattern_length = window*fs+1;
-    stimulus_prior = reshape(stimulus(1,1:100*pattern_length), [100,pattern_length]);
-    size(stimulus_prior)
-    size(all_spike_triggers)
-    nsp = size(all_spike_triggers,1); %number of spikes or no. of stimulus patterns
-    STA = mean(all_spike_triggers,1);
-    size(STA)
-    
-%     cov_matrix = (1/(length(all_spike_triggers)-1)).*((all_spike_triggers-STA)'*(all_spike_triggers-STA));
-%     cov_matrix = (1/(length(all_spike_triggers)-1)).*(all_spike_triggers*all_spike_triggers');
-    
-    cov_matrix = cov((all_spike_triggers'-STA'));
-    figure;
-    heatmap(flip(cov_matrix,2), 'Colormap', jet);
-    title('Covariance matrix using the formula');
-    ylabel('spike triggering stimulus pattern');
-    xlabel('spike triggering stimulus pattern');
-%     figure;
-%     heatmap(flip(cov_matrix_direct,2), 'Colormap', jet);
-%     title('Covariance matrix using "cov" command');
-%     ylabel('spike triggering stimulus pattern');
-%     xlabel('spike triggering stimulus pattern');
-    
-%     figure;
-%     heatmap(flip(cov_matrix-cov_matrix_direct,2));
+    for j=1:length(spike_locs)
+        if (spike_locs(j)-window*fs)>= 0
+            
+            spike_triggers = stimulus(1,(spike_locs(j)-window*fs):spike_locs(j));
+            all_spike_triggers = [all_spike_triggers; spike_triggers];
+        end
+    end
 
-%     size(cov_matrix)
+end
 
-%     stimulus_covariance = (1/(length(stimulus_prior)-1)).*((stimulus_prior)'*(stimulus_prior));
-    stimulus_covariance = cov(stimulus_prior');
-    figure;
-    heatmap(flip(stimulus_covariance,2), 'Colormap', jet);
-    title('Stimulus covariance using the formula');
-    ylabel('stimulus pattern');
-    xlabel('stimulus pattern');
-    
-    diff_cov = cov_matrix - stimulus_covariance;
-    figure;
-    heatmap(flip(cov_matrix,2), 'Colormap', jet);
-    title('STC-C');
-%     ylabel('spike triggering stimulus pattern');
-%     xlabel('spike triggering stimulus pattern');
-    
-    [V,D] = eig(diff_cov);
-    
-    [d, ind] = sort(diag(D));
-    
-    D_sorted = D(ind, ind);
-    
-    V_sorted = V(:,ind);
-    
-    ev1 = V_sorted(1,:);
-    ev2 = V_sorted(2,:);
-    ev_last = V_sorted(end,:);
-    size(V_sorted)
-    
-    figure;
-    t = linspace(-window*1000, 0,length(ev1));
-    plot(t, V_sorted(1:2,:));
-%     plot(t, ev1, t, ev2, t, ev_last);
-%     plot(ev1);
-%     figure; plot(t,ev2);
+
+
+STA = mean(all_spike_triggers,1);
+% t= linspace(-window*1000, 0, length(STA));
+% figure;
+% plot(t, STA);
+% title('Spike Triggered Average');
+% xlabel('Time before spike (ms)');
+% ylabel('Antennal movement');
+% ax = gca;
+% ax.Box = "off";
+
+
+% cov_matrix = cov((all_spike_triggers-STA)');
+nspikes = size(all_spike_triggers,1);
+cov_matrix = (1/(nspikes -1))*(all_spike_triggers-STA)'*(all_spike_triggers-STA);
+
+figure;
+
+h = heatmap((cov_matrix), 'Colormap', parula);
+h.YDisplayData = flipud(h.YDisplayData);
+h.GridVisible = "off";
+Labels = linspace(-window*1e3,0,length(cov_matrix));
+CustomLabels = string(Labels);
+CustomLabels(mod(Labels,10) ~= 0) = " ";
+h.XDisplayLabels = CustomLabels;
+h.YDisplayLabels = flip(CustomLabels);
+title("Spike Triggered Covariance (STC)");
+
+pattern_length = size(all_spike_triggers,2);
+m = size(all_spike_triggers,1);
+stimulus_prior = zeros([m pattern_length]);
+r = randi([1 (length(stimulus)-pattern_length)],1,m);
+for j=1:m
+    stimulus_prior(j,:) = stimulus(randperm(size(stimulus,1),1),r(j):r(j)+pattern_length-1);
+end
+
+avg_stim = mean(stimulus_prior,1);
+% stim_prior_cov = cov(stimulus_prior);
+stim_prior_cov = (1/(m -1))*(stimulus_prior-avg_stim)'*(stimulus_prior-avg_stim);
+figure;
+h = heatmap((stim_prior_cov), 'Colormap', parula);
+h.YDisplayData = flipud(h.YDisplayData);
+h.GridVisible = "off";
+Labels = linspace(-window*1e3,0,length(cov_matrix));
+CustomLabels = string(Labels);
+CustomLabels(mod(Labels,10) ~= 0) = " ";
+h.XDisplayLabels = CustomLabels;
+h.YDisplayLabels = flip(CustomLabels);
+title("Random stimulus prior");
+
+
+diff_cov = (cov_matrix - stim_prior_cov) ; 
+figure;
+h = heatmap(diff_cov, 'Colormap', parula);
+h.YDisplayData = flipud(h.YDisplayData);
+h.GridVisible = "off";
+Labels = linspace(-window*1e3,0,length(cov_matrix));
+CustomLabels = string(Labels);
+CustomLabels(mod(Labels,10) ~= 0) = " ";
+h.XDisplayLabels = CustomLabels;
+h.YDisplayLabels = flip(CustomLabels);
+title("STC-C");
+
+
+[V,D,W] = eig(diff_cov);
+
+[~, ind] = sort(diag(D), 'descend');
+Ds = D(ind,ind);
+Vs = V(:,ind);
+Ws = W(:,ind);
+
+ev1 = Vs(:,1);
+ev2 = Vs(:,2);
+
+figure;
+plot(diag(Ds), '.')
+title('Eigen values');
+ylabel('Eigen values');
+xlabel('Index');
+ax = gca;
+ax.Box = "off";
+
+
+t= linspace(-window*1000, 0, length(STA));
+
+diag_Ds = diag(Ds);
+plot(t, Vs(:,1:2));
+ax = gca;
+ax.YAxis.Visible = 'off'
+ax.Box = 'off';
+title('Eigen vectors of STC-C');
+xlabel('Time before spike (ms)');
+% ylabel('Antennal movement');
+
+
+
+
+[U,S,W] = svd(diff_cov, 'econ');
+D_svd = diag(S);
+
+figure;
+plot(t, W(:,1:2));
+% title('Eigen vectors of diff cov by SVD');
+ax = gca;
+ax.YAxis.Visible = 'off'
+ax.Box = 'off';
+xlabel('Time before spike (ms)');
+title ('Eigen vectors by SVD');
+
+% figure;
+% plot(t, U(:,1).*D(1).*W(1,:)', t, U(:,2).*D(2).*W(2,:)');
+
 end
 
 
