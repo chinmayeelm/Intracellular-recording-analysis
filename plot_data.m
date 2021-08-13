@@ -8,19 +8,15 @@ function plot_data(single_trial_length,no_of_protocols, fs, time, filename,  P)
         
         fig = figure(i+1);
         [p,l] = findpeaks(P(i).rec(1,:), "MinPeakHeight",0.2*max(P(i).rec(1,:)));
-        A1 = subplot(4,1,1); plot(time(1:single_trial_length), P(i).rec(1, :),'LineWidth', 0.01, 'Color', 'k'); %#0072BD');
+        A1 = subplot(4,1,2); plot(time(1:single_trial_length), P(i).rec(1, :),'LineWidth', 0.01, 'Color', 'k'); %#0072BD');
         hold on; plot(l/fs, p, '.', 'MarkerEdgeColor', 'r'); %'#A2142F');
         hold off;
         A1.Box = 'off';
         A1.XAxis.Visible = 'off';
         ylabel('Voltage (mV)');
-        if (P(i).stim_name == "sin" || P(i).stim_name == "sqr" || P(i).stim_name == "sum_sine")
-            title((join(split(P(i).stim_name,"_")," ")) +" Hz");
-        else
-            title((join(split(P(i).stim_name,"_"))));
-        end
         
-        A2 = subplot(4,1,2);
+        
+        A2 = subplot(4,1,3);
         
         k = 0.5;
         for j = 1:P(i).complete_trials
@@ -36,21 +32,28 @@ function plot_data(single_trial_length,no_of_protocols, fs, time, filename,  P)
         A2.XAxis.Visible = 'off';
             
 %         A3 = subplot(4,1,3); plot(time(1:single_trial_length), P(i).norm_gcfr, 'Color', [0.2,0.3,0.49]);
-        A3 = subplot(4,1,3); [lineOut, ~] = stdshade(P(i).norm_gcfr,0.6,[0.4660 0.6740 0.1880],time(1:single_trial_length));
+        A3 = subplot(4,1,4); [lineOut, ~] = stdshade(P(i).norm_gcfr,0.6,[0.4660 0.6740 0.1880],time(1:single_trial_length));
         lineOut.LineWidth  = 0.05;
         ylabel('Normalised GCFR');
+        xlabel('time(s)');
         A3.Box = 'off';
         A3.XAxis.Visible = 'off';
         
         
-        A4 = subplot(4,1,4); %plot(time(1:single_trial_length), mean(P(i).antennal_movement), 'Color', [0.6, 0.2,0]);
+        A4 = subplot(4,1,1); %plot(time(1:single_trial_length), mean(P(i).antennal_movement), 'Color', [0.6, 0.2,0]);
         [lineOut, ~] = stdshade(P(i).antennal_movement,0.6,[0.6, 0.2,0],time(1:single_trial_length));
         lineOut.LineWidth = 0.05;
         A4.Box = 'off';
         
 %         ylabel('Indenter feedback voltage');
         ylabel('Antennal movement (mm)');
-        xlabel('time(s)');
+        
+        
+        if (P(i).stim_name == "sin" || P(i).stim_name == "sqr" || P(i).stim_name == "sum_sine")
+            title((join(split(P(i).stim_name,"_")," ")) +" Hz");
+        else
+            title((join(split(P(i).stim_name,"_"))));
+        end
         
         linkaxes([A1,A2,A3,A4], 'x');
     

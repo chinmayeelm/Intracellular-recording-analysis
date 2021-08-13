@@ -7,9 +7,9 @@ function [power_fft, frq_fft] = fft_stim(stim_matrix, Fs, N)
 
 %     figure;
 %     plot(f,abs(stim_fft)/L); hold on;
-
+% 
 %     xlabel('Frequency (in hertz)');
-%     title('Magnitude Response');
+%     ylabel('Response magnitude');
 %     xlim ([0 350]);
     
    

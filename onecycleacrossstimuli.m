@@ -1,4 +1,4 @@
-ON_dur = 10;
+ON_dur = 20;
 OFF_dur = 5;
 fs = 10000;
 % idx = 17;
@@ -55,7 +55,7 @@ for z=1:5
             %                          A2 = subplot(2,1,2); plot(stim);
             ylabel 'Antennal movement'
             xlabel 'time (s)'
-            
+            xlim([0 10]);
             linkaxes([A1,A2],'x');
             
             continue
@@ -72,6 +72,7 @@ for z=1:5
         A2 = subplot(2,1,2); plot(t, stim_clips(1,:)); hold on;
         ylabel 'Antennal movement'
         xlabel 'time (s)'
+        xlim([0 10]);
         %              fig_name = sprintf('P_27_01_%0.0001fs',P.stim_period(idx))
         %                      within_trial_cycle = within_trial_cycle +1;
         linkaxes([A1,A2],'x');

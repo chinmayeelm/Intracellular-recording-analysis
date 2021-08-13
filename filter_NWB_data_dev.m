@@ -11,7 +11,7 @@
 % impulse_meta_num = 1;
 
 clip_data_flag = 0;
-for LUT_intra_row_idx = 7
+for LUT_intra_row_idx = 65
     
     
     LUT_intra_row_idx
@@ -188,19 +188,19 @@ for LUT_intra_row_idx = 7
     
     % Plot data
     
-    %     plot_data(single_trial_length,no_of_protocols, fs, time, filename,  P);
+%     plot_data(single_trial_length,no_of_protocols, fs, time, filename,  P);
     
     
     % Phase plot
     
     
-    for i=1:no_of_protocols
+    for i=2:no_of_protocols
         %     P(i).crossings = zc(i,:);
         if P(i).stim_type == "sin" %|| P(i).stim_type == "amp"
-            [gain, phase] = phase_plot(P(i).antennal_movement,P(i).norm_gcfr, P(i).raster, start_stim, stop_stim, fs, P(i).stim_period);
+            [corr_coeff, vs, phase] = phase_plot(P(i).antennal_movement,P(i).norm_gcfr, P(i).raster, start_stim, stop_stim, fs, P(i).stim_period);
             
             P(i).phase = phase;
-            P(i).gain = gain;
+            P(i).vs = vs;
         end
     end
     
@@ -209,21 +209,22 @@ for LUT_intra_row_idx = 7
         if P(i).stim_type == "amp"
             
             
-            [I_spike_phase, II_spike_phase, III_spike_phase, I_spike_amp, II_spike_amp, III_spike_amp] = spike_phase(P(i).antennal_movement(1,:), P(i).raster(1,:), fs, start_stim, stop_stim, P(i).stim_type);
-            %             figure(); scatter(I_spike_amp,I_spike_phase,100, '.k'); hold on;
-            %             %             pmin = min(I_spike_phase);
-            %             %             pmax = max(III_spike_phase);
-            %             %             yticks(pmin:pmax);
-            %             %             yticklabels(string(pmin:pmax)+'\pi');
-            %             %             ylim([0 pi/2]);
-            %             %             yticks(0:pi/4:pi/2);
-            %             %             yticklabels({'0','1/4 \pi','1/2 \pi'});
-            %             scatter(II_spike_amp,II_spike_phase, 100,  'b.');
-            %             scatter(III_spike_amp,III_spike_phase, 100, 'r.')
-            %             ylabel('Spike phase (rad)');
-            %             xlabel('Stimulus amplitude (mm)');
-            %             box off;
-            %             legend('I spike','II spike', 'III spike', 'Location', 'best');
+            [I_spike_phase, II_spike_phase, III_spike_phase, I_spike_amp, II_spike_amp, III_spike_amp] = spike_phase(P(i).antennal_movement(1,:), P(i).raster(1,:), fs, start_stim, stop_stim, P(i).stim_type, 1/P(i).stim_period);
+            figure(); scatter(I_spike_amp,I_spike_phase,100, '.k'); hold on;
+            pmin = min([I_spike_phase II_spike_phase III_spike_phase]);
+            pmax = max([I_spike_phase II_spike_phase III_spike_phase]);
+            pimin = floor(pmin/pi);
+            pimax = ceil(pmax/pi);
+            ylim([pimin pimax]);
+            yticks(pimin:pimax/4:pimax)
+            yticklabels( string(pimin:pimax/4:pimax) + "\pi" )
+            scatter(II_spike_amp,II_spike_phase, 100,  'b.');
+            scatter(III_spike_amp,III_spike_phase, 100, 'r.');
+            title('Amplitude sweep');
+            ylabel('Spike phase (rad)');
+            xlabel('Stimulus amplitude (mm)');
+            box off;
+            legend('I spike','II spike', 'III spike', 'Location', 'best');
             
             P(i).I_spike = [I_spike_amp', I_spike_phase'];
             P(i).II_spike = [II_spike_amp', II_spike_phase'];
@@ -233,19 +234,25 @@ for LUT_intra_row_idx = 7
     % GCFR Vs frequency and spike phase Vs Frequency
     
     for i = 1:no_of_protocols
-        if P(i).stim_type == "frq" || P(i).stim_type =="dec"
+        if P(i).stim_type == "frq" % || P(i).stim_type =="dec"
             
-            
-            [I_spike_phase, II_spike_phase, III_spike_phase, I_spike_freq, II_spike_freq, III_spike_freq] = spike_phase(P(i).antennal_movement(1,:), P(i).raster(1,:), fs, start_stim, stop_stim, P(i).stim_type);
-            %             figure(); scatter(I_spike_freq,I_spike_phase,100, '.k'); hold on;
-            %             yticks(0:pi/2:2*pi);
-            %             yticklabels({'0','1/2 \pi', '\pi','3/2 \pi', '2\pi'});
-            %             scatter(II_spike_freq,II_spike_phase, 100,  'b.');
-            %             scatter(III_spike_freq,III_spike_phase, 100, 'r.')
-            %             ylabel('Spike phase (rad)');
-            %             xlabel('Stimulus frequency (Hz)');
-            %             box off;
-            %             legend('I spike','II spike', 'III spike', 'Location', 'best');
+            P(i).inc_frq_chirp_f = linspace(1,max_chirp_frq,ON_dur*fs+1);
+            [I_spike_phase, II_spike_phase, III_spike_phase, I_spike_freq, II_spike_freq, III_spike_freq] = spike_phase(P(i).antennal_movement(1,:), P(i).raster(1,:), fs, start_stim, stop_stim, P(i).stim_type, P(i).inc_frq_chirp_f);
+            figure(); scatter(I_spike_freq,I_spike_phase,100, '.k'); hold on;
+            pmin = min([I_spike_phase II_spike_phase III_spike_phase]);
+            pmax = max([I_spike_phase II_spike_phase III_spike_phase]);
+            pimin = floor(pmin/pi);
+            pimax = ceil(pmax/pi);
+            ylim([pimin pimax]);
+            yticks(pimin:pimax/4:pimax)
+            yticklabels( string(pimin:pimax/4:pimax) + "\pi" )
+            scatter(II_spike_freq,II_spike_phase, 100,  'b.');
+            scatter(III_spike_freq,III_spike_phase, 100, 'r.');
+            title('Frequency chirp');
+            ylabel('Spike phase (rad)');
+            xlabel('Stimulus frequency (Hz)');
+            box off;
+            legend('I spike','II spike', 'III spike', 'Location', 'best');
         end
         
         if P(i).stim_type == "frq"
@@ -254,28 +261,28 @@ for LUT_intra_row_idx = 7
             P(i).II_spike = [II_spike_freq', II_spike_phase'];
             P(i).III_spike = [III_spike_freq', III_spike_phase'];
             
-            %             P(i).inc_frq_chirp_f = linspace(1,max_chirp_frq,ON_dur*fs+1);
-            %             figure;
-            %             [lineOut, ~] = stdshade(P(i).norm_gcfr(:,start_stim:stop_stim),0.2,'k',P(i).inc_frq_chirp_f);
-            %             lineOut.LineWidth  = 0.01;
-            %             ylabel 'Normalised GCFR';
-            %             xlabel 'Frequency (Hz)';
-            %             title ('Response to increasing frequency chirp');
-            %             box off;
+            P(i).inc_frq_chirp_f = linspace(1,max_chirp_frq,ON_dur*fs+1);
+            figure;
+            [lineOut, ~] = stdshade(P(i).norm_gcfr(:,start_stim:stop_stim),0.2,'k',P(i).inc_frq_chirp_f);
+            lineOut.LineWidth  = 0.01;
+            ylabel 'GCFR';
+            xlabel 'Frequency (Hz)';
+            title ('Response to increasing frequency chirp');
+            box off;
             
         elseif P(i).stim_type == "dec"
             P(i).dec_frq_chirp_f = linspace(max_chirp_frq,1,ON_dur*fs+1);
             
             %             hold on;
-            %             figure;
-            %             [lineOut, ~] = stdshade(P(i).norm_gcfr(:,start_stim:stop_stim),0.2,'k',fliplr(P(i).dec_frq_chirp_f));
-            %             lineOut.LineWidth  = 0.05;
-            %             ax = gca;
-            %             ax.XTickLabel = flipud(ax.XTickLabel);
-            %             ylabel 'Normalised GCFR';
-            %             xlabel 'Frequency (Hz)';
-            %             box off;
-            %             title ('Response to decreasing frequency chirp');
+            figure;
+            [lineOut, ~] = stdshade(P(i).gcfr(:,start_stim:stop_stim),0.2,'k',fliplr(P(i).dec_frq_chirp_f));
+            lineOut.LineWidth  = 0.05;
+            ax = gca;
+            ax.XTickLabel = flipud(ax.XTickLabel);
+            ylabel 'GCFR';
+            xlabel 'Frequency (Hz)';
+            box off;
+            title ('Response to decreasing frequency chirp');
             
             P(i).dec_chirp_I_spike = [I_spike_freq', I_spike_phase'];
             P(i).dec_chirp_II_spike = [II_spike_freq', II_spike_phase'];
@@ -289,12 +296,23 @@ for LUT_intra_row_idx = 7
     % STA of Band limited white Gaussian Noise
     
     for i = 1:no_of_protocols
-        if P(i).stim_type == "blwgn"
+        if P(i).stim_type == "blwgn" || P(i).stim_type == "frq"
             STA_window = 0.1;
             [~, power_fft, frq_fft, STA]  = STA_analysis(P(i).raster, P(i).antennal_movement, STA_window, fs,start_stim, stop_stim);
             P(i).power_fft = power_fft;
             P(i).frq_fft = frq_fft;
             P(i).STA = STA;
+            
+            figure;
+            plot(frq_fft, power_fft);
+            xlabel('Frequency (in hertz)');
+            ylabel('Response magnitude');
+            title(join(split(P(i).stim_name,'_')," "));
+            xlim([0 350]);
+            
+%             figure; plot(STA);
+%             figur
+           
         end
     end
     
@@ -322,57 +340,57 @@ for LUT_intra_row_idx = 7
         
     end
     
-%     mean_spike_latency = mean(extractfield(P, 'latencies'));
-%     spike_latency_SD = std(extractfield(P, 'latencies'));
-%     spike_latency_var = var(extractfield(P, 'latencies'));
+    %     mean_spike_latency = mean(extractfield(P, 'latencies'));
+    %     spike_latency_SD = std(extractfield(P, 'latencies'));
+    %     spike_latency_var = var(extractfield(P, 'latencies'));
     
     
     
-end    
-    %% Write structure to another structure
-    
-    % meta_struct(struct_num).moth = P;
-    % % amp_sweep(struct_num) = P(1);
-    % % blwgn(struct_num) = P(2);
-    % dec_frq_chirp(struct_num) = P;
-    % inc_frq_chirp(struct_num) = P;
-    % % T_sqr_27_01(struct_num,:) = struct2table(P, 'AsArray', true);
-    % struct_num = struct_num+1;
+end
+%% Write structure to another structure
 
-    for i = 1:length(P)
-        try
-            if P(i).stim_type == "frq" || P(i).stim_type == "dec"
-                chirp_meta_struct(chirp_meta_num).moth = P(i);
-                chirp_meta_num = chirp_meta_num+1;
+% meta_struct(struct_num).moth = P;
+% % amp_sweep(struct_num) = P(1);
+% % blwgn(struct_num) = P(2);
+% dec_frq_chirp(struct_num) = P;
+% inc_frq_chirp(struct_num) = P;
+% % T_sqr_27_01(struct_num,:) = struct2table(P, 'AsArray', true);
+% struct_num = struct_num+1;
 
-            elseif P(i).stim_type == "amp"
-                ampsweep_meta_struct(ampsweep_meta_num).moth = P(i);
-                ampsweep_meta_num = ampsweep_meta_num+1;
-
-            elseif P(i).stim_type == "blwgn" || P(i).stim_type == "blwgn2"
-                blwgn_meta_struct(blwgn_meta_num).moth = P(i);
-                blwgn_meta_num = blwgn_meta_num+1;
-
-            elseif P(i).stim_type == "sin" || P(i).stim_type == "sum"
-                sin_meta_struct(sin_meta_num).moth = P(i);
-                sin_meta_num = sin_meta_num +1;
-
-            elseif P(i).stim_type == "sqr" || P(i).stim_type == "step"
-                sqr_meta_struct(sqr_meta_num).moth = P(i);
-                sqr_meta_num = sqr_meta_num+1;
-
-            elseif (P(i).stim_type == "impulse")
-                impulse_meta_struct(impulse_meta_num).moth = P(i);
-                impulse_meta_num = impulse_meta_num + 1;
-
-            else
-                continue;
-
-            end
-        catch
-            disp("failed to add recording: " + string(LUT_intra_row_idx));
+for i = 1:length(P)
+    try
+        if P(i).stim_type == "frq" || P(i).stim_type == "dec"
+            chirp_meta_struct(chirp_meta_num).moth = P(i);
+            chirp_meta_num = chirp_meta_num+1;
+            
+        elseif P(i).stim_type == "amp"
+            ampsweep_meta_struct(ampsweep_meta_num).moth = P(i);
+            ampsweep_meta_num = ampsweep_meta_num+1;
+            
+        elseif P(i).stim_type == "blwgn" || P(i).stim_type == "blwgn2"
+            blwgn_meta_struct(blwgn_meta_num).moth = P(i);
+            blwgn_meta_num = blwgn_meta_num+1;
+            
+        elseif P(i).stim_type == "sin" || P(i).stim_type == "sum"
+            sin_meta_struct(sin_meta_num).moth = P(i);
+            sin_meta_num = sin_meta_num +1;
+            
+        elseif P(i).stim_type == "sqr" || P(i).stim_type == "step"
+            sqr_meta_struct(sqr_meta_num).moth = P(i);
+            sqr_meta_num = sqr_meta_num+1;
+            
+        elseif (P(i).stim_type == "impulse")
+            impulse_meta_struct(impulse_meta_num).moth = P(i);
+            impulse_meta_num = impulse_meta_num + 1;
+            
+        else
             continue;
+            
         end
+    catch
+        disp("failed to add recording: " + string(LUT_intra_row_idx));
+        continue;
     end
-    
+end
+
 % end
