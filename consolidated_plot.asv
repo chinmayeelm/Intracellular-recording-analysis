@@ -3,11 +3,8 @@ function fig_handle = consolidated_plot(time, filtered_data_bp, hes_data, stim_f
     
     [p,l] = findpeaks(100*filtered_data_bp, "MinPeakHeight",0.25*max(100*filtered_data_bp));
     [p1,l1] = findpeaks(100*filtered_data_bp, "MinPeakHeight",0.1*max(100*filtered_data_bp));
-    p_small = setxor(p,p1);
-    l_small = setxor(l,l1);
     subplot(3,1,1);plot(time, filtered_data_bp*100, 'k');
     hold on; plot(l/fs, p, '.', 'MarkerEdgeColor', 'r');
-    plot(l_small/fs, p_small, '.', 'MarkerEdgeColor', 'b');
     
     A1 = gca;
     title('Response to antennal movement')

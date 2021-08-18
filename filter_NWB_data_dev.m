@@ -11,7 +11,7 @@
 % impulse_meta_num = 1;
 
 clip_data_flag = 0;
-for LUT_intra_row_idx = 65
+for LUT_intra_row_idx = 6
     
     
     LUT_intra_row_idx
@@ -127,7 +127,8 @@ for LUT_intra_row_idx = 65
     
     %
     
-    %     fig_handle = consolidated_plot(time, filtered_data_bp, hes_data, stim_fb);
+%     fig_handle = consolidated_plot(time, filtered_data_bp, hes_data, stim_fb, fs);
+    
     %     pause;
     %
     % Run this if the stimulus was randomised
@@ -189,8 +190,9 @@ for LUT_intra_row_idx = 65
     % Plot data
     
 %     plot_data(single_trial_length,no_of_protocols, fs, time, filename,  P);
-    
-    
+
+%     pause;
+%    
     % Phase plot
     
     
@@ -234,7 +236,7 @@ for LUT_intra_row_idx = 65
     % GCFR Vs frequency and spike phase Vs Frequency
     
     for i = 1:no_of_protocols
-        if P(i).stim_type == "frq" % || P(i).stim_type =="dec"
+        if P(i).stim_type == "frq"  %|| P(i).stim_type =="dec"
             
             P(i).inc_frq_chirp_f = linspace(1,max_chirp_frq,ON_dur*fs+1);
             [I_spike_phase, II_spike_phase, III_spike_phase, I_spike_freq, II_spike_freq, III_spike_freq] = spike_phase(P(i).antennal_movement(1,:), P(i).raster(1,:), fs, start_stim, stop_stim, P(i).stim_type, P(i).inc_frq_chirp_f);
@@ -296,19 +298,19 @@ for LUT_intra_row_idx = 65
     % STA of Band limited white Gaussian Noise
     
     for i = 1:no_of_protocols
-        if P(i).stim_type == "blwgn" || P(i).stim_type == "frq"
+        if P(i).stim_type == "blwgn"% || P(i).stim_type == "frq"
             STA_window = 0.1;
             [~, power_fft, frq_fft, STA]  = STA_analysis(P(i).raster, P(i).antennal_movement, STA_window, fs,start_stim, stop_stim);
             P(i).power_fft = power_fft;
             P(i).frq_fft = frq_fft;
             P(i).STA = STA;
             
-            figure;
-            plot(frq_fft, power_fft);
-            xlabel('Frequency (in hertz)');
-            ylabel('Response magnitude');
-            title(join(split(P(i).stim_name,'_')," "));
-            xlim([0 350]);
+%             figure;
+%             plot(frq_fft, power_fft);
+%             xlabel('Frequency (in hertz)');
+%             ylabel('Response magnitude');
+%             title(join(split(P(i).stim_name,'_')," "));
+%             xlim([0 350]);
             
 %             figure; plot(STA);
 %             figur

@@ -38,7 +38,7 @@ for k= 2:length(locs)
 %     plot(stim_clips); hold on; plot(ind(1), stim_clips(ind(1)), 'rx');
     
     
-    if stim_type == "frq"
+    if stim_type == "frq" %|| stim_type == "dec"
         
 %         stim_freq = 1 ./ (diff(locs) / fs);
 %         stim_freq = sgolayfilt(stim_freq, 1,71);

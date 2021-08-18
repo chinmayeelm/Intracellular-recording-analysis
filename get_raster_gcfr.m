@@ -9,7 +9,7 @@ function [raster_data,avg_gcfr,no_of_true_trials, gcfr]   = get_raster_gcfr(no_o
         gauss_win = gausswin(L, alpha); %29.3 ms
         for i=1:no_of_trials
 %             p=[]; l=[];
-            [p,l] =  findpeaks(P_rec(i,:), "MinPeakHeight",0.2*max(P_rec(i,:)));
+            [p,l] =  findpeaks(P_rec(i,:), "MinPeakHeight",0.25*max(P_rec(i,:)));
             spike_amp= p;
             ISI = diff(l)./10000;
 %             plot(spike_amp(2:end),ISI, '.'); hold on;
@@ -24,7 +24,7 @@ function [raster_data,avg_gcfr,no_of_true_trials, gcfr]   = get_raster_gcfr(no_o
 %             xlabel 'Trial No.';
 %             ylim([0 1]);
 %             xlim([0 47]);
-            if mode(p)<3 
+            if mode(p)<5 %3 
                 disp("mode(p)="); disp(mode(p));
                 disp("min(rec)="); disp(min(P_rec(i,:)));
 %                 disp("p="); disp(p);
