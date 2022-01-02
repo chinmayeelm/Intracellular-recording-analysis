@@ -17,16 +17,16 @@ function [stim_freq, power_fft, frq_fft] = fft_stim_(stim_matrix, Fs, L)
 %         length(P1(2:end-1))
 
        
-        f = Fs*(0:(L/2))/L;
-%         f = f(2:end-1);
-        length(f)
+        f = Fs*(0:floor(L/2))/L;
+        f = f(2:end-1);
+        length(f);
 %         figure();
 %         plot(f,P1(2:end-1)); hold on;
-        plot(f,P1); %hold on;
-        title('Tuning curve')
-        xlabel('f (Hz)')
-        ylabel('|P1(f)|')
-        xlim([0 350]);
+%         plot(f,P1); %hold on;
+%         title('Tuning curve')
+%         xlabel('f (Hz)')
+%         ylabel('|P1(f)|')
+%         xlim([0 350]);
 
 %         [~,loc] = max(P1(2:end-1));
         [~,loc] = max(P1);

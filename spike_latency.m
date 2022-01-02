@@ -3,7 +3,7 @@ function latency = spike_latency(stimulus,raster_data,start_stim, stop_stim,fs, 
 %   Detailed explanation goes here
     stim = stimulus(:, start_stim : stop_stim);
     resp = raster_data(:, start_stim : stop_stim);
-    stim_SD = std(stim(1,1:start_stim));
+    stim_SD = std(stimulus(1,1:start_stim));
     
 %     [m,~] = size(stim);
     

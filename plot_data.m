@@ -37,7 +37,7 @@ function plot_data(single_trial_length,no_of_protocols, fs, time, filename,  P)
         ylabel('Normalised GCFR');
         xlabel('time(s)');
         A3.Box = 'off';
-        A3.XAxis.Visible = 'off';
+        A3.XAxis.Visible = 'on';
         
         
         A4 = subplot(4,1,1); %plot(time(1:single_trial_length), mean(P(i).antennal_movement), 'Color', [0.6, 0.2,0]);

@@ -16,7 +16,7 @@ function [STA_freq, power_fft, frq_fft,STA] = STA_analysis(raster, stim, window,
                 continue;
             end
             spike_triggers(j,:) = stimulus(i,(spike_locs(j)-window*fs):spike_locs(j));
-            spike_triggers(j,:) = spike_triggers(j,:)-mean(spike_triggers(j,:));
+            spike_triggers(j,:) = spike_triggers(j,:);
 %             plot(STA); hold on;
             
         end

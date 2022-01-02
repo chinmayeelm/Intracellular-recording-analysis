@@ -11,7 +11,9 @@
 % impulse_meta_num = 1;
 
 clip_data_flag = 0;
-for LUT_intra_row_idx = 6
+for LUT_intra_row_idx = 62
+    
+     
     
     
     LUT_intra_row_idx
@@ -20,7 +22,7 @@ for LUT_intra_row_idx = 6
     expt_date = LUT_intra.expt_date(LUT_intra_row_idx);
     filename = LUT_intra.filename(LUT_intra_row_idx);
     
-    % filename = "M1_N3_T5"; %change HES parameters if required.
+%     filename = "M3_N3_T3"; %change HES parameters if required.
     filename_str = sprintf("%s.nwb", filename);
     nwb_in = nwbRead(filename_str);
     
@@ -29,35 +31,37 @@ for LUT_intra_row_idx = 6
     data = rec.data.load;
     time = rec.timestamps.load;
     
+%     data = downsample(data,10);
+%     time = downsample(time,10);
     
-    %     p = nwb_in.general_stimulus.load;
-    % ON_dur = str2num(parameters(4));
-    % OFF_dur =str2num(parameters(5));
-    % no_of_trials = str2num(parameters(6));
-    %     fs = str2num(p(1));
+    %temporary parameters to check files not on LUT
+%     parameters = nwb_in.general_stimulus.load;
+%     ON_dur = str2num(parameters(3));
+%     OFF_dur =str2num(parameters(4));
+%     no_of_trials = str2num(parameters(5));
+%     fs = str2num(parameters(1));
+%     max_chirp_frq = 150;
+%     amp_sweep_frq = 5;
+%     blwgn_fc = 300; 
+    
+    
     row_name = strcat(string(expt_date), "_",filename);
     
-    parameters = LUT_intra(row_name,:);
-    
-    
+    parameters = LUT_intra(row_name,:);     
     ON_dur = parameters.ON_dur;
-    OFF_dur =parameters.OFF_dur;
+    OFF_dur = parameters.OFF_dur;
     no_of_trials = parameters.no_of_trials;
     fs = parameters.fs;
-    
     max_chirp_frq = parameters.max_chirp_frq;
     amp_sweep_frq = parameters.amp_sweep_frq;
     blwgn_fc = parameters.blwgn_fc;
     impulse_dur = ON_dur;
     
     
-    %     total_dur = length(data)/fs;
-    %     time = linspace(0,total_dur,length(data));
-    
     start_stim = OFF_dur*fs;
     stop_stim = (ON_dur+OFF_dur)*fs;
     
-    single_trial_length =start_stim + stop_stim+1;
+    single_trial_length = start_stim + stop_stim+1;
     
     
     % Run this if the order of the stimulus should be taken from a text file
@@ -66,7 +70,7 @@ for LUT_intra_row_idx = 6
     
     % Run this to take stimulus order from nwb file stimulus description
     
-    if parameters.stim_order == ""
+    if  parameters.stim_order == ""
         stim = nwb_in.stimulus_presentation.get('mechanical_stimulus');
         %         stim_order = stim.stimulus_description;
         stim_order_vector = string(split(stim.stimulus_description, ','));
@@ -156,6 +160,8 @@ for LUT_intra_row_idx = 6
     % Create structs
     
     d_ref = datetime('2021.06.01', 'InputFormat', 'yyyy.MM.dd');
+    expt_date = split(pwd, '\');
+    expt_date = expt_date(3);
     d_check = datetime(expt_date, 'InputFormat', 'yyyy.MM.dd');
     
     if d_check < d_ref
@@ -194,7 +200,9 @@ for LUT_intra_row_idx = 6
 %     pause;
 %    
     % Phase plot
-    
+end
+
+%%
     
     for i=2:no_of_protocols
         %     P(i).crossings = zc(i,:);
@@ -239,7 +247,8 @@ for LUT_intra_row_idx = 6
         if P(i).stim_type == "frq"  %|| P(i).stim_type =="dec"
             
             P(i).inc_frq_chirp_f = linspace(1,max_chirp_frq,ON_dur*fs+1);
-            [I_spike_phase, II_spike_phase, III_spike_phase, I_spike_freq, II_spike_freq, III_spike_freq] = spike_phase(P(i).antennal_movement(1,:), P(i).raster(1,:), fs, start_stim, stop_stim, P(i).stim_type, P(i).inc_frq_chirp_f);
+%             [I_spike_phase, II_spike_phase, III_spike_phase, I_spike_freq, II_spike_freq, III_spike_freq] = spike_phase(P(i).antennal_movement(1,:), P(i).raster(1,:), fs, start_stim, stop_stim, P(i).stim_type, P(i).inc_frq_chirp_f);
+            [I_spike_phase, II_spike_phase, III_spike_phase, I_spike_freq, II_spike_freq, III_spike_freq] = spike_phase(P(i).stim_ifb(1,:), P(i).raster(1,:), fs, start_stim, stop_stim, P(i).stim_type, P(i).inc_frq_chirp_f);
             figure(); scatter(I_spike_freq,I_spike_phase,100, '.k'); hold on;
             pmin = min([I_spike_phase II_spike_phase III_spike_phase]);
             pmax = max([I_spike_phase II_spike_phase III_spike_phase]);
@@ -263,7 +272,7 @@ for LUT_intra_row_idx = 6
             P(i).II_spike = [II_spike_freq', II_spike_phase'];
             P(i).III_spike = [III_spike_freq', III_spike_phase'];
             
-            P(i).inc_frq_chirp_f = linspace(1,max_chirp_frq,ON_dur*fs+1);
+            P(i).inc_frq_chirp_f = linspace(0,max_chirp_frq,ON_dur*fs+1); % f0 = 0 for data 1 Sep onwards
             figure;
             [lineOut, ~] = stdshade(P(i).norm_gcfr(:,start_stim:stop_stim),0.2,'k',P(i).inc_frq_chirp_f);
             lineOut.LineWidth  = 0.01;
@@ -273,7 +282,7 @@ for LUT_intra_row_idx = 6
             box off;
             
         elseif P(i).stim_type == "dec"
-            P(i).dec_frq_chirp_f = linspace(max_chirp_frq,1,ON_dur*fs+1);
+            P(i).dec_frq_chirp_f = linspace(max_chirp_frq,0,ON_dur*fs+1); % f0 = 0 for data 1 Sep onwards
             
             %             hold on;
             figure;
@@ -294,17 +303,17 @@ for LUT_intra_row_idx = 6
     
     %     pause;
     
-    
+%%  
     % STA of Band limited white Gaussian Noise
     
     for i = 1:no_of_protocols
         if P(i).stim_type == "blwgn"% || P(i).stim_type == "frq"
-            STA_window = 0.1;
+            STA_window = 0.05;
             [~, power_fft, frq_fft, STA]  = STA_analysis(P(i).raster, P(i).antennal_movement, STA_window, fs,start_stim, stop_stim);
             P(i).power_fft = power_fft;
             P(i).frq_fft = frq_fft;
             P(i).STA = STA;
-            
+%             P(i).ISI = isi_hist(P(i).raster(:,start_stim:stop_stim),fs);
 %             figure;
 %             plot(frq_fft, power_fft);
 %             xlabel('Frequency (in hertz)');
@@ -322,16 +331,16 @@ for LUT_intra_row_idx = 6
     % end
     % Covariance analysis
     
-    % for i = 1:no_of_protocols
-    %     if P(i).stim_type == "blwgn"
-    %         window = 0.05;
-    %         [ev1, ev2] = cov_analysis(P(i).raster, P(i).antennal_movement, window, fs, start_stim, stop_stim);
-    %         P(i).cov_matrix = cov_matrix;
-    %         P(i).ev1 = ev1;
-    %         P(i).ev2 = ev2;
-    %     end
-    % end
-    % Latency to spike in square or step wave stimulus
+    for i = 1:no_of_protocols
+        if P(i).stim_type == "blwgn"
+            window = 0.05;
+            [ev1, ev2] = cov_analysis(P(i).raster, P(i).antennal_movement, window, fs, start_stim, stop_stim);
+%             P(i).cov_matrix = cov_matrix;
+            P(i).ev1 = ev1;
+            P(i).ev2 = ev2;
+        end
+    end
+%%    % Latency to spike in square or step wave stimulus
     
     for i = 1:no_of_protocols
         
@@ -348,7 +357,7 @@ for LUT_intra_row_idx = 6
     
     
     
-end
+% end
 %% Write structure to another structure
 
 % meta_struct(struct_num).moth = P;

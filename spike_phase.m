@@ -13,7 +13,7 @@ for j = 2:length(stim)
 end
 [val,locs ]= find(zc==1);
 
-%     A1 =  subplot(2,1,1); plot(stim);hold on; plot(locs, stim(locs), 'rx'); yline(mean_pos); hold off;
+    A1 =  subplot(2,1,1); plot(stim);hold on;% plot(locs, stim(locs), 'rx'); yline(mean_pos); hold off;
 
 stim_clips = [];
 resp_clips = [];

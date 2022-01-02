@@ -42,17 +42,17 @@ STA = mean(all_spike_triggers,1);
 nspikes = size(all_spike_triggers,1);
 cov_matrix = (1/(nspikes -1))*(all_spike_triggers-STA)'*(all_spike_triggers-STA);
 
-figure;
-
-h = heatmap((cov_matrix), 'Colormap', parula);
-h.YDisplayData = flipud(h.YDisplayData);
-h.GridVisible = "off";
-Labels = linspace(-window*1e3,0,length(cov_matrix));
-CustomLabels = string(Labels);
-CustomLabels(mod(Labels,10) ~= 0) = " ";
-h.XDisplayLabels = CustomLabels;
-h.YDisplayLabels = flip(CustomLabels);
-title("Spike Triggered Covariance (STC)");
+% figure;
+% 
+% h = heatmap((cov_matrix), 'Colormap', parula);
+% h.YDisplayData = flipud(h.YDisplayData);
+% h.GridVisible = "off";
+% Labels = linspace(-window*1e3,0,length(cov_matrix));
+% CustomLabels = string(Labels);
+% CustomLabels(mod(Labels,10) ~= 0) = " ";
+% h.XDisplayLabels = CustomLabels;
+% h.YDisplayLabels = flip(CustomLabels);
+% title("Spike Triggered Covariance (STC)");
 
 pattern_length = size(all_spike_triggers,2);
 m = size(all_spike_triggers,1);
@@ -65,29 +65,29 @@ end
 avg_stim = mean(stimulus_prior,1);
 % stim_prior_cov = cov(stimulus_prior);
 stim_prior_cov = (1/(m -1))*(stimulus_prior-avg_stim)'*(stimulus_prior-avg_stim);
-figure;
-h = heatmap((stim_prior_cov), 'Colormap', parula);
-h.YDisplayData = flipud(h.YDisplayData);
-h.GridVisible = "off";
-Labels = linspace(-window*1e3,0,length(cov_matrix));
-CustomLabels = string(Labels);
-CustomLabels(mod(Labels,10) ~= 0) = " ";
-h.XDisplayLabels = CustomLabels;
-h.YDisplayLabels = flip(CustomLabels);
-title("Random stimulus prior");
+% figure;
+% h = heatmap((stim_prior_cov), 'Colormap', parula);
+% h.YDisplayData = flipud(h.YDisplayData);
+% h.GridVisible = "off";
+% Labels = linspace(-window*1e3,0,length(cov_matrix));
+% CustomLabels = string(Labels);
+% CustomLabels(mod(Labels,10) ~= 0) = " ";
+% h.XDisplayLabels = CustomLabels;
+% h.YDisplayLabels = flip(CustomLabels);
+% title("Random stimulus prior");
 
 
 diff_cov = (cov_matrix - stim_prior_cov) ; 
-figure;
-h = heatmap(diff_cov, 'Colormap', parula);
-h.YDisplayData = flipud(h.YDisplayData);
-h.GridVisible = "off";
-Labels = linspace(-window*1e3,0,length(cov_matrix));
-CustomLabels = string(Labels);
-CustomLabels(mod(Labels,10) ~= 0) = " ";
-h.XDisplayLabels = CustomLabels;
-h.YDisplayLabels = flip(CustomLabels);
-title("STC-C");
+% figure;
+% h = heatmap(diff_cov, 'Colormap', parula);
+% h.YDisplayData = flipud(h.YDisplayData);
+% h.GridVisible = "off";
+% Labels = linspace(-window*1e3,0,length(cov_matrix));
+% CustomLabels = string(Labels);
+% CustomLabels(mod(Labels,10) ~= 0) = " ";
+% h.XDisplayLabels = CustomLabels;
+% h.YDisplayLabels = flip(CustomLabels);
+% title("STC-C");
 
 
 [V,D,W] = eig(diff_cov);
@@ -101,12 +101,12 @@ ev1 = Vs(:,1);
 ev2 = Vs(:,2);
 
 figure;
-plot(diag(Ds), '.')
-title('Eigen values');
-ylabel('Eigen values');
-xlabel('Index');
-ax = gca;
-ax.Box = "off";
+% plot(diag(Ds), '.')
+% title('Eigen values');
+% ylabel('Eigen values');
+% xlabel('Index');
+% ax = gca;
+% ax.Box = "off";
 
 
 t= linspace(-window*1000, 0, length(STA));
