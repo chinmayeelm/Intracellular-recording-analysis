@@ -100,7 +100,7 @@ Ws = W(:,ind);
 ev1 = Vs(:,1);
 ev2 = Vs(:,2);
 
-figure;
+% figure;
 % plot(diag(Ds), '.')
 % title('Eigen values');
 % ylabel('Eigen values');
@@ -112,12 +112,12 @@ figure;
 t= linspace(-window*1000, 0, length(STA));
 
 diag_Ds = diag(Ds);
-plot(t, Vs(:,1).* diag_Ds(1), t, Vs(:,2).*diag_Ds(2));
-ax = gca;
-ax.Box = 'off';
-title('Eigen vectors of STC-C');
-xlabel('Time before spike (ms)');
-ylabel('Antennal movement');
+% plot(t, Vs(:,1).* diag_Ds(1), t, Vs(:,2).*diag_Ds(2));
+% ax = gca;
+% ax.Box = 'off';
+% title('Eigen vectors of STC-C');
+% xlabel('Time before spike (ms)');
+% ylabel('Antennal movement');
 
 
 

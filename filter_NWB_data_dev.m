@@ -15,7 +15,6 @@ for LUT_intra_row_idx = 62
     
      
     
-    
     LUT_intra_row_idx
     cd ..
     cd(string(LUT_intra.expt_date(LUT_intra_row_idx)))

@@ -10,8 +10,8 @@
 % sqr_meta_num = 1;
 % impulse_meta_num = 1;
 
-clip_data_flag = 1;
-for LUT_intra_row_idx = 62
+clip_data_flag = 0;
+for LUT_intra_row_idx = 6
     
      
     

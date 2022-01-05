@@ -21,13 +21,11 @@ function P = create_structs(rec_protocols_sorted,stim_protocols_hes_sorted,fs, s
         P(i).stim_ifb = stim_protocols_ifb_sorted(trial_idx: trial_idx+ no_of_trials-1, :);
         
         
-        [raster,avg_gcfr,complete_trials, gcfr, invalid_trials]  = get_raster_gcfr(no_of_trials, P(i).rec, single_trial_length);
+        [raster,avg_gcfr,complete_trials, gcfr]  = get_raster_gcfr(no_of_trials, P(i).rec, single_trial_length);
         P(i).gcfr = gcfr;
         P(i).raster = raster;
         P(i).avg_gcfr = avg_gcfr;
         P(i).complete_trials = complete_trials;
-        
-        P(i).hes_data_unfilt(invalid_trials,:) = [];
         
         type_frq = split(P(i).stim_name, '_');
         P(i).stim_type = type_frq(1);
@@ -36,7 +34,7 @@ function P = create_structs(rec_protocols_sorted,stim_protocols_hes_sorted,fs, s
         if (P(i).stim_type == "sin" )
             P(i).stim_period = 1/str2double(type_frq(2));
             order=4;
-            for j=1:complete_trials
+            for j=1:no_of_trials
                 P(i).antennal_movement(j,:) =  butter_filtfilt(P(i).hes_data_unfilt(j,:), 2*str2double(type_frq(2)), fs, order, a, b, c); %2*str2double(type_frq(2))
 %              
             end
@@ -44,13 +42,13 @@ function P = create_structs(rec_protocols_sorted,stim_protocols_hes_sorted,fs, s
         elseif (P(i).stim_type == "sqr")
             P(i).stim_period = 1/str2double(type_frq(2));
             order=4;
-            for j=1:complete_trials
+            for j=1:no_of_trials
                 P(i).antennal_movement(j,:) =  butter_filtfilt(P(i).hes_data_unfilt(j,:), 10, fs, order, a, b, c); %2*str2double(type_frq(2))
             end
             
         elseif P(i).stim_type == "frq" || P(i).stim_type == "dec"
             order=4;
-            for j=1:complete_trials
+            for j=1:no_of_trials
                 P(i).antennal_movement(j, :) =  butter_filtfilt(P(i).hes_data_unfilt(j,:), 2*max_chirp_frq, fs, order, a, b, c);
                 P(i).max_chirp_frq = max_chirp_frq;
             end
@@ -58,20 +56,20 @@ function P = create_structs(rec_protocols_sorted,stim_protocols_hes_sorted,fs, s
         elseif P(i).stim_type == "impulse"
             P(i).imp_dur = impulse_dur;
             order=4;
-            for j=1:complete_trials
+            for j=1:no_of_trials
                 P(i).antennal_movement(j,:) =  butter_filtfilt(P(i).hes_data_unfilt(j,:), 2/P(i).imp_dur, fs, order, a, b, c);
             end
             
         elseif P(i).stim_type == "blwgn" || P(i).stim_type == "blwgn2"
             order=4;
-            for j=1:complete_trials
+            for j=1:no_of_trials
                 P(i).antennal_movement(j,:) = butter_filtfilt(P(i).hes_data_unfilt(j,:), blwgn_fc*2, fs, order, a, b, c);
                 P(i).blwgn_fc = blwgn_fc;
             end
             
         elseif (P(i).stim_type == "amp")
             order=3;
-            for j=1:complete_trials
+            for j=1:no_of_trials
                 P(i).antennal_movement(j,:) =  butter_filtfilt(P(i).hes_data_unfilt(j,:), 2*amp_sweep_frq, fs, order, a, b, c);
                 P(i).amp_sweep_frq = amp_sweep_frq; 
                 P(i).stim_period = 1/amp_sweep_frq;
@@ -80,7 +78,7 @@ function P = create_structs(rec_protocols_sorted,stim_protocols_hes_sorted,fs, s
         elseif (P(i).stim_type == "step")
 %             P(i).step_dur = type_frq(2);
             order=4;
-            for j=1:complete_trials
+            for j=1:no_of_trials
 %                 P(i).antennal_movement(j,:) =  butter_filtfilt(P(i).hes_data_unfilt(j,:), 2/str2double(type_frq(2)), fs, order, a, b, c);
                 P(i).antennal_movement(j,:) =  butter_filtfilt(P(i).hes_data_unfilt(j,:), 100, fs, order, a, b, c);
             end
@@ -88,14 +86,14 @@ function P = create_structs(rec_protocols_sorted,stim_protocols_hes_sorted,fs, s
 %         elseif (P(i).stim_type == "step_var_amp")
 %             P(i).step_amp = type_frq(2);
 %             order=4;
-%             for j=1:complete_trials
+%             for j=1:no_of_trials
 %                 P(i).antennal_movement(j,:) =  butter_filtfilt(P(i).hes_data_unfilt(j,:), 10, fs, order, a, b, c);
 %             end
             
         elseif (P(i).stim_type == "sum")
             P(i).stim_period = 1/str2num(type_frq(3));
             order=4;
-            for j=1:complete_trials
+            for j=1:no_of_trials
                 P(i).antennal_movement(j,:) =  butter_filtfilt(P(i).hes_data_unfilt(j,:), 4*str2double(type_frq(3)), fs, order, a, b, c);
             end
             
@@ -103,7 +101,7 @@ function P = create_structs(rec_protocols_sorted,stim_protocols_hes_sorted,fs, s
             noisySin_frq = 30;
             max_noise_frq = 300;
             order = 4;
-            for j=1:complete_trials
+            for j=1:no_of_trials
                 P(i).antennal_movement(j,:) = butter_filtfilt(P(i).hes_data_unfilt(j,:), 2*max_noise_frq, fs, order, a, b, c);
             end
             
