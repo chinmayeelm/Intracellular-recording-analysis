@@ -42,7 +42,7 @@ function plot_data(single_trial_length,no_of_protocols, fs, time, filename,  P)
         A3.XAxis.Visible = 'on';
         
         
-        A4 = subplot(3,1,1);%(4,1,1) %plot(time(1:single_trial_length), mean(P(i).antennal_movement), 'Color', [0.6, 0.2,0]);
+        A4 = subplot(3,1,1); %plot(time(1:single_trial_length), mean(P(i).antennal_movement), 'Color', [0.6, 0.2,0]);
         [lineOut, ~] = stdshade(P(i).antennal_movement,0.6,[0.6, 0.2,0],time(1:single_trial_length));
         lineOut.LineWidth = 0.05;
         A4.Box = 'off';
@@ -57,8 +57,7 @@ function plot_data(single_trial_length,no_of_protocols, fs, time, filename,  P)
 %             title((join(split(P(i).stim_name,"_"))));
 %         end
         
-%         linkaxes([A1,A2,A3,A4], 'x');
-        linkaxes([A2,A3,A4], 'x');
+        linkaxes([A1,A2,A3,A4], 'x');
     
 %         savefigures(filename, P(i).stim_name, fig, P(i).date);
     end
