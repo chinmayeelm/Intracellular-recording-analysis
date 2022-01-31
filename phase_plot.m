@@ -9,7 +9,7 @@ raster(zero_ind) = NaN;
 
 stim = stimulus - mean(stimulus,2);
 
-[m,n] = size(stim);
+[ntrials,nsamples] = size(stim);
 mean_positions = mean(stim, 2);
 resp = resp - mean(resp,2);
 % figure;
@@ -18,18 +18,18 @@ resp = resp - mean(resp,2);
 phase = [];
 
 figure;
-for i = 1:m
+for trial = 1:ntrials
     
     cos_theta = [];
     sin_theta = [];
     count = 0;
-    mean_pos  =mean_positions(i);
+    mean_pos  =mean_positions(trial);
     
     locs = [];
     zc = [];
-    for j = 2:n-1
-        if (stim(i,j-1)<=mean_pos && stim(i,j)>=mean_pos && stim(i,j+1)>mean_pos)
-            zc(j) = 1;
+    for sample = 2:nsamples-1
+        if (stim(trial,sample-1)<=mean_pos && stim(trial,sample)>=mean_pos && stim(trial,sample+1)>mean_pos)
+            zc(sample) = 1;
         end
     end
     [val,locs ]= find(zc==1);
@@ -39,17 +39,17 @@ for i = 1:m
     for k= 2:length(locs)
         
         
-        stim_clips = stim(i, locs(k-1):locs(k)); %figure(); subplot(2,1,1); plot(stim_clips);
-        resp_clips = resp(i, locs(k-1):locs(k)); %subplot(2,1,2); plot(resp_clips);
-        raster_clips = raster(i, locs(k-1):locs(k));
+        stim_clips = stim(trial, locs(k-1):locs(k)); %figure(); subplot(2,1,1); plot(stim_clips);
+        resp_clips = resp(trial, locs(k-1):locs(k)); %subplot(2,1,2); plot(resp_clips);
+        raster_clips = raster(trial, locs(k-1):locs(k));
         
         %         subplot(2,1,2); plot(raster_clips, 0, '|'  );
         
         if period > 0.2
             
-%             count = count + 1;
-%             coef = corrcoef(stim_clips, resp_clips);
-%             corr_coef(count)  = coef(1,2);
+            %             count = count + 1;
+            %             coef = corrcoef(stim_clips, resp_clips);
+            %             corr_coef(count)  = coef(1,2);
             
             
             
@@ -77,20 +77,20 @@ for i = 1:m
     if period > 0.2
         vs = NaN;
         phase = NaN;
-%         corr_coef_val(i) = mean(corr_coef);
-        coef = corrcoef(stim(i,:), resp(i,:));
-        corr_coef_val(i) = coef(1,2);
-        plot(period, corr_coef_val(i), '.'); hold on;
+        %         corr_coef_val(i) = mean(corr_coef);
+        coef = corrcoef(stim(trial,:), resp(trial,:));
+        corr_coef_val(trial) = coef(1,2);
+        plot(period, corr_coef_val(trial), '.'); hold on;
         
     elseif period <=0.2
         sum(cos_theta);
         sum(sin_theta);
-        vs(i) = (sqrt(((sum(cos_theta))^2)+((sum(sin_theta))^2)))/count;
-        p(i) = mean(phase);
-        polarscatter(p(i),vs(i), 100, '.'); hold on;
+        vs(trial) = (sqrt(((sum(cos_theta))^2)+((sum(sin_theta))^2)))/count;
+        p(trial) = mean(phase);
+        polarscatter(p(trial),vs(trial), 100, '.'); hold on;
         rlim([0 1])
         title("frequency = " + 1/period + "Hz");
-        corr_coef_val(i) = mean(corr_coef);
+        corr_coef_val(trial) = mean(corr_coef);
     end
     
 end

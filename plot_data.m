@@ -7,14 +7,16 @@ function plot_data(single_trial_length,no_of_protocols, fs, time, filename,  P)
         end
         
         fig = figure(i+1);
-        [p,l] = findpeaks(P(i).rec(1,:), "MinPeakHeight",0.25*max(P(i).rec(1,:)));
-%         A1 = subplot(4,1,2); plot(time(1:single_trial_length), P(i).rec(1, :),'LineWidth', 0.01, 'Color', 'k'); %#0072BD');
-%         hold on; plot(l/fs, p, '.', 'MarkerEdgeColor', 'r'); %'#A2142F');
+        fig.Position = [0 0 960 640];
+%         [p,l] = findpeaks(P(i).rec(1,:), "MinPeakHeight",0.25*max(P(i).rec(1,:)));
+%         A1 = subplot(4,1,2);
+%         plot(time(1:single_trial_length), P(i).rec(1, :),'LineWidth', 0.01, 'Color', 'k'); %#0072BD');
+%         hold on; plot((l/fs), p, '.', 'MarkerEdgeColor', 'r'); %'#A2142F');
 %         hold off;
 %         A1.Box = 'off';
 %         A1.XAxis.Visible = 'off';
 %         ylabel('Membrane potential (mV)');
-        
+%         
         
 %         A2 = subplot(4,1,3);
         A2 = subplot(3,1,2);
@@ -33,7 +35,8 @@ function plot_data(single_trial_length,no_of_protocols, fs, time, filename,  P)
         A2.XAxis.Visible = 'off';
             
 %         A3 = subplot(4,1,3); plot(time(1:single_trial_length), P(i).norm_gcfr, 'Color', [0.2,0.3,0.49]);
-        A3 = subplot(3,1,3); %(4,1,4); 
+        A3 = subplot(3,1,3);
+%         A3 = subplot(4,1,4); 
         [lineOut, ~] = stdshade(P(i).gcfr,0.6,[0.4660 0.6740 0.1880],time(1:single_trial_length));
         lineOut.LineWidth  = 0.05;
         ylabel('Firing rate (Hz)');
@@ -42,7 +45,8 @@ function plot_data(single_trial_length,no_of_protocols, fs, time, filename,  P)
         A3.XAxis.Visible = 'on';
         
         
-        A4 = subplot(3,1,1);%(4,1,1) %plot(time(1:single_trial_length), mean(P(i).antennal_movement), 'Color', [0.6, 0.2,0]);
+        A4 = subplot(3,1,1);
+%         A4 = subplot(4,1,1); %plot(time(1:single_trial_length), mean(P(i).antennal_movement), 'Color', [0.6, 0.2,0]);
         [lineOut, ~] = stdshade(P(i).antennal_movement,0.6,[0.6, 0.2,0],time(1:single_trial_length));
         lineOut.LineWidth = 0.05;
         A4.Box = 'off';

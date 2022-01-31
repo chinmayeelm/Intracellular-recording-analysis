@@ -12,9 +12,8 @@
 
 clip_data_flag = 0;
 
-for LUT_intra_row_idx = 58 %[1     2     3     6    34    39    42    44    58]
-    
-        
+for LUT_intra_row_idx = 38   
+    %[1     2     3     6    34    39    42    44    58]
     
     LUT_intra_row_idx
     cd ..
@@ -196,29 +195,30 @@ for LUT_intra_row_idx = 58 %[1     2     3     6    34    39    42    44    58]
     % Plot data
     
 %     plot_data(single_trial_length,no_of_protocols, fs, time, filename,  P);
-    for i=1:length(P)
-        if P(i).stim_name=="blwgn"
-            
-            STA_window = 0.05;
-            [~, power_fft, frq_fft, STA]  = STA_analysis(P(i).raster, P(i).antennal_movement, STA_window, fs,start_stim, stop_stim);
-            P(i).power_fft = power_fft;
-            P(i).frq_fft = frq_fft;
-            P(i).STA = STA;
-            
-            window = 0.05;
-            [ev1, ev2] = cov_analysis(P(i).raster, P(i).antennal_movement, window, fs, start_stim, stop_stim);
-%             P(i).cov_matrix = cov_matrix;
-            P(i).ev1 = ev1;
-            P(i).ev2 = ev2;
-            
-            S = fidelity_func(P(i), start_stim, stop_stim, fs, LUT_intra_row_idx);
-            blwgn_jitter_meta(meta_struct_idx) = S;
-            meta_struct_idx = meta_struct_idx + 1;
-        end
-    
-    end
+%     for i=1:length(P)
+%         if P(i).stim_name=="blwgn"
+%             
+%             STA_window = 0.05;
+%             [~, power_fft, frq_fft, STA]  = STA_analysis(P(i).raster, P(i).antennal_movement, STA_window, fs,start_stim, stop_stim);
+%             P(i).power_fft = power_fft;
+%             P(i).frq_fft = frq_fft;
+%             P(i).STA = STA;
+%             
+%             window = 0.05;
+%             [ev1, ev2] = cov_analysis(P(i).raster, P(i).antennal_movement, window, fs, start_stim, stop_stim);
+% %             P(i).cov_matrix = cov_matrix;
+%             P(i).ev1 = ev1;
+%             P(i).ev2 = ev2;
+%             
+%             S = jitter_func(P(i), start_stim, stop_stim, fs, LUT_intra_row_idx);
+%             blwgn_jitter_meta(meta_struct_idx) = S;
+%             meta_struct_idx = meta_struct_idx + 1;
+%         end
+%     
+%     end
 end
 
+% figure; plot(time(1:single_trial_length), P(3).antennal_movement(1,:));
 %%
     
     for i=2:no_of_protocols
@@ -256,6 +256,9 @@ end
             P(i).I_spike = [I_spike_amp', I_spike_phase'];
             P(i).II_spike = [II_spike_amp', II_spike_phase'];
             P(i).III_spike = [III_spike_amp', III_spike_phase'];
+            
+            
+            [amp_val, vs, phase] = ampsweep_phase_plot(P(i).antennal_movement, P(i).raster,start_stim, stop_stim, fs, 1/amp_sweep_frq);
         end
     end
     % GCFR Vs frequency and spike phase Vs Frequency
@@ -289,32 +292,35 @@ end
 %             P(i).II_spike = [II_spike_freq', II_spike_phase'];
 %             P(i).III_spike = [III_spike_freq', III_spike_phase'];
             
-            P(i).inc_frq_chirp_f = linspace(50,max_chirp_frq,ON_dur*fs+1); % f0 = 0 for data 1 Sep onwards
-            figure;
+            intended_chirp = linspace(1,max_chirp_frq,stop_stim); % f0 = 0 for data 1 Sep onwards
+            P(i).inc_frq_chirp_f = intended_chirp(start_stim:end); 
+%             figure;
             [lineOut, ~] = stdshade(P(i).gcfr(:,start_stim:stop_stim),0.2,'k',P(i).inc_frq_chirp_f);
+            hold on;
             lineOut.LineWidth  = 0.01;
             ylabel 'GCFR';
             xlabel 'Frequency (Hz)';
-            title ('Response to increasing frequency chirp');
+%             title ('Response to increasing frequency chirp');
+            title(LUT_intra_row_idx);
             box off;
             
-        elseif P(i).stim_type == "dec"
-            P(i).dec_frq_chirp_f = linspace(max_chirp_frq,0,ON_dur*fs+1); % f0 = 0 for data 1 Sep onwards
-            
-            %             hold on;
-            figure;
-            [lineOut, ~] = stdshade(P(i).gcfr(:,start_stim:stop_stim),0.2,'k',fliplr(P(i).dec_frq_chirp_f));
-            lineOut.LineWidth  = 0.05;
-            ax = gca;
-            ax.XTickLabel = flipud(ax.XTickLabel);
-            ylabel 'GCFR';
-            xlabel 'Frequency (Hz)';
-            box off;
-            title ('Response to decreasing frequency chirp');
-            
-%             P(i).dec_chirp_I_spike = [I_spike_freq', I_spike_phase'];
-%             P(i).dec_chirp_II_spike = [II_spike_freq', II_spike_phase'];
-%             P(i).dec_chirp_III_spike = [III_spike_freq', III_spike_phase'];
+%         elseif P(i).stim_type == "dec"
+%             P(i).dec_frq_chirp_f = linspace(max_chirp_frq,0,ON_dur*fs+1); % f0 = 0 for data 1 Sep onwards
+%             
+%             %             hold on;
+%             figure;
+%             [lineOut, ~] = stdshade(P(i).gcfr(:,start_stim:stop_stim),0.2,'k',fliplr(P(i).dec_frq_chirp_f));
+%             lineOut.LineWidth  = 0.05;
+%             ax = gca;
+%             ax.XTickLabel = flipud(ax.XTickLabel);
+%             ylabel 'GCFR';
+%             xlabel 'Frequency (Hz)';
+%             box off;
+%             title ('Response to decreasing frequency chirp');
+%             
+% %             P(i).dec_chirp_I_spike = [I_spike_freq', I_spike_phase'];
+% %             P(i).dec_chirp_II_spike = [II_spike_freq', II_spike_phase'];
+% %             P(i).dec_chirp_III_spike = [III_spike_freq', III_spike_phase'];
         end
     end
     
@@ -361,9 +367,11 @@ end
     
     for i = 1:no_of_protocols
         
+        latencies = [];
         if (P(i).stim_type == "sqr") || (P(i).stim_type == "step")
             latencies = spike_latency(P(i).antennal_movement,P(i).raster,start_stim, stop_stim,fs, P(i).complete_trials);
             P(i).latencies = latencies;
+            spike_latencies = [spike_latencies latencies];
         end
         
     end
