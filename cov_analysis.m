@@ -4,7 +4,7 @@ function [ev1, ev2] = cov_analysis(raster, antennal_movement, window, fs,start_s
 % 
 raster_data = raster(:,start_stim:stop_stim);
 stimulus = antennal_movement(:,start_stim:stop_stim);
-window = 0.04;
+% window = 0.04;
 
 
 [m,~] = size(raster_data);

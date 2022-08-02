@@ -12,7 +12,7 @@
 
 clip_data_flag = 0;
 
-for LUT_intra_row_idx = 38   
+for LUT_intra_row_idx = 47 
     %[1     2     3     6    34    39    42    44    58]
     
     LUT_intra_row_idx
@@ -130,7 +130,7 @@ for LUT_intra_row_idx = 38
     
     %
     
-%     fig_handle = consolidated_plot(time, filtered_data_bp, hes_data, stim_fb, fs);
+    fig_handle = consolidated_plot(time, filtered_data_bp, hes_data, stim_fb, fs);
     
     %     pause;
     %
@@ -218,7 +218,7 @@ for LUT_intra_row_idx = 38
 %     end
 end
 
-% figure; plot(time(1:single_trial_length), P(3).antennal_movement(1,:));
+% figure; plot(time(1:single_trial_length), P(1).antennal_movement(1,:));
 %%
     
     for i=2:no_of_protocols

@@ -1,10 +1,10 @@
 [~,yymm,dd] = fileparts(pwd);
 date = strcat(yymm, dd);
 
-filename = "M1_N1_stair1";
+filename = "M1_N1_stair";
 filename_str = sprintf("%s.nwb", filename);
 nwb_in = nwbRead(filename_str); 
-clip_data_flag = 0;
+clip_data_flag = 1;
 
 % disp(nwb_in);
 rec = nwb_in.acquisition.get('response_to_JO_stimulation');
@@ -69,8 +69,9 @@ if clip_data_flag == 1
     start_point = input(prompt1)*fs;
     stop_point = input(prompt2)*fs;
     start_clip_point = start_point-mod(start_point,single_trial_length)+1;
+    if isempty(input(prompt2))
+        stop_clip_point
     stop_clip_point = stop_point-mod(stop_point,single_trial_length);
-    
     
     data = data(start_clip_point:stop_clip_point,:);
     time = time(start_clip_point:stop_clip_point);

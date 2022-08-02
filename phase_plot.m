@@ -87,7 +87,7 @@ for trial = 1:ntrials
         sum(sin_theta);
         vs(trial) = (sqrt(((sum(cos_theta))^2)+((sum(sin_theta))^2)))/count;
         p(trial) = mean(phase);
-        polarscatter(p(trial),vs(trial), 100, '.'); hold on;
+        polarscatter(p(trial),vs(trial), 500, '.'); hold on;
         rlim([0 1])
         title("frequency = " + 1/period + "Hz");
         corr_coef_val(trial) = mean(corr_coef);

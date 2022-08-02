@@ -1,4 +1,4 @@
-function P = create_structs(rec_protocols_sorted,stim_protocols_hes_sorted,fs, stim_protocols_ifb_sorted, no_of_protocols, no_of_trials, single_trial_length, stim_order_sorted, max_chirp_frq,amp_sweep_frq, blwgn_fc, impulse_dur, a, b, c)
+function P = create_structs(rec_protocols_sorted,stim_protocols_hes_sorted,fs, stim_protocols_ifb_sorted, no_of_protocols, no_of_trials, single_trial_length, stim_order_sorted, max_chirp_frq,amp_sweep_frq, blwgn_fc, impulse_dur, a, b, c, L, alpha)
 
     for i=1:no_of_protocols
         
@@ -21,10 +21,10 @@ function P = create_structs(rec_protocols_sorted,stim_protocols_hes_sorted,fs, s
         P(i).stim_ifb = stim_protocols_ifb_sorted(trial_idx: trial_idx+ no_of_trials-1, :);
         
         
-        [raster,avg_gcfr,complete_trials, gcfr, invalid_trials]  = get_raster_gcfr(no_of_trials, P(i).rec, single_trial_length);
-        P(i).gcfr = gcfr;
+        [raster,avg_gcfr,complete_trials, gcfr, invalid_trials]  = get_raster_gcfr(no_of_trials, P(i).rec, single_trial_length, fs, L, alpha);
+        P(i).gcfr = gcfr; %in Hz
         P(i).raster = raster;
-        P(i).avg_gcfr = avg_gcfr;
+        P(i).avg_gcfr = avg_gcfr; %in Hz
         P(i).complete_trials = complete_trials;
         
         P(i).hes_data_unfilt(invalid_trials,:) = [];
@@ -77,20 +77,21 @@ function P = create_structs(rec_protocols_sorted,stim_protocols_hes_sorted,fs, s
                 P(i).stim_period = 1/amp_sweep_frq;
             end
         
-        elseif (P(i).stim_type == "step")
+        elseif (P(i).stim_type == "step" || type_frq(2) == "ramp" || P(i).stim_type == "var" )
 %             P(i).step_dur = type_frq(2);
             order=4;
             for j=1:complete_trials
 %                 P(i).antennal_movement(j,:) =  butter_filtfilt(P(i).hes_data_unfilt(j,:), 2/str2double(type_frq(2)), fs, order, a, b, c);
-                P(i).antennal_movement(j,:) =  butter_filtfilt(P(i).hes_data_unfilt(j,:), 100, fs, order, a, b, c);
+                P(i).antennal_movement(j,:) =  butter_filtfilt(P(i).hes_data_unfilt(j,:), 8, fs, order, a, b, c);
             end
             
-%         elseif (P(i).stim_type == "step_var_amp")
-%             P(i).step_amp = type_frq(2);
-%             order=4;
-%             for j=1:complete_trials
-%                 P(i).antennal_movement(j,:) =  butter_filtfilt(P(i).hes_data_unfilt(j,:), 10, fs, order, a, b, c);
-%             end
+        elseif ( type_frq(2) == "stair" || P(i).stim_name == "inc_dec_stair")
+%             P(i).step_dur = type_frq(2);
+            order=4;
+            for j=1:complete_trials
+%                 P(i).antennal_movement(j,:) =  butter_filtfilt(P(i).hes_data_unfilt(j,:), 2/str2double(type_frq(2)), fs, order, a, b, c);
+                P(i).antennal_movement(j,:) =  butter_filtfilt(P(i).hes_data_unfilt(j,:), 10, fs, order, a, b, c);
+            end
             
         elseif (P(i).stim_type == "sum")
             P(i).stim_period = 1/str2num(type_frq(3));
