@@ -68,6 +68,7 @@ function P = create_structs(rec_protocols_sorted,stim_protocols_hes_sorted,fs, s
                 P(i).antennal_movement(j,:) = butter_filtfilt(P(i).hes_data_unfilt(j,:), blwgn_fc*2, fs, order, a, b, c);
                 P(i).blwgn_fc = blwgn_fc;
             end
+            P(i).antennal_movement = P(i).antennal_movement - mean(P(i).antennal_movement,2);
             
         elseif (P(i).stim_type == "amp")
             order=3;
