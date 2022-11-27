@@ -1,4 +1,4 @@
-function [STA_freq, power_fft, frq_fft,STA] = STA_analysis(raster, stim, window, fs,start_stim, stop_stim)
+function STA = STA_analysis(raster, stim, window, fs,start_stim, stop_stim)
     
     raster_data = raster(:,start_stim : stop_stim);
     stimulus = stim(:,start_stim : stop_stim);
@@ -16,7 +16,7 @@ function [STA_freq, power_fft, frq_fft,STA] = STA_analysis(raster, stim, window,
                 continue;
             end
             spike_triggers(j,:) = stimulus(i,(spike_locs(j)-window*fs):spike_locs(j));
-            spike_triggers(j,:) = spike_triggers(j,:);
+            spike_triggers(j,:) = spike_triggers(j,:)- mean(spike_triggers(j,:));
 %             plot(STA); hold on;
             
         end
@@ -34,12 +34,12 @@ function [STA_freq, power_fft, frq_fft,STA] = STA_analysis(raster, stim, window,
 
     STA = mean(all_spike_triggers);
 %     plot(STA);
-    t_STA = linspace(-(window*1000),0,length(STA));%-100:0.1:0;
+%     t_STA = linspace(-(window*1000),0,length(STA));%-100:0.1:0;
 %     figure(); plot(t_STA, STA); %hold on;
 %     title ('Spike triggered average');
 %     ylabel 'Antennal movement (mm)';
 %     xlabel 'time (ms)';
-    [power_fft, frq_fft] = get_fft(STA, fs, window*fs);
+
 %     histogram(STA_freq);
     
 %     rng('default');
