@@ -1,4 +1,4 @@
-function [stim_freq, power_fft, frq_fft] = fft_stim_(stim_matrix, Fs, L)
+function [stim_freq, power_fft, frq_fft] = fft_stim_(stim_matrix, Fs)
 
 
 %     [m,~]  = size(stim_matrix);
@@ -6,6 +6,7 @@ function [stim_freq, power_fft, frq_fft] = fft_stim_(stim_matrix, Fs, L)
     
 %     for i=1:m
 %         stim_filt = sgolayfilt(stim_matrix(i,:), 3, 51);
+        L = length(stim_matrix);
         Y = fft(stim_matrix);
 
 %         figure()
@@ -21,12 +22,12 @@ function [stim_freq, power_fft, frq_fft] = fft_stim_(stim_matrix, Fs, L)
 %         f = f(2:end-1);
         length(f)
         figure();
-        plot(f,P1); hold on;
+        semilogx(f(2:end-1),P1(2:end-1)); hold on;
 %         plot(f,P1); %hold on;
-        title('Tuning curve')
+        title('FFT of Stimulus')
         xlabel('f (Hz)')
-        ylabel('|P1(f)|')
-        xlim([0 350]);
+        ylabel('Magnitude')
+%         xlim([0 350]);
 
 %         [~,loc] = max(P1(2:end-1));
 %         [~,loc] = max(P1);
