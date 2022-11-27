@@ -12,7 +12,7 @@
 
 clip_data_flag = 0;
 
-for LUT_intra_row_idx = 47 
+for LUT_intra_row_idx =63 
     %[1     2     3     6    34    39    42    44    58]
     
     LUT_intra_row_idx
