@@ -1,4 +1,4 @@
-function P = create_structs(rec_protocols_sorted,stim_protocols_hes_sorted,fs, stim_protocols_ifb_sorted, no_of_protocols, no_of_trials, single_trial_length, stim_order_sorted, max_chirp_frq,amp_sweep_frq, blwgn_fc, impulse_dur, a, b, c, L, alpha)
+function P = create_structs(rec_protocols_sorted,stim_protocols_hes_sorted,fs, stim_protocols_ifb_sorted, no_of_protocols, no_of_trials, single_trial_length, stim_order_sorted, max_chirp_frq,amp_sweep_frq, blwgn_fc, impulse_dur, a, b, c, L, alpha, movementRadius)
 
     for i=1:no_of_protocols
         
@@ -68,7 +68,7 @@ function P = create_structs(rec_protocols_sorted,stim_protocols_hes_sorted,fs, s
                 P(i).antennal_movement(j,:) = butter_filtfilt(P(i).hes_data_unfilt(j,:), blwgn_fc*2, fs, order, a, b, c);
                 P(i).blwgn_fc = blwgn_fc;
             end
-            P(i).antennal_movement = P(i).antennal_movement - mean(P(i).antennal_movement,2);
+            P(i).antennal_movement = rad2deg((P(i).antennal_movement - mean(P(i).antennal_movement,2))./movementRadius);
             
         elseif (P(i).stim_type == "amp")
             order=3;
