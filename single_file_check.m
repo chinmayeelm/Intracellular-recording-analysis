@@ -1,10 +1,10 @@
 [~,yymm,dd] = fileparts(pwd);
 date = strcat(yymm, dd);
 
-filename = "M1_N1_stair1";
+filename = "M1_N1_blwgn";
 filename_str = sprintf("%s.nwb", filename);
 nwb_in = nwbRead(filename_str); 
-clip_data_flag = 0;
+clip_data_flag =0;
 
 % disp(nwb_in);
 rec = nwb_in.acquisition.get('response_to_JO_stimulation');
@@ -32,6 +32,7 @@ fs = str2num(parameters(1));
 gauss_win_L = 10000;
 gauss_win_alpha = 2;
 
+movementRadius = 0.78; % in mm
 
 % ON_dur = 15;
 % OFF_dur =5;
@@ -41,8 +42,8 @@ gauss_win_alpha = 2;
 
 start_stim = OFF_dur*fs;
 stop_stim = (ON_dur+OFF_dur)*fs;
-% single_trial_length = start_stim + stop_stim+1;
-single_trial_length = start_stim + stop_stim;
+single_trial_length = start_stim + stop_stim+1;
+% single_trial_length = start_stim + stop_stim;
 
 % stim_frequencies = find_stim_freq(stim_fb,ON_dur, OFF_dur, fs)
 
@@ -59,7 +60,7 @@ stim_order_vector = string(split(stim.stimulus_description, ','));
 %
 valid_trials = round(length(data)/single_trial_length);
 
-clear nwb_in
+% clear nwb_in
 
 if clip_data_flag == 1
     
@@ -156,7 +157,7 @@ else
     a=0.5334; b=516.5; c = -3.233;
 end
 
-P = create_structs(rec_protocols_sorted,stim_protocols_hes_sorted,fs, stim_protocols_ifb_sorted, no_of_protocols, no_of_trials, single_trial_length, stim_order_sorted,max_chirp_frq, amp_sweep_frq, blwgn_fc, ON_dur, a, b, c, gauss_win_L, gauss_win_alpha);
+P = create_structs(rec_protocols_sorted,stim_protocols_hes_sorted,fs, stim_protocols_ifb_sorted, no_of_protocols, no_of_trials, single_trial_length, stim_order_sorted,max_chirp_frq, amp_sweep_frq, blwgn_fc, ON_dur, a, b, c, gauss_win_L, gauss_win_alpha, movementRadius);
 % end
 %
 
@@ -258,10 +259,11 @@ end
 for i = 1:no_of_protocols
     if P(i).stim_type == "blwgn"
         STA_window = 0.1;
-        [~, power_fft, frq_fft, STA]  = STA_analysis(P(i).raster, P(i).antennal_movement, STA_window, fs, start_stim, stop_stim);
+        STA  = STA_analysis(P(i).raster, P(i).antennal_movement, STA_window, fs, start_stim, stop_stim);
         P(i).power_fft = power_fft;
         P(i).frq_fft = frq_fft;
         P(i).STA = STA;
+        [stim_freq, power_fft, frq_fft] = get_fft(STA, fs, window*fs);
     end
 end
 
