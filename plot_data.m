@@ -8,7 +8,7 @@ function plot_data(single_trial_length,no_of_protocols, fs, time, filename,  P)
         
         fig = figure;
 %         fig = figure(i+1);
-        fig.Position = [0 0 960 640];
+%         fig.Position = [0 0 960 640];
 %         [p,l] = findpeaks(P(i).rec(1,:), "MinPeakHeight",0.25*max(P(i).rec(1,:)));
 %         A1 = subplot(4,1,2);
 %         plot(time(1:single_trial_length), P(i).rec(1, :),'LineWidth', 0.01, 'Color', 'k'); %#0072BD');
@@ -16,8 +16,8 @@ function plot_data(single_trial_length,no_of_protocols, fs, time, filename,  P)
 %         hold off;
 %         A1.Box = 'off';
 %         A1.XAxis.Visible = 'off';
-%         ylabel('Membrane potential (mV)');
-%         
+%         ylabel('Membrane potential (mV)','FontSize', 14);
+% %         
         
 %         A2 = subplot(4,1,3);
         A2 = subplot(3,1,2);
@@ -37,11 +37,11 @@ function plot_data(single_trial_length,no_of_protocols, fs, time, filename,  P)
         A2.YAxis.FontSize = 12;
         
             
-%         A3 = subplot(4,1,3); plot(time(1:single_trial_length), P(i).norm_gcfr, 'Color', [0.2,0.3,0.49]);
+%         A3 = subplot(4,1,4); %plot(time(1:single_trial_length), P(i).norm_gcfr, 'Color', [0.2,0.3,0.49]);
         A3 = subplot(3,1,3);
 %           A3 = subplot(2,1,2);
 %         A3 = subplot(4,1,4); 
-        [lineOut, ~] = stdshade(P(i).gcfr,0.2,[0.4660 0.6740 0.1880],time(1:single_trial_length)); %10 = (fs/L)*gcfr Hz
+        [lineOut, ~] = stdshade(P(i).gcfr,0.2,[0.4660 0.6740 0.1880],time(1:single_trial_length)); 
         lineOut.LineWidth  = 0.05;
         ylabel('Firing rate (Hz)','FontSize', 14);
         xlabel('time(s)','FontSize', 14);
@@ -59,7 +59,7 @@ function plot_data(single_trial_length,no_of_protocols, fs, time, filename,  P)
         A4.Box = 'off';
         A4.XAxis.Visible = 'off';
 %         ylabel('Indenter feedback voltage');
-        ylabel('Stimulus (mm)','FontSize', 14);
+        ylabel('Stimulus (deg)','FontSize', 14);
         A4.YAxis.FontSize = 12;
         
         if (P(i).stim_name == "sin" || P(i).stim_name == "sqr" || P(i).stim_name == "sum_sine")

@@ -12,16 +12,16 @@
 
 clip_data_flag = 0;
 
-for LUT_intra_row_idx =63 
+for LUT_intra_row_idx =46 
     %[1     2     3     6    34    39    42    44    58]
     
-    LUT_intra_row_idx
-    cd ..
-    cd(string(LUT_intra.expt_date(LUT_intra_row_idx)))
-    expt_date = LUT_intra.expt_date(LUT_intra_row_idx);
+%     LUT_intra_row_idx
+%     cd ..
+%     cd(string(LUT_intra.expt_date(LUT_intra_row_idx)))
+    expt_date = replace(LUT_intra.expt_date(LUT_intra_row_idx),'.','-');
     filename = LUT_intra.filename(LUT_intra_row_idx);
     
-%     filename = "M3_N3_T3"; %change HES parameters if required.
+    filename = "M2_N1_T6"; %change HES parameters if required.
     filename_str = sprintf("%s.nwb", filename);
     nwb_in = nwbRead(filename_str);
     
@@ -56,6 +56,33 @@ for LUT_intra_row_idx =63
     blwgn_fc = parameters.blwgn_fc;
     impulse_dur = ON_dur;
     
+    %% If parameters are not in the LUT
+    max_chirp_frq =  150;
+    max_sqr_sin_frq = 10;
+    amp_sweep_frq = 5;
+    blwgn_fc = 300;
+
+    fileParameters = nwb_in.general_stimulus.load;
+    if length(fileParameters) == 5
+
+        ON_dur = str2num(fileParameters(3));
+        OFF_dur =  str2num(fileParameters(4));
+        no_of_trials = str2num(fileParameters(5));
+        fs = str2num(fileParameters(1));
+
+    elseif length(fileParameters) == 6
+
+        ON_dur = str2num(fileParameters(4));
+        OFF_dur =  str2num(fileParameters(5));
+        no_of_trials = str2num(fileParameters(6));
+        fs = str2num(fileParameters(1));
+
+    else
+
+        disp('No parameters in the file');
+    end
+
+%%    
     
     start_stim = OFF_dur*fs;
     stop_stim = (ON_dur+OFF_dur)*fs;
@@ -128,6 +155,11 @@ for LUT_intra_row_idx =63
     filtered_data_bp = filtfilt(d_rec, rec_data);
     
     
+    gauss_win_L = fs/4;
+    gauss_win_alpha = 2;
+
+    movementRadius = 0.64; %0.78; % in mm
+    
     %
     
     fig_handle = consolidated_plot(time, filtered_data_bp, hes_data, stim_fb, fs);
@@ -169,7 +201,7 @@ for LUT_intra_row_idx =63
         a=0.5334; b=516.5; c = -3.233;
     end
     
-    P = create_structs(rec_protocols_sorted,stim_protocols_hes_sorted,fs, stim_protocols_ifb_sorted, no_of_protocols, no_of_trials, single_trial_length, stim_order_sorted,max_chirp_frq, amp_sweep_frq, blwgn_fc, ON_dur, a, b, c);
+    P = create_structs(rec_protocols_sorted,stim_protocols_hes_sorted,fs, stim_protocols_ifb_sorted, no_of_protocols, no_of_trials, single_trial_length, stim_order_sorted,max_chirp_frq, amp_sweep_frq, blwgn_fc, ON_dur, a, b, c,gauss_win_L, gauss_win_alpha, movementRadius);
     % end
     %
     

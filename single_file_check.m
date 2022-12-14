@@ -1,7 +1,7 @@
 [~,yymm,dd] = fileparts(pwd);
 date = strcat(yymm, dd);
 
-filename = "M1_N1_blwgn";
+filename = "M1_N1_sine_sqr";
 filename_str = sprintf("%s.nwb", filename);
 nwb_in = nwbRead(filename_str); 
 clip_data_flag =0;
@@ -24,20 +24,34 @@ amp_sweep_frq = 5;
 blwgn_fc = 300;
 
 parameters = nwb_in.general_stimulus.load;
-ON_dur = str2num(parameters(3));
-OFF_dur =  str2num(parameters(4));
-no_of_trials = str2num(parameters(5));
-fs = str2num(parameters(1));
+if length(parameters) == 5
+   
+    ON_dur = str2num(parameters(3));
+    OFF_dur =  str2num(parameters(4));
+    no_of_trials = str2num(parameters(5));
+    fs = str2num(parameters(1));
+
+elseif length(parameters) == 6
+    
+    ON_dur = str2num(parameters(4));
+    OFF_dur =  str2num(parameters(5));
+    no_of_trials = str2num(parameters(6));
+    fs = str2num(parameters(1));
+    
+else
+    
+    disp('No parameters in the file');
+end
 
 gauss_win_L = 10000;
 gauss_win_alpha = 2;
 
-movementRadius = 0.78; % in mm
+movementRadius = 0.64; %0.78; % in mm
 
-% ON_dur = 15;
-% OFF_dur =5;
+% ON_dur = 30;
+% OFF_dur =3;
 % no_of_trials = 5;
-% fs = 1e5;
+% fs = 1e4;
 
 
 start_stim = OFF_dur*fs;
@@ -56,6 +70,7 @@ stim = nwb_in.stimulus_presentation.get('mechanical_stimulus');
 %         stim_order = stim.stimulus_description;
 stim_order_vector = string(split(stim.stimulus_description, ','));
 % [stim_order_sorted, idx] = sortfromnwb(stim_order_vector);
+% stim_order_vector = LUT_intra.stim_order(2);
 
 %
 valid_trials = round(length(data)/single_trial_length);
@@ -182,7 +197,7 @@ end
 
 %% Plot data
 % figure;
-plot_data(single_trial_length,no_of_protocols, fs, time, filename,  P);
+plot_data(single_trial_length,no_of_protocols, fs, time, filename,  P(1));
 
 
 %% Phase plot             Not working
