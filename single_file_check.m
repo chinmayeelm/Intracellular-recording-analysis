@@ -1,7 +1,7 @@
 [~,yymm,dd] = fileparts(pwd);
 date = strcat(yymm, dd);
 
-filename = "M1_N1_sine_sqr";
+filename = "M1_N6_chirp_sweep";
 filename_str = sprintf("%s.nwb", filename);
 nwb_in = nwbRead(filename_str); 
 clip_data_flag =0;
@@ -43,7 +43,7 @@ else
     disp('No parameters in the file');
 end
 
-gauss_win_L = 10000;
+gauss_win_L = fs;
 gauss_win_alpha = 2;
 
 movementRadius = 0.64; %0.78; % in mm
@@ -135,7 +135,7 @@ filtered_data_bp = filtfilt(d_rec, rec_data);
 fig_handle = consolidated_plot(time, filtered_data_bp, hes_data, stim_fb, fs);
 % 
 
-%% Run this if the stimulus was randomised
+% Run this if the stimulus was randomised
 % [rec_protocols_reshaped, rec_protocols_sorted] = reshape_sort_data(filtered_data_bp, single_trial_length, no_of_protocols, no_of_trials, idx);
 % [stim_protocols_hes_reshaped, stim_protocols_hes_sorted] = reshape_sort_data(antennal_movement, single_trial_length, no_of_protocols, no_of_trials, idx);
 % [stim_protocols_ifb_reshaped,stim_protocols_ifb_sorted ]=  reshape_sort_data(stim_fb, single_trial_length, no_of_protocols, no_of_trials, idx);
@@ -150,7 +150,8 @@ rec_protocols_sorted = sort_data(rec_protocols_reshaped,idx);
 stim_protocols_hes_sorted = sort_data(stim_protocols_hes_reshaped, idx); %hes data not filtered. Antennal movement not calculated
 stim_protocols_ifb_sorted = sort_data(stim_protocols_ifb_reshaped, idx);
 
-%% Clip 2s of baseline activity in the beginning and end of trials
+% Clip 2s of baseline activity in the beginning and end of trials
+%{
 start_clip_point = 2*fs+1;
 stop_clip_point = single_trial_length - 2*fs;
 
@@ -159,8 +160,9 @@ stim_protocols_hes_sorted = stim_protocols_hes_sorted(:,start_clip_point : stop_
 stim_protocols_ifb_sorted = stim_protocols_ifb_sorted(:,start_clip_point : stop_clip_point);
 
 single_trial_length = length(rec_protocols_sorted);
+%}
 
-%% Create structs
+% Create structs
 d_ref = datetime('2021.06.01', 'InputFormat', 'yyyy.MM.dd');
 expt_date = split(pwd, '\');
 expt_date = expt_date(3);
