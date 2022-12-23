@@ -36,7 +36,8 @@ function [raster_data,avg_gcfr,no_of_true_trials, gcfr, invalid_trials]   = get_
             else
                 raster_data(i,l) = 1;
                 no_of_true_trials = no_of_true_trials+1;
-                gcfr(no_of_true_trials,:) = (fs/L)*filter(gauss_win, 1, raster_data(i,:));
+%                 gcfr(no_of_true_trials,:) = (fs/L)*filtfilt(gauss_win, 1, raster_data(i,:));
+                gcfr(no_of_true_trials,:) = fs*filtfilt(gauss_win, sum(gauss_win), raster_data(i,:));
 %                 gcfr(no_of_true_trials,:) = filtfilt(gauss_win, 1, raster_data(i,:));
 
             end
@@ -45,6 +46,7 @@ function [raster_data,avg_gcfr,no_of_true_trials, gcfr, invalid_trials]   = get_
         raster_data(invalid_trials,:)=[];
         sum_of_spikes = sum(raster_data, 1);
         
-        avg_gcfr = (fs/L)*(filter(gauss_win, 1, sum_of_spikes))/no_of_true_trials;
+%         avg_gcfr = (fs/L)*(filtfilt(gauss_win, 1, sum_of_spikes))/no_of_true_trials;
+        avg_gcfr = fs*(filtfilt(gauss_win, sum(gauss_win), sum_of_spikes))/no_of_true_trials;
 
 end    
