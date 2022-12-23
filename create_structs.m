@@ -40,7 +40,7 @@ function P = create_structs(rec_protocols_sorted,stim_protocols_hes_sorted,fs, s
                 P(i).antennal_movement(j,:) =  butter_filtfilt(P(i).hes_data_unfilt(j,:), 10*str2double(type_frq(2)), fs, order, a, b, c); %2*str2double(type_frq(2))
 %              
             end
-            P(i).antennal_movement = rad2deg((P(i).antennal_movement - mean(P(i).antennal_movement,2))./movementRadius);
+            P(i).antennal_movement = rad2deg((P(i).antennal_movement - mean(P(i).antennal_movement(:,1:2*fs),2))./movementRadius);
             
         elseif (P(i).stim_type == "sqr")
             P(i).stim_period = 1/str2double(type_frq(2));
@@ -48,7 +48,7 @@ function P = create_structs(rec_protocols_sorted,stim_protocols_hes_sorted,fs, s
             for j=1:complete_trials
                 P(i).antennal_movement(j,:) =  butter_filtfilt(P(i).hes_data_unfilt(j,:), 10, fs, order, a, b, c); %2*str2double(type_frq(2))
             end
-            P(i).antennal_movement = rad2deg((P(i).antennal_movement - mean(P(i).antennal_movement,2))./movementRadius);
+            P(i).antennal_movement = rad2deg((P(i).antennal_movement - mean(P(i).antennal_movement(:,1:2*fs),2))./movementRadius);
             
         elseif P(i).stim_type == "frq" || P(i).stim_type == "dec"
             order=4;
@@ -56,7 +56,7 @@ function P = create_structs(rec_protocols_sorted,stim_protocols_hes_sorted,fs, s
                 P(i).antennal_movement(j, :) =  butter_filtfilt(P(i).hes_data_unfilt(j,:), 2*max_chirp_frq, fs, order, a, b, c);
                 P(i).max_chirp_frq = max_chirp_frq;
             end
-            P(i).antennal_movement = rad2deg((P(i).antennal_movement - mean(P(i).antennal_movement,2))./movementRadius);
+            P(i).antennal_movement = rad2deg((P(i).antennal_movement - mean(P(i).antennal_movement(:,1:2*fs),2))./movementRadius);
             
         elseif P(i).stim_type == "impulse"
             P(i).imp_dur = impulse_dur;
@@ -64,7 +64,7 @@ function P = create_structs(rec_protocols_sorted,stim_protocols_hes_sorted,fs, s
             for j=1:complete_trials
                 P(i).antennal_movement(j,:) =  butter_filtfilt(P(i).hes_data_unfilt(j,:), 2/P(i).imp_dur, fs, order, a, b, c);
             end
-            P(i).antennal_movement = rad2deg((P(i).antennal_movement - mean(P(i).antennal_movement,2))./movementRadius);
+            P(i).antennal_movement = rad2deg((P(i).antennal_movement - mean(P(i).antennal_movement(:,1:2*fs),2))./movementRadius);
             
         elseif P(i).stim_type == "blwgn" || P(i).stim_type == "blwgn2"
             order=4;
@@ -72,7 +72,7 @@ function P = create_structs(rec_protocols_sorted,stim_protocols_hes_sorted,fs, s
                 P(i).antennal_movement(j,:) = butter_filtfilt(P(i).hes_data_unfilt(j,:), blwgn_fc*2, fs, order, a, b, c);
                 P(i).blwgn_fc = blwgn_fc;
             end
-            P(i).antennal_movement = rad2deg((P(i).antennal_movement - mean(P(i).antennal_movement,2))./movementRadius);
+            P(i).antennal_movement = rad2deg((P(i).antennal_movement - mean(P(i).antennal_movement(:,1:2*fs),2))./movementRadius);
             
         elseif (P(i).stim_type == "amp")
             order=3;
@@ -81,7 +81,7 @@ function P = create_structs(rec_protocols_sorted,stim_protocols_hes_sorted,fs, s
                 P(i).amp_sweep_frq = amp_sweep_frq; 
                 P(i).stim_period = 1/amp_sweep_frq;
             end
-            P(i).antennal_movement = rad2deg((P(i).antennal_movement - mean(P(i).antennal_movement,2))./movementRadius);
+            P(i).antennal_movement = rad2deg((P(i).antennal_movement - mean(P(i).antennal_movement(:,1:2*fs),2))./movementRadius);
             
         elseif (P(i).stim_type == "step" || type_frq(2) == "ramp" || P(i).stim_type == "var" )
 %             P(i).step_dur = type_frq(2);
@@ -90,7 +90,7 @@ function P = create_structs(rec_protocols_sorted,stim_protocols_hes_sorted,fs, s
 %                 P(i).antennal_movement(j,:) =  butter_filtfilt(P(i).hes_data_unfilt(j,:), 2/str2double(type_frq(2)), fs, order, a, b, c);
                 P(i).antennal_movement(j,:) =  butter_filtfilt(P(i).hes_data_unfilt(j,:), 8, fs, order, a, b, c);
             end
-            P(i).antennal_movement = rad2deg((P(i).antennal_movement - mean(P(i).antennal_movement,2))./movementRadius);
+            P(i).antennal_movement = rad2deg((P(i).antennal_movement - mean(P(i).antennal_movement(:,1:2*fs),2))./movementRadius);
 
         elseif ( type_frq(2) == "stair" || P(i).stim_name == "inc_dec_stair")
 %             P(i).step_dur = type_frq(2);
@@ -99,7 +99,7 @@ function P = create_structs(rec_protocols_sorted,stim_protocols_hes_sorted,fs, s
 %                 P(i).antennal_movement(j,:) =  butter_filtfilt(P(i).hes_data_unfilt(j,:), 2/str2double(type_frq(2)), fs, order, a, b, c);
                 P(i).antennal_movement(j,:) =  butter_filtfilt(P(i).hes_data_unfilt(j,:), 10, fs, order, a, b, c);
             end
-            P(i).antennal_movement = rad2deg((P(i).antennal_movement - mean(P(i).antennal_movement,2))./movementRadius);
+            P(i).antennal_movement = rad2deg((P(i).antennal_movement - mean(P(i).antennal_movement(:,1:2*fs),2))./movementRadius);
             
         elseif (P(i).stim_type == "sum")
             P(i).stim_period = 1/str2num(type_frq(3));
@@ -107,7 +107,7 @@ function P = create_structs(rec_protocols_sorted,stim_protocols_hes_sorted,fs, s
             for j=1:complete_trials
                 P(i).antennal_movement(j,:) =  butter_filtfilt(P(i).hes_data_unfilt(j,:), 4*str2double(type_frq(3)), fs, order, a, b, c);
             end
-            P(i).antennal_movement = rad2deg((P(i).antennal_movement - mean(P(i).antennal_movement,2))./movementRadius);
+            P(i).antennal_movement = rad2deg((P(i).antennal_movement - mean(P(i).antennal_movement(:,1:2*fs),2))./movementRadius);
             
         elseif (P(i).stim_type == "noisySin")
             noisySin_frq = 30;
@@ -116,7 +116,7 @@ function P = create_structs(rec_protocols_sorted,stim_protocols_hes_sorted,fs, s
             for j=1:complete_trials
                 P(i).antennal_movement(j,:) = butter_filtfilt(P(i).hes_data_unfilt(j,:), 2*max_noise_frq, fs, order, a, b, c);
             end
-            P(i).antennal_movement = rad2deg((P(i).antennal_movement - mean(P(i).antennal_movement,2))./movementRadius);
+            P(i).antennal_movement = rad2deg((P(i).antennal_movement - mean(P(i).antennal_movement(:,1:2*fs),2))./movementRadius);
             
         end
 
