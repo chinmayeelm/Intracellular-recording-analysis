@@ -1,7 +1,7 @@
 [~,yymm,dd] = fileparts(pwd);
 date = strcat(yymm, dd);
 
-filename = "M1_N6_chirp_sweep";
+filename = "M1_N1_stair";
 filename_str = sprintf("%s.nwb", filename);
 nwb_in = nwbRead(filename_str); 
 clip_data_flag =0;
@@ -56,8 +56,11 @@ movementRadius = 0.64; %0.78; % in mm
 
 start_stim = OFF_dur*fs;
 stop_stim = (ON_dur+OFF_dur)*fs;
-single_trial_length = start_stim + stop_stim+1;
-% single_trial_length = start_stim + stop_stim;
+% single_trial_length = start_stim + stop_stim+1;
+single_trial_length = start_stim + stop_stim;
+if mod(length(data),single_trial_length)~=0
+    single_trial_length = start_stim + stop_stim+1;
+end
 
 % stim_frequencies = find_stim_freq(stim_fb,ON_dur, OFF_dur, fs)
 
@@ -135,7 +138,7 @@ filtered_data_bp = filtfilt(d_rec, rec_data);
 fig_handle = consolidated_plot(time, filtered_data_bp, hes_data, stim_fb, fs);
 % 
 
-% Run this if the stimulus was randomised
+%% Run this if the stimulus was randomised
 % [rec_protocols_reshaped, rec_protocols_sorted] = reshape_sort_data(filtered_data_bp, single_trial_length, no_of_protocols, no_of_trials, idx);
 % [stim_protocols_hes_reshaped, stim_protocols_hes_sorted] = reshape_sort_data(antennal_movement, single_trial_length, no_of_protocols, no_of_trials, idx);
 % [stim_protocols_ifb_reshaped,stim_protocols_ifb_sorted ]=  reshape_sort_data(stim_fb, single_trial_length, no_of_protocols, no_of_trials, idx);
@@ -199,7 +202,7 @@ end
 
 %% Plot data
 % figure;
-plot_data(single_trial_length,no_of_protocols, fs, time, filename,  P(1));
+plot_data(single_trial_length,no_of_protocols, fs, time, filename,  P);
 
 
 %% Phase plot             Not working
