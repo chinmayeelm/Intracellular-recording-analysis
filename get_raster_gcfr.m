@@ -47,6 +47,7 @@ function [raster_data,avg_gcfr,no_of_true_trials, gcfr, invalid_trials]   = get_
         sum_of_spikes = sum(raster_data, 1);
         
 %         avg_gcfr = (fs/L)*(filtfilt(gauss_win, 1, sum_of_spikes))/no_of_true_trials;
-        avg_gcfr = fs*(filtfilt(gauss_win, sum(gauss_win), sum_of_spikes))/no_of_true_trials;
+%         avg_gcfr = fs*(filtfilt(gauss_win, sum(gauss_win), sum_of_spikes))/no_of_true_trials;
+        avg_gcfr = mean(gcfr,1)/no_of_true_trials;
 
 end    
