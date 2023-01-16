@@ -1,5 +1,5 @@
 
-function [raster_data,avg_gcfr,no_of_true_trials, gcfr, invalid_trials]   = get_raster_gcfr(no_of_trials, P_rec, single_trial_length, fs, L, alpha)
+function [raster_data,avg_gcfr,no_of_true_trials, gcfr, invalid_trials]   = get_raster_gcfr(no_of_trials, P_rec, single_trial_length, fs, L, sigma)
     
         gcfr = [];
         invalid_trials = [];
@@ -7,6 +7,7 @@ function [raster_data,avg_gcfr,no_of_true_trials, gcfr, invalid_trials]   = get_
         raster_data = zeros(no_of_trials, single_trial_length);
 %         L = fs/2; %fs/10; %1000; %5000
 %         alpha = 4;%2;%8;
+        alpha = ((L-1)/(2*sigma*fs));
         gauss_win = gausswin(L, alpha); 
         for i=1:no_of_trials
 %             p=[]; l=[];
@@ -37,7 +38,8 @@ function [raster_data,avg_gcfr,no_of_true_trials, gcfr, invalid_trials]   = get_
                 raster_data(i,l) = 1;
                 no_of_true_trials = no_of_true_trials+1;
 %                 gcfr(no_of_true_trials,:) = (fs/L)*filtfilt(gauss_win, 1, raster_data(i,:));
-                gcfr(no_of_true_trials,:) = fs*filtfilt(gauss_win, sum(gauss_win), raster_data(i,:));
+%                 gcfr(no_of_true_trials,:) = fs*filtfilt(gauss_win, sum(gauss_win), raster_data(i,:));
+                gcfr(no_of_true_trials,:) = (fs/sum(gauss_win))*conv(raster_data(i,:),gauss_win,'same');
 %                 gcfr(no_of_true_trials,:) = filtfilt(gauss_win, 1, raster_data(i,:));
 
             end

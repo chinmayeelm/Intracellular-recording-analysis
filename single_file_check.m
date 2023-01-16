@@ -1,7 +1,8 @@
+% clear;
 [~,yymm,dd] = fileparts(pwd);
 date = strcat(yymm, dd);
 
-filename = "M1_N1_stair";
+filename = "M1_N1_ramp";
 filename_str = sprintf("%s.nwb", filename);
 nwb_in = nwbRead(filename_str); 
 clip_data_flag =0;
@@ -43,12 +44,12 @@ else
     disp('No parameters in the file');
 end
 
-gauss_win_L = fs;
-gauss_win_alpha = 2;
+gauss_win_L = fs/5;
+gauss_win_sigma = 0.03; % 30 ms
 
 movementRadius = 0.64; %0.78; % in mm
 
-% ON_dur = 30;
+% ON_dur = 4;
 % OFF_dur =3;
 % no_of_trials = 5;
 % fs = 1e4;
@@ -78,7 +79,7 @@ stim_order_vector = string(split(stim.stimulus_description, ','));
 %
 valid_trials = round(length(data)/single_trial_length);
 
-% clear nwb_in
+clear nwb_in
 
 if clip_data_flag == 1
     
@@ -138,7 +139,7 @@ filtered_data_bp = filtfilt(d_rec, rec_data);
 fig_handle = consolidated_plot(time, filtered_data_bp, hes_data, stim_fb, fs);
 % 
 
-%% Run this if the stimulus was randomised
+% Run this if the stimulus was randomised
 % [rec_protocols_reshaped, rec_protocols_sorted] = reshape_sort_data(filtered_data_bp, single_trial_length, no_of_protocols, no_of_trials, idx);
 % [stim_protocols_hes_reshaped, stim_protocols_hes_sorted] = reshape_sort_data(antennal_movement, single_trial_length, no_of_protocols, no_of_trials, idx);
 % [stim_protocols_ifb_reshaped,stim_protocols_ifb_sorted ]=  reshape_sort_data(stim_fb, single_trial_length, no_of_protocols, no_of_trials, idx);
@@ -177,7 +178,7 @@ else
     a=0.5334; b=516.5; c = -3.233;
 end
 
-P = create_structs(rec_protocols_sorted,stim_protocols_hes_sorted,fs, stim_protocols_ifb_sorted, no_of_protocols, no_of_trials, single_trial_length, stim_order_sorted,max_chirp_frq, amp_sweep_frq, blwgn_fc, ON_dur, a, b, c, gauss_win_L, gauss_win_alpha, movementRadius);
+P = create_structs(rec_protocols_sorted,stim_protocols_hes_sorted,fs, stim_protocols_ifb_sorted, no_of_protocols, no_of_trials, single_trial_length, stim_order_sorted,max_chirp_frq, amp_sweep_frq, blwgn_fc, ON_dur, a, b, c, gauss_win_L, gauss_win_sigma, movementRadius);
 % end
 %
 
@@ -251,10 +252,10 @@ for i = 1:no_of_protocols
         
         P(i).inc_frq_chirp_f = linspace(1,max_chirp_frq,ON_dur*fs+1);
         figure;
-        [lineOut, ~] = stdshade(P(i).norm_gcfr(:,start_stim:stop_stim),0.2,'k',P(i).inc_frq_chirp_f);
+        [lineOut, ~] = stdshade(P(i).gcfr(:,start_stim:stop_stim),0.2,'k',P(i).inc_frq_chirp_f);
         lineOut.LineWidth  = 0.05;
         lineOut.LineWidth  = 0.01;
-        ylabel 'Normalised GCFR';
+        ylabel 'Firing rate (Hz)';
         xlabel 'Frequency (Hz)';
         title ('Response to increasing frequency chirp');
         
@@ -262,9 +263,9 @@ for i = 1:no_of_protocols
         P(i).dec_frq_chirp_f = linspace(max_chirp_frq,1,ON_dur*fs+1);
         
         figure;
-        [lineOut, ~] = stdshade(P(i).norm_gcfr(:,start_stim:stop_stim),0.2,'k',P(i).dec_frq_chirp_f);
+        [lineOut, ~] = stdshade(P(i).gcfr(:,start_stim:stop_stim),0.2,'k',P(i).dec_frq_chirp_f);
         lineOut.LineWidth  = 0.05;
-        ylabel 'Normalised GCFR';
+        ylabel 'Firing rate (Hz)';
         xlabel 'Frequency (Hz)';
         title ('Response to decreasing frequency chirp');
         %

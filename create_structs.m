@@ -1,4 +1,4 @@
-function P = create_structs(rec_protocols_sorted,stim_protocols_hes_sorted,fs, stim_protocols_ifb_sorted, no_of_protocols, no_of_trials, single_trial_length, stim_order_sorted, max_chirp_frq,amp_sweep_frq, blwgn_fc, impulse_dur, a, b, c, L, alpha, movementRadius)
+function P = create_structs(rec_protocols_sorted,stim_protocols_hes_sorted,fs, stim_protocols_ifb_sorted, no_of_protocols, no_of_trials, single_trial_length, stim_order_sorted, max_chirp_frq,amp_sweep_frq, blwgn_fc, impulse_dur, a, b, c, L, sigma, movementRadius)
 
     for i=1:no_of_protocols
         
@@ -21,7 +21,7 @@ function P = create_structs(rec_protocols_sorted,stim_protocols_hes_sorted,fs, s
         P(i).stim_ifb = stim_protocols_ifb_sorted(trial_idx: trial_idx+ no_of_trials-1, :);
         
         
-        [raster,avg_gcfr,complete_trials, gcfr, invalid_trials]  = get_raster_gcfr(no_of_trials, P(i).rec, single_trial_length, fs, L, alpha);
+        [raster,avg_gcfr,complete_trials, gcfr, invalid_trials]  = get_raster_gcfr(no_of_trials, P(i).rec, single_trial_length, fs, L, sigma);
         P(i).gcfr = gcfr; %in Hz
         P(i).raster = raster;
         P(i).avg_gcfr = avg_gcfr; %in Hz
