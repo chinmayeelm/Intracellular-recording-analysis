@@ -1,6 +1,7 @@
 % clear;
-[~,yymm,dd] = fileparts(pwd);
-date = strcat(yymm, dd);
+date = split(pwd, '\');
+date = string(date(3));
+date = datetime(replace(date, '.','-'),'Format','dd-MM-uuuu');
 
 filename = "M1_N1_ramp";
 filename_str = sprintf("%s.nwb", filename);
@@ -47,7 +48,21 @@ end
 gauss_win_L = fs/5;
 gauss_win_sigma = 0.03; % 30 ms
 
-movementRadius = 0.64; %0.78; % in mm
+flag_meas_table = readtable('E:\Recordings\Antenna flagellum measurements\flagellum-length-measurements.xlsx');
+flag_meas_table.Date = datetime(flag_meas_table.Date, 'format', 'dd-MM-uuuu');
+filenameParts = split(filename,'_');
+mothId = filenameParts(1);
+flag_meas_table.Properties.RowNames = join([string(flag_meas_table.Date) flag_meas_table.MothID],'_');
+
+rowId = join([string(date) mothId],'_');
+try 
+    movementRadius = table2array(flag_meas_table(rowId,'Length_mm_'));
+    disp('flagellum measurement exists')
+
+catch
+    disp('Taking default radius')
+    movementRadius = 0.64; %0.78; % in mm
+end
 
 % ON_dur = 4;
 % OFF_dur =3;
