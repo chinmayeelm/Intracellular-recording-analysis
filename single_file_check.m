@@ -3,7 +3,7 @@ date = split(pwd, '\');
 date = string(date(3));
 date = datetime(replace(date, '.','-'),'Format','dd-MM-uuuu');
 
-filename = "M1_N1_ramp";
+filename = "M1_N1_blwgn";
 filename_str = sprintf("%s.nwb", filename);
 nwb_in = nwbRead(filename_str); 
 clip_data_flag =0;
@@ -94,7 +94,7 @@ stim_order_vector = string(split(stim.stimulus_description, ','));
 %
 valid_trials = round(length(data)/single_trial_length);
 
-clear nwb_in
+% clear nwb_in
 
 if clip_data_flag == 1
     
@@ -108,7 +108,8 @@ if clip_data_flag == 1
     
     
     data = data(start_clip_point:stop_clip_point,:);
-    time = time(start_clip_point:stop_clip_point);
+%     time = time(start_clip_point:stop_clip_point);
+    time = time(1:length(data));
     valid_trials = round(length(data)/single_trial_length);
     
     stim_order_vector = stim_order_vector(1:valid_trials);
@@ -218,7 +219,7 @@ end
 
 %% Plot data
 % figure;
-plot_data(single_trial_length,no_of_protocols, fs, time, filename,  P);
+plot_data(single_trial_length,no_of_protocols, fs, time, filename,  P(1));
 
 
 %% Phase plot             Not working

@@ -8,7 +8,7 @@ sourceFolderPath = join([rootFolderPath '\' folderName '\'],'');
 cd (sourceFolderPath);
 fileNameparts = split(fileName, '_');
 
-mothFolderID = fileNameparts(1);
+mothFolderID = string(fileNameparts(1));
 if ~isfolder("raw") 
     mkdir("raw");
     addpath("raw");   

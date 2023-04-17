@@ -6,7 +6,7 @@ function fig_handle = consolidated_plot(time, filtered_data_bp, hes_data, stim_f
     p_small = setxor(p,p1);
     l_small = setxor(l,l1);
     A1 = subplot(2,1,1);plot(time, filtered_data_bp*100, 'k');
-    ylim([-10 50]);
+    ylim([-10 80]);
     hold on; plot(l/fs, p, '.', 'MarkerEdgeColor', 'r');
 %     plot(l_small/fs, p_small, '.', 'MarkerEdgeColor', 'b');
     

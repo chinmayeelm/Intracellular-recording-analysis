@@ -21,9 +21,9 @@ function [stim_freq, power_fft, frq_fft] = fft_stim_(stim_matrix, Fs)
         f = Fs*(0:(L/2))/L;
 %         f = f(2:end-1);
         length(f)
-        figure();
+%         figure();
         semilogx(f(2:end-1),P1(2:end-1)); hold on;
-%         plot(f,P1); %hold on;
+        plot(f,P1); %hold on;
         title('FFT of Stimulus')
         xlabel('f (Hz)')
         ylabel('Magnitude')
@@ -31,6 +31,9 @@ function [stim_freq, power_fft, frq_fft] = fft_stim_(stim_matrix, Fs)
 
 %         [~,loc] = max(P1(2:end-1));
 %         [~,loc] = max(P1);
+
+
+
         [~,loc] = max(P1);
         stim_freq = f(loc);
         

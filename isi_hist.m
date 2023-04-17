@@ -10,11 +10,11 @@ isi_all = [];
         isi_all = [isi_all isi];
     end
     
-% figure;
-% histogram(isi_all,'BinWidth', 1);
-% xlabel 'ISI (ms)';
-% ylabel 'Occurances';
-% title 'Histogram of ISI';
+figure;
+histogram(isi_all,'BinWidth', 1);
+xlabel 'ISI (ms)';
+ylabel 'Occurances';
+title 'Histogram of ISI';
 
 end
 
