@@ -3,7 +3,7 @@ date = split(pwd, '\');
 date = string(date(3));
 date = datetime(replace(date, '.','-'),'Format','dd-MM-uuuu');
 
-filename = "M1_N1_blwgn";
+filename = "M1_N1_ramp";
 filename_str = sprintf("%s.nwb", filename);
 nwb_in = nwbRead(filename_str); 
 clip_data_flag =0;
@@ -217,12 +217,12 @@ for i=1:no_of_protocols
     
 end
 
-%% Plot data
+% Plot data
 % figure;
-plot_data(single_trial_length,no_of_protocols, fs, time, filename,  P(1));
+% plot_data(single_trial_length,no_of_protocols, fs, time, filename,  P);
 
 
-%% Phase plot             Not working
+% Phase plot             Not working
 
 % Write code to select only sine, frq_chirp and amp_sweep protocols
 % No :P
@@ -238,26 +238,26 @@ for i=1:no_of_protocols
     end
 end
 %}
-%% GCFR Vs frequency and spike phase Vs Frequency
+% GCFR Vs frequency and spike phase Vs Frequency
 
 for i = 1:no_of_protocols
             if P(i).stim_type == "frq" || P(i).stim_type =="dec"
     
     
                  [I_spike_phase, II_spike_phase, III_spike_phase, I_spike_freq, II_spike_freq, III_spike_freq] = spike_phase(P(i).antennal_movement(1,:), P(i).raster(1,:), fs, ON_dur, OFF_dur);
-                 figure(); scatter(I_spike_freq,I_spike_phase,100, 'k.'); hold on;
-                 pmin = min(I_spike_phase);
-                 pmax = max(I_spike_phase);
-                 pimin = floor(pmin/pi);
-                 pimax = ceil(pmax/pi);
-    %              yticks(0:pi/4:2*pi);
-                 yticks((pimin:pimax) * pi);
-                 yticklabels( string(pimin:pimax) + "\pi" )
-                 scatter(II_spike_freq,II_spike_phase, 100,  'b.');
-                 scatter(III_spike_freq,III_spike_phase, 100, 'r.')
-                 ylabel('Spike phase (rad)');
-                 xlabel('Stimulus frequency (Hz)');
-                 legend('I spike','II spike', 'III spike');
+%                  figure(); scatter(I_spike_freq,I_spike_phase,100, 'k.'); hold on;
+%                  pmin = min(I_spike_phase);
+%                  pmax = max(I_spike_phase);
+%                  pimin = floor(pmin/pi);
+%                  pimax = ceil(pmax/pi);
+%     %              yticks(0:pi/4:2*pi);
+%                  yticks((pimin:pimax) * pi);
+%                  yticklabels( string(pimin:pimax) + "\pi" )
+%                  scatter(II_spike_freq,II_spike_phase, 100,  'b.');
+%                  scatter(III_spike_freq,III_spike_phase, 100, 'r.')
+%                  ylabel('Spike phase (rad)');
+%                  xlabel('Stimulus frequency (Hz)');
+%                  legend('I spike','II spike', 'III spike');
             end
     
     if P(i).stim_type == "frq"
@@ -266,24 +266,26 @@ for i = 1:no_of_protocols
         %              P(i).II_spike = [II_spike_freq', II_spike_phase'];
         %              P(i).III_spike = [III_spike_freq', III_spike_phase'];
         
-        P(i).inc_frq_chirp_f = linspace(1,max_chirp_frq,ON_dur*fs+1);
-        figure;
-        [lineOut, ~] = stdshade(P(i).gcfr(:,start_stim:stop_stim),0.2,'k',P(i).inc_frq_chirp_f);
-        lineOut.LineWidth  = 0.05;
-        lineOut.LineWidth  = 0.01;
-        ylabel 'Firing rate (Hz)';
-        xlabel 'Frequency (Hz)';
-        title ('Response to increasing frequency chirp');
-        
+        inc_frq_chirp_f = linspace(1,max_chirp_frq,ON_dur*fs+1);
+        P(i).inc_frq_chirp_f = inc_frq_chirp_f;
+%         figure;
+%         [lineOut, ~] = stdshade(P(i).gcfr(:,start_stim:stop_stim),0.2,'k',P(i).inc_frq_chirp_f);
+%         inc_chirp_gcfr = P(i).gcfr(:,start_stim:stop_stim);
+%         lineOut.LineWidth  = 0.05;
+%         lineOut.LineWidth  = 0.01;
+%         ylabel 'Firing rate (Hz)';
+%         xlabel 'Frequency (Hz)';
+%         title ('Response to increasing frequency chirp');
+%         
     elseif P(i).stim_type == "dec"
         P(i).dec_frq_chirp_f = linspace(max_chirp_frq,1,ON_dur*fs+1);
         
-        figure;
-        [lineOut, ~] = stdshade(P(i).gcfr(:,start_stim:stop_stim),0.2,'k',P(i).dec_frq_chirp_f);
-        lineOut.LineWidth  = 0.05;
-        ylabel 'Firing rate (Hz)';
-        xlabel 'Frequency (Hz)';
-        title ('Response to decreasing frequency chirp');
+%         figure;
+%         [lineOut, ~] = stdshade(P(i).gcfr(:,start_stim:stop_stim),0.2,'k',P(i).dec_frq_chirp_f);
+%         lineOut.LineWidth  = 0.05;
+%         ylabel 'Firing rate (Hz)';
+%         xlabel 'Frequency (Hz)';
+%         title ('Response to decreasing frequency chirp');
         %
         %              P(i).dec_chirp_I_spike = [I_spike_freq', I_spike_phase'];
         %              P(i).dec_chirp_II_spike = [II_spike_freq', II_spike_phase'];
@@ -291,32 +293,41 @@ for i = 1:no_of_protocols
     end
 end
 
-%% STA of Band limited white Gaussian Noise
+% STA of Band limited white Gaussian Noise
 
-for i = 1:no_of_protocols
-    if P(i).stim_type == "blwgn"
-        STA_window = 0.1;
-        STA  = STA_analysis(P(i).raster, P(i).antennal_movement, STA_window, fs, start_stim, stop_stim);
-        P(i).power_fft = power_fft;
-        P(i).frq_fft = frq_fft;
-        P(i).STA = STA;
-        [stim_freq, power_fft, frq_fft] = get_fft(STA, fs, window*fs);
-    end
-end
+% for i = 1:no_of_protocols
+%     if P(i).stim_type == "blwgn"
+%         STA_window = 0.1;
+%         STA  = STA_analysis(P(i).raster, P(i).antennal_movement, STA_window, fs, start_stim, stop_stim);
+% 
+%         [stim_freq, power_fft, frq_fft] = get_fft(STA, fs, window*fs);        
+%         P(i).power_fft = power_fft;
+%         P(i).frq_fft = frq_fft;
+%         P(i).STA = STA;
+%     end
+% end
 
 
 
-%% Covariance analysis
+% Covariance analysis
 
 for i = 1:no_of_protocols
     if P(i).stim_type == "blwgn"
         window = 0.03;
-        [ev1, ev2] = cov_analysis(P(i).raster, P(i).antennal_movement, window, fs, start_stim, stop_stim);
+        [ev1, ev2, STA] = cov_analysis(P(i).raster, P(i).antennal_movement, window, fs, start_stim, stop_stim);
 %         P(i).cov_matrix = cov_matrix;
                 P(i).ev1 = ev1;
                 P(i).ev2 = ev2;
+                P(i).STA = STA;
+        [power_fft, frq_fft] = get_fft(STA, fs, window*fs);        
+        P(i).power_fft = power_fft;
+        P(i).frq_fft = frq_fft;
     end
 end
+
+
+
+
 %% Latency to spike in square or step wave stimulus
 
 for i = 1:no_of_protocols
