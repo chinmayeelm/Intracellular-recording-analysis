@@ -3,7 +3,7 @@ date = split(pwd, '\');
 date = string(date(3));
 date = datetime(replace(date, '.','-'),'Format','dd-MM-uuuu');
 
-filename = "M1_N1_ramp";
+filename = "M1_N4_step";
 filename_str = sprintf("%s.nwb", filename);
 nwb_in = nwbRead(filename_str); 
 clip_data_flag =0;
@@ -45,8 +45,8 @@ else
     disp('No parameters in the file');
 end
 
-gauss_win_L = fs/5;
-gauss_win_sigma = 0.03; % 30 ms
+gauss_win_L = fs; %fs/5;
+gauss_win_sigma = 0.1; %0.03; % 30 ms
 
 flag_meas_table = readtable('E:\Recordings\Antenna flagellum measurements\flagellum-length-measurements.xlsx');
 flag_meas_table.Date = datetime(flag_meas_table.Date, 'format', 'dd-MM-uuuu');
