@@ -20,13 +20,10 @@ for i=1:length(P)
     xlabel('Time (s)', 'FontSize',12);
     ax2.Box = 'off';
     
-    
     linkaxes([ax1 ax2], 'x');
     xlim([3 Inf]);
     
 end
-legend(ax1, arrayfun(@(x) replace(x.stim_name, "_"," "), P), 'Location', 'best');
-legend(ax1, 'boxoff');
 
 max_FR = [];
 velocity = [];
@@ -38,14 +35,14 @@ for i=1:length(P)
     start_point = P(i).OFF_dur*P(i).fs;
     stim_end_point = (P(i).OFF_dur+P(i).ON_dur)*P(i).fs;
     stim_name = split(P(i).stim_name);
-    delta_t = str2double(stim_name(2))
-    baselineFR = mean(P(i).avg_gcfr(1:3*P(i).fs),"all");
-    pos_ref = mean(-P(i).mean_movement(1:3*P(i).fs));
-    pos_stim = mean(-P(i).mean_movement((P(i).OFF_dur + delta_t)*P(i).fs:(P(i).OFF_dur + delta_t+2)*P(i).fs));
-    amplitude = abs(pos_ref - pos_stim)
+    delta_t = str2double(stim_name(2));
+    baselineFR = mean(P(i).avg_gcfr(1:3*fs),"all");
+    pos_ref = mean(-P(i).mean_movement(1:3*P(1).fs));
+    pos_stim = mean(-P(i).mean_movement(8*P(1).fs:9*P(1).fs));
+    amplitude = abs(pos_ref - pos_stim);
     velocity_values = repmat((amplitude/delta_t), [P(i).complete_trials,1]);
-    velocity = [velocity; velocity_values]
-    spikes = sum(P(i).raster(:,start_point:start_point+delta_t*P(i).fs),2)./delta_t;
+    velocity = [velocity; velocity_values];
+    spikes = sum(P(i).raster(:,start_point:start_point+delta_t*fs),2)./delta_t;
     %         velocity = [velocity; velocity];
     %         [min_val,stop_point] = min(P(i).avg_gcfr(start_point:(P(i).ON_dur+P(i).OFF_dur)*P(i).fs));
 %     for timestamps = start_point : stim_end_point
@@ -68,8 +65,8 @@ for i=1:length(P)
     
 end
 
-[velocity_sorted, idx] = sort(velocity, 'ascend')
-max_FR_sorted = max_FR(idx)
+[velocity_sorted, idx] = sort(velocity, 'ascend');
+max_FR_sorted = max_FR(idx);
 avg_spikes_sorted = avg_spikes(idx);
 meanMaxFR = median(reshape(max_FR_sorted, P(i).complete_trials, []),1);
 meanSpikes = mean(reshape(avg_spikes_sorted, P(i).complete_trials, []),1);
@@ -88,7 +85,7 @@ scatter(velocity_sorted, max_FR_sorted, 5,'k','filled','MarkerFaceAlpha',0.3);
 % ylim([0 100]);
 ylabel('Peak firing rate (Hz)', 'FontSize',12);
 xlabel('Angular velocity (deg/s)', 'FontSize',12);
-title(replace([P(i).date P(i).filename], '_','-'));
+title(replace([P(1).date P(1).filename], '_','-'));
 
 FR =reshape(max_FR_sorted, P(i).complete_trials, []);
 p = ranksum(FR(:,1), FR(:,end))

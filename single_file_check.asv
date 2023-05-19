@@ -3,7 +3,7 @@ date = split(pwd, '\');
 date = string(date(3));
 date = datetime(replace(date, '.','-'),'Format','dd-MM-uuuu');
 
-filename = "M1_N1_ramp_up";
+filename = "M2_N1_ramp";
 filename_str = sprintf("%s.nwb", filename);
 nwb_in = nwbRead(filename_str); 
 clip_data_flag =0;
@@ -70,13 +70,13 @@ end
 % fs = 1e4;
 
 
-% start_stim = OFF_dur*fs;
-% stop_stim = (ON_dur+OFF_dur)*fs;
-% % single_trial_length = start_stim + stop_stim+1;
-% single_trial_length = start_stim + stop_stim;
-% if mod(length(data),single_trial_length)~=0
-%     single_trial_length = start_stim + stop_stim+1;
-% end
+start_stim = OFF_dur*fs;
+stop_stim = (ON_dur+OFF_dur)*fs;
+% single_trial_length = start_stim + stop_stim+1;
+single_trial_length = start_stim + stop_stim;
+if mod(length(data),single_trial_length)~=0
+    single_trial_length = start_stim + stop_stim+1;
+end
 
 % stim_frequencies = find_stim_freq(stim_fb,ON_dur, OFF_dur, fs)
 
@@ -92,7 +92,8 @@ stim_order_vector = string(split(stim.stimulus_description, ','));
 % stim_order_vector = LUT_intra.stim_order(2);
 [stim_order_sorted,idx] = sort(stim_order_vector);
 no_of_protocols = length(unique(stim_order_sorted));
-valid_trials = no_of_protocols * no_of_trials;
+%
+% valid_trials = round(length(data)/single_trial_length);
 
 % clear nwb_in
 
@@ -130,7 +131,7 @@ elseif time(end)==0
     no_of_protocols = length(unique(stim_order_sorted));
 end
 %
-single_trial_length = length(data)/valid_trials;
+
 %     no_of_protocols = length(stim_order_sorted)/no_of_trials;
 
 % valid_trials = round(length(data)/single_trial_length);

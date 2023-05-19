@@ -10,12 +10,11 @@ for i = 1:length(P)
     tonicGCFR(i,:) = P(i).avg_gcfr(startPt : stopPt);
 end
 
-descentFR = tonicGCFR(length(P),:);
+descentFR = tonicGCFR(length(P),1:2*fs);
 descentFR = descentFR/max(descentFR);
 t1=linspace(0.0001,4,4*fs+1);
-plot(t1,descentFR); hold on;
 
-idx = randperm(numel(t1),500);
+idx = randperm(numel(t1),1000);
 
 [xData, yData] = prepareCurveData( t1, descentFR );
 xData = xData(idx);
@@ -35,14 +34,13 @@ adaptation_coeff = fitresult.b;
 rsquare = gof.rsquare;
 
 % Plot fit with data.
-% figure();
-% h = plot( fitresult, xData, yData );
-% legend( h, 't1 vs. descentFR', 'untitled fit 1', 'Location', 'NorthEast', 'Interpreter', 'none' );
-% % Label axes
-% xlabel( 't1', 'Interpreter', 'none' );
-% ylabel( 'descentFR', 'Interpreter', 'none' );
-% text(2,1, join(string([adaptation_coeff rsquare])));
-% grid on
+figure();
+h = plot( fitresult, xData, yData );
+legend( h, 't1 vs. descentFR', 'untitled fit 1', 'Location', 'NorthEast', 'Interpreter', 'none' );
+% Label axes
+xlabel( 'descentFR', 'Interpreter', 'none' );
+ylabel( 't1', 'Interpreter', 'none' );
+grid on
 
 title(join([string(P(1).date) replace(P(1).filename, '_',' ')], ' ' ));
 

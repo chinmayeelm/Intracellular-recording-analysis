@@ -13,27 +13,25 @@ rsquare = zeros(1, nfiles);
 
 ignorefiles = [];
 
-for irow = 6%:nfiles
+for irow = 1:nfiles
     
     irow
-%     close all;
+    close all;
     
-%     try
+    try
     P_ramp = getStructP(dataDirectory_ramp(irow), filename_ramp(irow),0);
-    
 %     P_step = getStructP(dataDirectory_step(irow), filename_step(irow),0);
     rampGCFRplots(P_ramp);
 %     stepGCFRplots(P_step);
-%     try
-%     [adaptation_coeff(irow), rsquare(irow)] = calcAdaptation(P_ramp);
-%     catch
-%         disp("Not enough duration to fit curve");
-%         ignorefiles = [ignorefiles irow];
-%     end
+    try
+    [adaptation_coeff(irow), rsquare(irow)] = calcAdaptation(P_ramp);
+    catch
+        disp("Not enough duration to fit curve");
+        
+    end
     
-%     catch
-%         ignorefiles = [ignorefiles irow];
-%     end
+    catch
+        d
     pause;
 
 end
