@@ -5,26 +5,35 @@ function stepGCFRplots(P)
 total_trial_dur = P(1).ON_dur+2*P(1).OFF_dur;
 time = linspace(0,total_trial_dur,P(1).single_trial_length);
 
-figure;
+
 for i=1:length(P)
-    
-    ax1 = subplot(2,1,1); plot(time, -P(i).mean_movement, 'LineWidth',1); hold on;
-    %     lgd = legend(["0.005 mm", "0.01 mm","-0.005 mm","-0.01 mm"],"Location","northeast","NumColumns",1);
-    %     title(lgd, "Step amplitude");
+    figure;
+    ax1 = subplot(4,1,1); plot(time, -P(i).mean_movement, 'LineWidth',1); hold on;
+    %     lgd = legend(["1 s", "2 s","0.5 s", "0.5 s"],"Location","northeast","NumColumns",1);
+    %     title(lgd, "Ramp duration");
     ylabel('Antennal position (deg)', 'FontSize',12);
     title(replace([P(1).date P(1).filename], '_','-'));
     ax1.Box = 'off';
     ax1.XAxis.Visible = 'off';
     
+    ax2 = subplot(4,1,2); plot(time(2:end),diff(P(i).intendedStimulus(1,:)), 'LineWidth', 1); hold on;
+    ylabel('Velocity (a.u)');
+    ax1.Box = 'off';
+    ax1.XAxis.Visible = 'off';
     
-    ax2 = subplot(2,1,2); plot(time, P(i).avg_gcfr, 'LineWidth',1); hold on;
+    ax3 = subplot(4,1,3); plot(time(3:end),diff(P(i).intendedStimulus(1,:),2), 'LineWidth', 1); hold on;
+    ylabel('Accelaration (a.u)');
+    ax1.Box = 'off';
+    ax1.XAxis.Visible = 'off';
+    
+    ax4 = subplot(4,1,4); plot(time, P(i).avg_gcfr, 'LineWidth',1); hold on;
     ylabel('Mean Firing rate (Hz)', 'FontSize',12);
     xlabel('Time (s)', 'FontSize',12);
     ax2.Box = 'off';
     
-    linkaxes([ax1 ax2], 'x');
-    xlim([3 Inf])
     
+    linkaxes([ax1 ax2 ax3 ax4], 'x');
+    xlim([3 Inf]);    
 end
 
 %Steady state firing rate Vs Position
