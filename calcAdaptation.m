@@ -3,46 +3,54 @@ function [adaptation_coeff, rsquare] = calcAdaptation(P)
 %   Detailed explanation goes here
 fs = P(1).fs;
 tonicGCFR = [];
+gcfrDur = 0.5;
 for i = 1:length(P)
     gcfr = P(i).avg_gcfr;
     [~,startPt] = max(gcfr);
-    stopPt = startPt + 4*fs;
+    stopPt = startPt + gcfrDur*fs;
     tonicGCFR(i,:) = P(i).avg_gcfr(startPt : stopPt);
 end
 
 descentFR = tonicGCFR(length(P),:);
 descentFR = descentFR/max(descentFR);
-t1=linspace(0.0001,4,4*fs+1);
-plot(t1,descentFR); hold on;
+t1=linspace(0.0001,gcfrDur, length(descentFR));
+% plot(t1,descentFR); hold on;
 
-idx = randperm(numel(t1),500);
+% idx = randperm(numel(t1),500);
 
 [xData, yData] = prepareCurveData( t1, descentFR );
-xData = xData(idx);
-yData = yData(idx);
+% xData = xData(idx);
+% yData = yData(idx);
 
 % Set up fittype and options.
-ft = fittype( 'power1' );
-opts = fitoptions( 'Method', 'NonlinearLeastSquares' );
-opts.Display = 'Off';
+% ft = fittype( 'power1' );
+ft = fittype( 'exp1' );
+% opts = fitoptions( 'Method', 'NonlinearLeastSquares' );
+% opts.Display = 'Off';
 % opts.Robust = 'Bisquare';
 % opts.StartPoint = [9397215.94371203 -3.68090399369325];
 
 % Fit model to data.
-[fitresult, gof] = fit( xData, yData, ft, opts )
+% [fitresult, gof] = fit( xData, yData, ft, opts );
+[fitresult, gof] = fit( xData, yData, ft );
 
 adaptation_coeff = fitresult.b;
 rsquare = gof.rsquare;
 
 % Plot fit with data.
-% figure();
-% h = plot( fitresult, xData, yData );
+figure();
+plot( fitresult, xData, yData ); hold on;
+xlim([0 Inf]);
+ylim([0 2]);
 % legend( h, 't1 vs. descentFR', 'untitled fit 1', 'Location', 'NorthEast', 'Interpreter', 'none' );
-% % Label axes
-% xlabel( 't1', 'Interpreter', 'none' );
-% ylabel( 'descentFR', 'Interpreter', 'none' );
-% text(2,1, join(string([adaptation_coeff rsquare])));
-% grid on
+% Label axes
+xlabel( 'time (s)');
+ylabel( 'Norm. mean firing rate');
+
+str = sprintf(" k = %0.3f \n rsquare = %0.3f", adaptation_coeff, rsquare);
+text(1,1.5, str);
+text(0.25,1.5, str);
+grid on
 
 title(join([string(P(1).date) replace(P(1).filename, '_',' ')], ' ' ));
 
