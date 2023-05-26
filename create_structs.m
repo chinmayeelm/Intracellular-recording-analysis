@@ -1,4 +1,4 @@
-function P = create_structs(rec_protocols_sorted,stim_protocols_hes_sorted,fs, stim_protocols_ifb_sorted, no_of_protocols, no_of_trials, single_trial_length, stim_order_sorted, max_chirp_frq,amp_sweep_frq, blwgn_fc, impulse_dur, a, b, c, L, sigma, movementRadius)
+function P = create_structs(rec_protocols_sorted,stim_protocols_hes_sorted,fs, stim_protocols_ifb_sorted,intended_stimulus_sorted, no_of_protocols, no_of_trials, single_trial_length, stim_order_sorted, max_chirp_frq,amp_sweep_frq, blwgn_fc, impulse_dur, a, b, c, L, sigma, movementRadius)
 
     for i=1:no_of_protocols
         
@@ -19,6 +19,7 @@ function P = create_structs(rec_protocols_sorted,stim_protocols_hes_sorted,fs, s
         P(i).rec = 100*(rec_protocols_sorted(trial_idx: trial_idx+ no_of_trials-1, :));
         P(i).hes_data_unfilt = stim_protocols_hes_sorted(trial_idx: trial_idx+ no_of_trials-1, :);
         P(i).stim_ifb = stim_protocols_ifb_sorted(trial_idx: trial_idx+ no_of_trials-1, :);
+        P(i).intendedStimulus = intended_stimulus_sorted(trial_idx: trial_idx+ no_of_trials-1, :);
         
         
         [raster,avg_gcfr,complete_trials, gcfr, invalid_trials]  = get_raster_gcfr(no_of_trials, P(i).rec, single_trial_length, fs, L, sigma);
