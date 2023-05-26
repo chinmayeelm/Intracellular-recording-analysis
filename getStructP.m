@@ -1,4 +1,4 @@
-function P = getStructP(dataDirectory,filename,clip_data_flag)
+function [P,intendedStimulus] = getStructP(dataDirectory,filename,clip_data_flag)
 %UNTITLED Summary of this function goes here
 %   Detailed explanation goes here
 
@@ -8,12 +8,16 @@ mothId = filenameParts(1);
 cd (join(['E:\Recordings\' string(expt_date) '\' 'raw\' mothId '\'], ''))
 
 filename_str = sprintf("%s.nwb", filename);
+% filepath = join(['E:\Recordings\' string(expt_date) '\' 'raw\' mothId '\' filename_str], '');
 nwb_in = nwbRead(filename_str); 
 % clip_data_flag =0;
 
 rec = nwb_in.acquisition.get('response_to_JO_stimulation');
 data = rec.data.load;
 time = rec.timestamps.load;
+stim = nwb_in.stimulus_presentation.get('mechanical_stimulus');
+intendedStimulus = stim.data.load;
+
 
 max_chirp_frq =  150;
 max_sqr_sin_frq = 10;
@@ -40,8 +44,8 @@ else
     disp('No parameters in the file');
 end
 
-gauss_win_L = fs; %fs/5;
-gauss_win_sigma = 0.1; %0.03; % 30 ms
+gauss_win_L = fs/5;
+gauss_win_sigma = 0.03; % 30 ms
 
 flag_meas_table = readtable('E:\Recordings\Antenna flagellum measurements\flagellum-length-measurements.xlsx', 'VariableNamingRule','preserve');
 flag_meas_table.Date = datetime(flag_meas_table.Date, 'format', 'dd-MM-uuuu');
@@ -60,7 +64,8 @@ catch
     movementRadius = 0.64; %0.78; % in mm
 end
 
-stim = nwb_in.stimulus_presentation.get('mechanical_stimulus');
+
+
 stim_order_vector = string(split(stim.stimulus_description, ','));
 [stim_order_sorted,idx] = sort(stim_order_vector);
 no_of_protocols = length(unique(stim_order_sorted));
@@ -69,17 +74,16 @@ valid_trials = no_of_protocols * no_of_trials;
 
 if clip_data_flag == 1
     
-    prompt1 = 'Enter start point for data';
-    prompt2 = 'Enter stop point for data';
-    
     start_stim = OFF_dur*fs;
     stop_stim = (ON_dur+OFF_dur)*fs;
-    
     single_trial_length = start_stim + stop_stim;
     if mod(length(data),single_trial_length)~=0
         single_trial_length = start_stim + stop_stim+1;
     end
-    
+
+    prompt1 = 'Enter start point for data';
+    prompt2 = 'Enter stop point for data';
+        
     start_point = input(prompt1)*fs;
     stop_point = input(prompt2)*fs;
     start_clip_point = start_point-mod(start_point,single_trial_length)+1;
@@ -97,6 +101,13 @@ if clip_data_flag == 1
     
 elseif time(end)==0
     
+    start_stim = OFF_dur*fs;
+    stop_stim = (ON_dur+OFF_dur)*fs;
+    single_trial_length = start_stim + stop_stim;
+    if mod(length(data),single_trial_length)~=0
+        single_trial_length = start_stim + stop_stim+1;
+    end
+
     start_stim = OFF_dur*fs;
     stop_stim = (ON_dur+OFF_dur)*fs;
    
@@ -118,8 +129,6 @@ elseif time(end)==0
 
    
 end
-
-
 single_trial_length = length(data)/valid_trials;
 
 rec_data = data(:,1);
@@ -136,7 +145,7 @@ d_rec = designfilt('bandpassiir','FilterOrder',rec_filt_order, ...
 filtered_data_bp = filtfilt(d_rec, rec_data);
 
 
-fig_handle = consolidated_plot(time, filtered_data_bp, hes_data, stim_fb, fs);
+% fig_handle = consolidated_plot(time, filtered_data_bp, hes_data, stim_fb, fs);
 % title(join([expt_date replace(filename, '_', '')]));
  
 
@@ -149,6 +158,7 @@ stim_protocols_ifb_reshaped = reshape_data(stim_fb, single_trial_length, no_of_p
 rec_protocols_sorted = sort_data(rec_protocols_reshaped,idx);
 stim_protocols_hes_sorted = sort_data(stim_protocols_hes_reshaped, idx); %hes data not filtered. Antennal movement not calculated
 stim_protocols_ifb_sorted = sort_data(stim_protocols_ifb_reshaped, idx);
+intended_stimulus_sorted = sort_data(intendedStimulus', idx);
 
 % Clip 2s of baseline activity in the beginning and end of trials
 %{
@@ -174,7 +184,7 @@ else
     a=0.5334; b=516.5; c = -3.233;
 end
 
-P = create_structs(rec_protocols_sorted,stim_protocols_hes_sorted,fs, stim_protocols_ifb_sorted, no_of_protocols, no_of_trials, single_trial_length, stim_order_sorted,max_chirp_frq, amp_sweep_frq, blwgn_fc, ON_dur, a, b, c, gauss_win_L, gauss_win_sigma, movementRadius);
+P = create_structs(rec_protocols_sorted,stim_protocols_hes_sorted,fs, stim_protocols_ifb_sorted,intended_stimulus_sorted, no_of_protocols, no_of_trials, single_trial_length, stim_order_sorted,max_chirp_frq, amp_sweep_frq, blwgn_fc, ON_dur, a, b, c, gauss_win_L, gauss_win_sigma, movementRadius);
 
 [P(:).ON_dur] = deal(ON_dur);
 [P(:).OFF_dur] = deal(OFF_dur);

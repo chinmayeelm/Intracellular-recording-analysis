@@ -3,7 +3,7 @@ date = split(pwd, '\');
 date = string(date(3));
 date = datetime(replace(date, '.','-'),'Format','dd-MM-uuuu');
 
-filename = "M1_N1_ramp_up";
+filename = "M2_N5_ramp";
 filename_str = sprintf("%s.nwb", filename);
 nwb_in = nwbRead(filename_str); 
 clip_data_flag =0;
@@ -17,6 +17,8 @@ data = rec.data.load;
 
 % time = linspace(0,length(data),1);
 time = rec.timestamps.load;
+stim = nwb_in.stimulus_presentation.get('mechanical_stimulus');
+intendedStimulus = stim.data.load;
 
 %sampling freq
 
@@ -70,13 +72,7 @@ end
 % fs = 1e4;
 
 
-% start_stim = OFF_dur*fs;
-% stop_stim = (ON_dur+OFF_dur)*fs;
-% % single_trial_length = start_stim + stop_stim+1;
-% single_trial_length = start_stim + stop_stim;
-% if mod(length(data),single_trial_length)~=0
-%     single_trial_length = start_stim + stop_stim+1;
-% end
+
 
 % stim_frequencies = find_stim_freq(stim_fb,ON_dur, OFF_dur, fs)
 
@@ -98,6 +94,13 @@ valid_trials = no_of_protocols * no_of_trials;
 
 if clip_data_flag == 1
     
+    start_stim = OFF_dur*fs;
+    stop_stim = (ON_dur+OFF_dur)*fs;
+    single_trial_length = start_stim + stop_stim;
+    if mod(length(data),single_trial_length)~=0
+        single_trial_length = start_stim + stop_stim+1;
+    end
+
     prompt1 = 'Enter start point for data';
     prompt2 = 'Enter stop point for data';
     
@@ -112,12 +115,22 @@ if clip_data_flag == 1
     time = time(1:length(data));
     valid_trials = round(length(data)/single_trial_length);
     
-    stim_order_vector = stim_order_vector(1:valid_trials);
+    start_valid_trial = ((start_clip_point-1)/single_trial_length)+1;
+    stop_valid_trial = stop_clip_point/single_trial_length;
+    stim_order_vector = stim_order_vector(start_valid_trial:stop_valid_trial);
+    intendedStimulus = intendedStimulus(:,start_valid_trial:stop_valid_trial); 
     [stim_order_sorted,idx] = sort(stim_order_vector);
     no_of_protocols = length(unique(stim_order_sorted));
     
 elseif time(end)==0
     
+    start_stim = OFF_dur*fs;
+    stop_stim = (ON_dur+OFF_dur)*fs;
+    single_trial_length = start_stim + stop_stim;
+    if mod(length(data),single_trial_length)~=0
+        single_trial_length = start_stim + stop_stim+1;
+    end
+
     stop_point = find(data(:,2)==0,1) - 1;
     clip_point = stop_point-mod(stop_point,single_trial_length);
     
@@ -126,6 +139,7 @@ elseif time(end)==0
     valid_trials = round(length(data)/single_trial_length);
     
     stim_order_vector = stim_order_vector(1:valid_trials);
+    intendedStimulus = intendedStimulus(:,1:valid_trials); 
     [stim_order_sorted,idx] = sort(stim_order_vector);
     no_of_protocols = length(unique(stim_order_sorted));
 end
@@ -172,7 +186,7 @@ stim_protocols_ifb_reshaped = reshape_data(stim_fb, single_trial_length, no_of_p
 rec_protocols_sorted = sort_data(rec_protocols_reshaped,idx);
 stim_protocols_hes_sorted = sort_data(stim_protocols_hes_reshaped, idx); %hes data not filtered. Antennal movement not calculated
 stim_protocols_ifb_sorted = sort_data(stim_protocols_ifb_reshaped, idx);
-
+intended_stimulus_sorted = sort_data(intendedStimulus', idx);
 % Clip 2s of baseline activity in the beginning and end of trials
 %{
 start_clip_point = 2*fs+1;
@@ -197,7 +211,7 @@ else
     a=0.5334; b=516.5; c = -3.233;
 end
 
-P = create_structs(rec_protocols_sorted,stim_protocols_hes_sorted,fs, stim_protocols_ifb_sorted, no_of_protocols, no_of_trials, single_trial_length, stim_order_sorted,max_chirp_frq, amp_sweep_frq, blwgn_fc, ON_dur, a, b, c, gauss_win_L, gauss_win_sigma, movementRadius);
+P = create_structs(rec_protocols_sorted,stim_protocols_hes_sorted,fs, stim_protocols_ifb_sorted,intended_stimulus_sorted, no_of_protocols, no_of_trials, single_trial_length, stim_order_sorted,max_chirp_frq, amp_sweep_frq, blwgn_fc, ON_dur, a, b, c, gauss_win_L, gauss_win_sigma, movementRadius);
 % end
 %
 
