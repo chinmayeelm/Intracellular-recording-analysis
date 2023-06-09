@@ -1,12 +1,31 @@
 % clear;
-date = split(pwd, '\');
-date = string(date(3));
-date = datetime(replace(date, '.','-'),'Format','dd-MM-uuuu');
 
-filename = "M1_N3_ramp";
+
+expt_date = split(pwd, '\');
+expt_date = expt_date(4);
+
+expt_date = datetime(replace(expt_date, '.','-'),'Format','dd-MM-uuuu');
+
+filename = "M1_N1_ramp";
 filename_str = sprintf("%s.nwb", filename);
 nwb_in = nwbRead(filename_str); 
 clip_data_flag =0;
+
+flag_meas_table = readtable('Antenna flagellum measurements\flagellum-length-measurements.xlsx');
+flag_meas_table.Date = datetime(flag_meas_table.Date, 'format', 'dd-MM-uuuu');
+filenameParts = split(filename,'_');
+mothId = filenameParts(1);
+flag_meas_table.Properties.RowNames = join([string(flag_meas_table.Date) flag_meas_table.MothID],'_');
+
+rowId = join([string(expt_date) mothId],'_');
+try 
+    movementRadius = table2array(flag_meas_table(rowId,'Lengthmm'));
+    disp('flagellum measurement exists')
+
+catch
+    disp('Taking default radius')
+    movementRadius = 0.64; %0.78; % in mm
+end
 
 % disp(nwb_in);
 rec = nwb_in.acquisition.get('response_to_JO_stimulation');
@@ -50,21 +69,7 @@ end
 gauss_win_L = fs/5;
 gauss_win_sigma = 0.03; % 30 ms
 
-flag_meas_table = readtable('E:\Recordings\Antenna flagellum measurements\flagellum-length-measurements.xlsx');
-flag_meas_table.Date = datetime(flag_meas_table.Date, 'format', 'dd-MM-uuuu');
-filenameParts = split(filename,'_');
-mothId = filenameParts(1);
-flag_meas_table.Properties.RowNames = join([string(flag_meas_table.Date) flag_meas_table.MothID],'_');
 
-rowId = join([string(date) mothId],'_');
-try 
-    movementRadius = table2array(flag_meas_table(rowId,'Lengthmm'));
-    disp('flagellum measurement exists')
-
-catch
-    disp('Taking default radius')
-    movementRadius = 0.64; %0.78; % in mm
-end
 
 % ON_dur = 4;
 % OFF_dur =3;
@@ -201,8 +206,6 @@ single_trial_length = length(rec_protocols_sorted);
 
 % Create structs
 d_ref = datetime('2021.06.01', 'InputFormat', 'yyyy.MM.dd');
-expt_date = split(pwd, '\');
-expt_date = expt_date(3);
 d_check = datetime(expt_date, 'InputFormat', 'yyyy.MM.dd');
 
 if d_check < d_ref
