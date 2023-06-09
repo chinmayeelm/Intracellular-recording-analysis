@@ -5,6 +5,16 @@ function stepGCFRplots(P)
 total_trial_dur = P(1).ON_dur+2*P(1).OFF_dur;
 time = linspace(0,total_trial_dur,P(1).single_trial_length);
 
+stim_name = string(extractfield(P, 'stim_name'))
+step_pos = str2double(extractAfter(stim_name, "ramp "))
+[~,idx] = sort(step_pos)
+P = P(idx);
+
+newColors = [0.1765    0.1804    0.5137 1
+             0.1765    0.1804    0.5137 0.5
+             0.9137    0.3059    0.1059 0.5
+             0.9137    0.3059    0.1059 1];
+
 figure('Color', 'w', 'WindowState','maximized');
 for i=1:length(P)
     

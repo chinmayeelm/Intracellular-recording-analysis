@@ -27,7 +27,7 @@ nfiles = length(filename_ramp);
 
 ignorefiles = [];
 
-for irow = 1:nfiles
+for irow = 10%1:nfiles
     
     irow
     close all;
@@ -42,12 +42,12 @@ for irow = 1:nfiles
 %     stepGCFRplots(P_step);
 %     stairGCFRplots(P_stair);
 %     chirpGCFRplots(P_chirp);
-    try
-    [adaptation_coeff(irow), rsquare(irow)] = calcAdaptation(P_ramp);
-    catch
-        disp("Not enough duration to fit curve");
-        ignorefiles = [ignorefiles irow];
-    end
+%     try
+%     [adaptation_coeff(irow), rsquare(irow)] = calcAdaptation(P_ramp);
+%     catch
+%         disp("Not enough duration to fit curve");
+%         ignorefiles = [ignorefiles irow];
+%     end
     
 %     catch
 %         ignorefiles = [ignorefiles irow];
