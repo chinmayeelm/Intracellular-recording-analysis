@@ -1,4 +1,4 @@
-function stairGCFRplots(P,intendedStimulus)
+function stairGCFRplots(P)
 %UNTITLED7 Summary of this function goes here
 %   Detailed explanation goes here
 total_trial_dur = P.single_trial_length/P.fs;
@@ -8,7 +8,7 @@ stimulus = -P.mean_movement;
 mid_point = length(stimulus)/2;
 
 
-S = abs(diff(intendedStimulus(1:P.single_trial_length,1)));
+S = abs(diff(P.intendedStimulus(1,1:P.single_trial_length)));
 
 x = [];
 for i=1:length(S)-1
@@ -24,18 +24,21 @@ x = x/P.fs;
 y_stim = repmat([-1 -1 1 1]', 1,length(x));
 y_gcfr = repmat([0 0 150 150]', 1,length(x));
 
-figure;
+figure('Color', 'w');
 
 ax1 = subplot(2,1,1); plot(time, stimulus, 'k'); hold on;
 patch(x,y_stim,[0.8500 0.3250 0.0980], 'FaceAlpha' , 0.3, 'EdgeColor', 'none');
 ylabel('Antennal position (deg)', 'FontSize',12);
-title(join([replace([P(1).date P(1).filename], '_','-')], '   '));
+% yyaxis right; plot(time, P.intendedStimulus(1,:), 'r', 'LineWidth', 0.5);
+ylabel('Generated position stimulus (a.u)');
+title(join([replace([P.date P(1).filename], '_','-')], '   '));
+grid on;
 
 ax2 = subplot(2,1,2);
 [lineOut, ~] = stdshade(P.gcfr,0.2,'k',time); %10 = (fs/L)*gcfr Hz
 lineOut.LineWidth  = 0.05;
 patch(x,y_gcfr, [0.8500 0.3250 0.0980], 'FaceAlpha' , 0.3, 'EdgeColor', 'none');
-
+grid on;
 ylabel('Avg. GCFR (Hz)','FontSize',12);
 xlabel('Time (s)','FontSize',12);
 

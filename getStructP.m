@@ -1,4 +1,4 @@
-function [P,intendedStimulus] = getStructP(dataDirectory,filename,clip_data_flag)
+function P = getStructP(dataDirectory,filename,clip_data_flag)
 %UNTITLED Summary of this function goes here
 %   Detailed explanation goes here
 
@@ -10,7 +10,6 @@ cd (join(['E:\Recordings\' string(expt_date) '\' 'raw\' mothId '\'], ''))
 filename_str = sprintf("%s.nwb", filename);
 % filepath = join(['E:\Recordings\' string(expt_date) '\' 'raw\' mothId '\' filename_str], '');
 nwb_in = nwbRead(filename_str); 
-% clip_data_flag =0;
 
 rec = nwb_in.acquisition.get('response_to_JO_stimulation');
 data = rec.data.load;
@@ -45,7 +44,7 @@ else
 end
 
 gauss_win_L = fs/5;
-gauss_win_sigma = 0.03; % 30 ms
+gauss_win_sigma = 0.03; % 30 ms % fs is multiplied in the code later.
 
 flag_meas_table = readtable('E:\Recordings\Antenna flagellum measurements\flagellum-length-measurements.xlsx', 'VariableNamingRule','preserve');
 flag_meas_table.Date = datetime(flag_meas_table.Date, 'format', 'dd-MM-uuuu');
@@ -145,8 +144,8 @@ d_rec = designfilt('bandpassiir','FilterOrder',rec_filt_order, ...
 filtered_data_bp = filtfilt(d_rec, rec_data);
 
 
-% fig_handle = consolidated_plot(time, filtered_data_bp, hes_data, stim_fb, fs);
-% title(join([expt_date replace(filename, '_', '')]));
+fig_handle = consolidated_plot(time, filtered_data_bp, hes_data, stim_fb, fs);
+title(join([expt_date replace(filename, '_', '')]));
  
 
 rec_protocols_reshaped = reshape_data(filtered_data_bp, single_trial_length, no_of_protocols, valid_trials);

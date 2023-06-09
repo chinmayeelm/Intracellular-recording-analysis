@@ -3,32 +3,37 @@ function rampGCFRplots(P)
 %   Detailed explanation goes here
 total_trial_dur = P(1).ON_dur+2*P(1).OFF_dur;
 time = linspace(0,total_trial_dur,P(1).single_trial_length);
-figure;
+figure('Color', 'w', 'WindowState', 'normal');
 
 for i=1:length(P)
     
     ax1 = subplot(4,1,1); plot(time, -P(i).mean_movement, 'LineWidth',1); hold on;
     %     lgd = legend(["1 s", "2 s","0.5 s", "0.5 s"],"Location","northeast","NumColumns",1);
     %     title(lgd, "Ramp duration");
-    ylabel('Antennal position (deg)', 'FontSize',12);
+    ylabel('Antennal position (deg)', 'FontSize',11);
+%     yyaxis right; ax5 = plot(time, P(i).intendedStimulus(1,:), '--', 'LineWidth', 0.5);
+%     ylabel('Generated position stimulus (a.u)');
     title(replace([P(1).date P(1).filename], '_','-'));
     ax1.Box = 'off';
     ax1.XAxis.Visible = 'off';
+    %grid on;
     
     ax2 = subplot(4,1,2); plot(time(2:end),diff(P(i).intendedStimulus(1,:)), 'LineWidth', 1); hold on;
-    ylabel('Velocity (a.u)');
-    ax1.Box = 'off';
-    ax1.XAxis.Visible = 'off';
+    ylabel('Velocity (a.u)', 'FontSize',11);
+    ax2.Box = 'off';
+    ax2.XAxis.Visible = 'off';
+    %grid on;
     
     ax3 = subplot(4,1,3); plot(time(3:end),diff(P(i).intendedStimulus(1,:),2), 'LineWidth', 1); hold on;
-    ylabel('Accelaration (a.u)');
-    ax1.Box = 'off';
-    ax1.XAxis.Visible = 'off';
+    ylabel('Accelaration (a.u)', 'FontSize',11);
+    ax3.Box = 'off';
+    ax3.XAxis.Visible = 'off';
+    %grid on;
     
     ax4 = subplot(4,1,4); plot(time, P(i).avg_gcfr, 'LineWidth',1); hold on;
-    ylabel('Mean Firing rate (Hz)', 'FontSize',12);
+    ylabel('Mean Firing rate (Hz)', 'FontSize',11);
     xlabel('Time (s)', 'FontSize',12);
-    ax2.Box = 'off';
+    ax4.Box = 'off';
     
     
     linkaxes([ax1 ax2 ax3 ax4], 'x');
@@ -37,7 +42,10 @@ for i=1:length(P)
 end
 legend(ax1, arrayfun(@(x) replace(x.stim_name, "_"," "), P), 'Location', 'best');
 legend(ax1, 'boxoff');
-
+% filename = join([replace(string(P(1).date), ".", "-") P(1).filename], '_');
+% cd('F:\Work\Analysis outputs\ramp_adaptation');
+% saveas(gcf, filename, 'png');
+%{
 max_FR = [];
 velocity = [];
 auc = zeros(1,length(P));
@@ -89,28 +97,28 @@ vel = unique(velocity_sorted);
 auc = auc(idx);
 nSpikes = nSpikes(idx);
 
-% velocity_sorted = num2str(velocity_sorted, '%.3f');
-% figure;
-% boxchart(velocity_sorted, max_FR_sorted, 'BoxWidth', 0.03, 'MarkerStyle',"+"); hold on;
-% plot(vel, meanMaxFR);  hold on;
-% scatter(velocity_sorted, max_FR_sorted, 5,'k','filled','MarkerFaceAlpha',0.3);
-% % boxplot(max_FR_sorted, velocity_sorted);
-% % ylim([0 100]);
-% ylabel('Peak firing rate (Hz)', 'FontSize',12);
-% xlabel('Angular velocity (deg/s)', 'FontSize',12);
-% title(replace([P(i).date P(i).filename], '_','-'));
+velocity_sorted = num2str(velocity_sorted, '%.3f');
+figure;
+boxchart(velocity_sorted, max_FR_sorted, 'BoxWidth', 0.03, 'MarkerStyle',"+"); hold on;
+plot(vel, meanMaxFR);  hold on;
+scatter(velocity_sorted, max_FR_sorted, 5,'k','filled','MarkerFaceAlpha',0.3);
+% boxplot(max_FR_sorted, velocity_sorted);
+% ylim([0 100]);
+ylabel('Peak firing rate (Hz)', 'FontSize',12);
+xlabel('Angular velocity (deg/s)', 'FontSize',12);
+title(replace([P(i).date P(i).filename], '_','-'));
 
 FR =reshape(max_FR_sorted, P(i).complete_trials, []);
 p = ranksum(FR(:,1), FR(:,end))
 
 
-% figure;
-% boxchart(velocity_sorted, avg_spikes_sorted, 'BoxWidth', 0.03, 'MarkerStyle',"+"); hold on;
-% % plot(vel, meanSpikes, '-o');  hold on;
-% semilogx(vel, meanSpikes, '-o');  hold on;
-% scatter(velocity_sorted, avg_spikes_sorted, 10,'k','filled', 'MarkerFaceAlpha',0.5);
-% ylabel('Mean firing rate (Hz)', 'FontSize',12);
-% xlabel('Angular velocity (deg/s)', 'FontSize',12);
-% title(replace([P(1).date P(1).filename], '_','-'));
-
+figure;
+boxchart(velocity_sorted, avg_spikes_sorted, 'BoxWidth', 0.03, 'MarkerStyle',"+"); hold on;
+% plot(vel, meanSpikes, '-o');  hold on;
+semilogx(vel, meanSpikes, '-o');  hold on;
+scatter(velocity_sorted, avg_spikes_sorted, 10,'k','filled', 'MarkerFaceAlpha',0.5);
+ylabel('Mean firing rate (Hz)', 'FontSize',12);
+xlabel('Angular velocity (deg/s)', 'FontSize',12);
+title(replace([P(1).date P(1).filename], '_','-'));
+%}
 end

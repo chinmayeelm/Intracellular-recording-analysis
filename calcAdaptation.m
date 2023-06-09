@@ -5,8 +5,12 @@ fs = P(1).fs;
 tonicGCFR = [];
 gcfrDur = 0.5;
 for i = 1:length(P)
+    stim_name = split(P(i).stim_name);
+    delta_t = str2double(stim_name(2));
+    
     gcfr = P(i).avg_gcfr;
-    [~,startPt] = max(gcfr);
+%     [~,startPt] = max(gcfr);
+    startPt = P(i).OFF_dur*fs + delta_t*fs + 1;
     stopPt = startPt + gcfrDur*fs;
     tonicGCFR(i,:) = P(i).avg_gcfr(startPt : stopPt);
 end
@@ -23,8 +27,8 @@ t1=linspace(0.0001,gcfrDur, length(descentFR));
 % yData = yData(idx);
 
 % Set up fittype and options.
-% ft = fittype( 'power1' );
-ft = fittype( 'exp1' );
+ft = fittype( 'power1' );
+% ft = fittype( 'exp1' );
 % opts = fitoptions( 'Method', 'NonlinearLeastSquares' );
 % opts.Display = 'Off';
 % opts.Robust = 'Bisquare';
@@ -41,17 +45,22 @@ rsquare = gof.rsquare;
 figure();
 plot( fitresult, xData, yData ); hold on;
 xlim([0 Inf]);
-ylim([0 2]);
+ylim([0 1.5]);
 % legend( h, 't1 vs. descentFR', 'untitled fit 1', 'Location', 'NorthEast', 'Interpreter', 'none' );
 % Label axes
 xlabel( 'time (s)');
 ylabel( 'Norm. mean firing rate');
 
 str = sprintf(" k = %0.3f \n rsquare = %0.3f", adaptation_coeff, rsquare);
-text(1,1.5, str);
-text(0.25,1.5, str);
+% text(1,1.5, str);
+% text(0.25,1.5, str);
+text(0.35,0.8, str);
+% text(0.4,0.7, str);
 grid on
 
 title(join([string(P(1).date) replace(P(1).filename, '_',' ')], ' ' ));
+filename = join([replace(string(P(1).date),".","-") P(1).filename 'adaptation'], '_');
+cd('F:\Work\Analysis outputs\ramp_adaptation');
+saveas(gcf, filename , 'png');
 
 end
