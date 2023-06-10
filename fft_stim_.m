@@ -13,14 +13,14 @@ function [stim_freq, power_fft, frq_fft] = fft_stim_(stim_matrix, Fs)
 %         plot(stim_matrix(i, :));
 
         P2 = abs(Y/L);
-        P1 = P2(1:L/2+1);
+        P1 = P2(1:floor(L/2+1));
         P1(2:end-1) = 2*P1(2:end-1);
-        length(P1(2:end-1))
+        length(P1(2:end-1));
 
        
         f = Fs*(0:(L/2))/L;
 %         f = f(2:end-1);
-        length(f)
+        length(f);
 %         figure();
         semilogx(f(2:end-1),P1(2:end-1)); hold on;
         plot(f,P1); %hold on;

@@ -4,24 +4,44 @@ function stepGCFRplots(P)
 
 total_trial_dur = P(1).ON_dur+2*P(1).OFF_dur;
 time = linspace(0,total_trial_dur,P(1).single_trial_length);
-
-stim_name = string(extractfield(P, 'stim_name'))
-step_pos = str2double(extractAfter(stim_name, "ramp "))
-[~,idx] = sort(step_pos)
-P = P(idx);
-
+%{
 newColors = [0.1765    0.1804    0.5137 1
              0.1765    0.1804    0.5137 0.5
              0.9137    0.3059    0.1059 0.5
              0.9137    0.3059    0.1059 1];
+stim_name = string(extractfield(P, 'stim_name'))
+step_pos = str2double(extractAfter(stim_name, "amp_ "))
+[~,idx] = sort(step_pos)
+P = P(idx);
 
-figure('Color', 'w', 'WindowState','maximized');
+figure('Color', 'w', 'WindowState','normal');
+
 for i=1:length(P)
+
+    S = abs(diff(P(i).intendedStimulus(1,1:P(i).single_trial_length)));
+    pos = max(abs(P(i).intendedStimulus(1,1:P(i).single_trial_length)))*100/2;
+
+    x = [];
+    for j=1:length(S)-1
+        if (S(j)==0 && S(j+1)>0) || (S(j)>0 && S(j+1)==0)
+            x = [x j];
+        end
+    end
+    x = reshape(x,2,[]);
+    x(3,:) = x(2,:);
+    x(4,:) = x(1,:);
+    x = x/P(i).fs;
+
+    y_stim = repmat([-1.2 -1.2 1.2 1.2]', 1,size(x,2));
+    y_gcfr = repmat([0 0 150 150]', 1,size(x,2));
+
     
-    ax1 = subplot(4,1,1); plot(time, -P(i).mean_movement, 'LineWidth',1); hold on;
+    
+    ax1 = subplot(2,1,1); plot(time, -P(i).mean_movement, 'LineWidth',1.5, 'Color',newColors(i,:)); hold on;
+    patch(x,y_stim,'k', 'FaceAlpha' , 0.05, 'EdgeColor', 'k');
     %     lgd = legend(["1 s", "2 s","0.5 s", "0.5 s"],"Location","northeast","NumColumns",1);
     %     title(lgd, "Ramp duration");
-    ylabel('Antennal position (deg)', 'FontSize',11);
+    ylabel('Antennal position (deg)', 'FontSize',12);
 %     yyaxis right; ax5 = plot(time, P(i).intendedStimulus(1,:), '--', 'LineWidth', 0.5);
 %     ylabel('Generated position stimulus (a.u)');
     title(replace([P(1).date P(1).filename], '_','-'));
@@ -29,32 +49,34 @@ for i=1:length(P)
     ax1.XAxis.Visible = 'off';
     %grid on
     
-    ax2 = subplot(4,1,2); plot(time(2:end),diff(P(i).intendedStimulus(1,:)), 'LineWidth', 1); hold on;
-    ylabel('Velocity (a.u)', 'FontSize',11);
-    ax2.Box = 'off';
-    ax2.XAxis.Visible = 'off';
+    % ax2 = subplot(4,1,2); plot(time(2:end),diff(P(i).intendedStimulus(1,:)), 'LineWidth', 1); hold on;
+    % ylabel('Velocity (a.u)', 'FontSize',11);
+    % ax2.Box = 'off';
+    % ax2.XAxis.Visible = 'off';
+    % %grid on;
+    % 
+    % ax3 = subplot(4,1,3); plot(time(3:end),diff(P(i).intendedStimulus(1,:),2), 'LineWidth', 1); hold on;
+    % ylabel('Accelaration (a.u)', 'FontSize',11);
+    % ax3.Box = 'off';
+    % ax3.XAxis.Visible = 'off';
     %grid on;
     
-    ax3 = subplot(4,1,3); plot(time(3:end),diff(P(i).intendedStimulus(1,:),2), 'LineWidth', 1); hold on;
-    ylabel('Accelaration (a.u)', 'FontSize',11);
-    ax3.Box = 'off';
-    ax3.XAxis.Visible = 'off';
-    %grid on;
-    
-    ax4 = subplot(4,1,4); plot(time, P(i).avg_gcfr, 'LineWidth',1); hold on;
-    ylabel('Mean Firing rate (Hz)', 'FontSize',11);
+    ax4 = subplot(2,1,2); plot(time, P(i).avg_gcfr, 'LineWidth',1.5, 'Color',newColors(i,:)); hold on;
+    patch(x,y_gcfr, 'k', 'FaceAlpha' , 0.05, 'EdgeColor', 'k');
+    ylabel('Mean Firing rate (Hz)', 'FontSize',12);
     xlabel('Time (s)', 'FontSize',12);
     ax4.Box = 'off';
     %grid on;
     
     
-    linkaxes([ax1 ax2 ax3 ax4], 'x');
+    linkaxes([ax1 ax4], 'x');
     xlim([3 Inf]);    
-end
 
+end
+%}
 %Steady state firing rate Vs Position
-%{
-figure;
+
+% figure;
 steadystateFR = [];
 position = [];
 % FRsorted = [];
@@ -70,10 +92,10 @@ for i=1:length(P)
     amplitude = pos_ref - pos_stim;
     position_values = repmat(amplitude, [P(i).complete_trials,1]);
     position = [position; position_values];
-    
+
     steadystateFR = [steadystateFR; mean(P(i).gcfr(:,ssLoc*P(1).fs:(ssLoc+1)*P(1).fs),2)];
-    
-    
+
+
 end
 
 [position_sorted, idx] = sort(position, 'ascend');
@@ -88,6 +110,10 @@ title(replace([P(1).date P(1).filename], '_','-'));
 ylabel('Firing rate (Hz)');
 xlabel('Position (deg)');
 
+
+%
+ylim([0 inf]);
+
 FR =reshape(FRsorted, P(i).complete_trials, []);
 if length(P) == 4
     plot(pos(1:2),median(meanFR(:,1:2),1), '-ro');
@@ -101,11 +127,9 @@ else
     p1 = ranksum(FR(:,1), FR(:,3));
     p2 = ranksum(FR(:,4), FR(:,6));
 end
+
 text(-1,10,sprintf('%0.3f',p1));
 text(0.5,10,sprintf('%0.3f',p2));
-%
-ylim([0 inf]);
-%}
 
 end
 

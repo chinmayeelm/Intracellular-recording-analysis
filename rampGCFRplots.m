@@ -1,11 +1,13 @@
-function rampGCFRplots(P)
+function [vel, meanMaxFR] = rampGCFRplots(P)
 %UNTITLED2 Summary of this function goes here
 %   Detailed explanation goes here
 total_trial_dur = P(1).ON_dur+2*P(1).OFF_dur;
 time = linspace(0,total_trial_dur,P(1).single_trial_length);
+
+%{
 % colormap('winter');
-stim_name = string(extractfield(P, 'stim_name'));
-ramp_dur = str2double(extractAfter(stim_name, "ramp "));
+stim_name = string(extractfield(P, 'stim_name'))
+ramp_dur = str2double(extractAfter(stim_name, "ramp "))
 [~,idx] = sort(ramp_dur);
 P = P(idx);
 n = numel(idx);
@@ -81,7 +83,7 @@ for i=1:length(P)
     xlim([3 Inf]);
     
 end
-
+%}
 
 % legend(ax1, arrayfun(@(x) replace(x.stim_name, "_"," "), P), 'Location', 'best');
 % legend(ax1, 'boxoff');
@@ -90,6 +92,8 @@ end
 % saveas(gcf, filename, 'png');
 %FR Vs Velocity
 % figure;
+
+
 max_FR = [];
 velocity = [];
 max_FR_sorted = [];
@@ -129,10 +133,10 @@ auc = auc(idx);
 nSpikes = nSpikes(idx);
 
 % velocity_sorted = num2str(velocity_sorted, '%.3f');
-figure;
-boxchart(velocity_sorted, max_FR_sorted, 'BoxWidth', 0.03, 'MarkerStyle',"+"); hold on;
-plot(vel, meanMaxFR);  hold on;
-scatter(velocity_sorted, max_FR_sorted, 5,'k','filled','MarkerFaceAlpha',0.3);
+% figure;
+% boxchart(velocity_sorted, max_FR_sorted, 'BoxWidth', 0.05, 'MarkerStyle',"+", "WhiskerLineColor",'#B2BEB5'); hold on;
+plot(vel, meanMaxFR, 'Color','#B2BEB5', 'LineWidth',0.25);  hold on;
+scatter(velocity_sorted, max_FR_sorted, 5,'filled');
 % boxplot(max_FR_sorted, velocity_sorted);
 % ylim([0 100]);
 ylabel('Peak firing rate (Hz)', 'FontSize',12);

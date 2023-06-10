@@ -5,7 +5,7 @@ function P = getStructP(dataDirectory,filename,clip_data_flag)
 expt_date = replace(dataDirectory, '-','.');
 filenameParts = split(filename, '_');
 mothId = filenameParts(1);
-cd (join(['E:\Recordings\' string(expt_date) '\' 'raw\' mothId '\'], ''))
+cd (join(['D:\Work\Recordings\' string(expt_date) '\' 'raw\' mothId '\'], ''))
 
 filename_str = sprintf("%s.nwb", filename);
 % filepath = join(['E:\Recordings\' string(expt_date) '\' 'raw\' mothId '\' filename_str], '');
@@ -46,7 +46,7 @@ end
 gauss_win_L = fs/5;
 gauss_win_sigma = 0.03; % 30 ms % fs is multiplied in the code later.
 
-flag_meas_table = readtable('E:\Recordings\Antenna flagellum measurements\flagellum-length-measurements.xlsx', 'VariableNamingRule','preserve');
+flag_meas_table = readtable('D:\Work\Recordings\Antenna flagellum measurements\flagellum-length-measurements.xlsx', 'VariableNamingRule','preserve');
 flag_meas_table.Date = datetime(flag_meas_table.Date, 'format', 'dd-MM-uuuu');
 flag_meas_table.Properties.RowNames = join([string(flag_meas_table.Date) flag_meas_table.MothID],'_');
 
@@ -144,8 +144,8 @@ d_rec = designfilt('bandpassiir','FilterOrder',rec_filt_order, ...
 filtered_data_bp = filtfilt(d_rec, rec_data);
 
 
-fig_handle = consolidated_plot(time, filtered_data_bp, hes_data, stim_fb, fs);
-title(join([expt_date replace(filename, '_', '')]));
+% fig_handle = consolidated_plot(time, filtered_data_bp, hes_data, stim_fb, fs);
+% title(join([expt_date replace(filename, '_', '')]));
  
 
 rec_protocols_reshaped = reshape_data(filtered_data_bp, single_trial_length, no_of_protocols, valid_trials);
@@ -174,7 +174,7 @@ single_trial_length = length(rec_protocols_sorted);
 % Create structs
 d_ref = datetime('2021.06.01', 'InputFormat', 'yyyy.MM.dd');
 expt_date = split(pwd, '\');
-expt_date = expt_date(3);
+expt_date = expt_date(4);
 d_check = datetime(expt_date, 'InputFormat', 'yyyy.MM.dd');
 
 if d_check < d_ref
