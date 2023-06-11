@@ -1,5 +1,7 @@
 function plot_data(single_trial_length,no_of_protocols, fs, time, filename,  P)
 
+    [b,a] = butter(3,4/(fs/2), 'low');
+    
     for i=1:no_of_protocols
         
         if isempty(P(i).gcfr)
@@ -7,7 +9,6 @@ function plot_data(single_trial_length,no_of_protocols, fs, time, filename,  P)
         end
         
         fig = figure;
-%         fig = figure(i+1);
 %         fig.Position = [0 0 960 640];
 %         [p,l] = findpeaks(P(i).rec(1,:), "MinPeakHeight",0.25*max(P(i).rec(1,:)));
 %         A1 = subplot(4,1,2);
@@ -16,31 +17,34 @@ function plot_data(single_trial_length,no_of_protocols, fs, time, filename,  P)
 %         hold off;
 %         A1.Box = 'off';
 %         A1.XAxis.Visible = 'off';
+%         A1.YAxis.FontSize = 12;
 %         ylabel('Membrane potential (mV)','FontSize', 14);
-% %         
+% % %         
         
 %         A2 = subplot(4,1,3);
-        A2 = subplot(3,1,2);
-
-        k = 0.5;
-        for j = 1:P(i).complete_trials
-            l = find(P(i).raster(j,:)==1);
-            spike_time = l/fs;
-            for m = 1:length(spike_time)
-                line([spike_time(m) spike_time(m)], [k k+0.5], 'Color', 'k', 'LineWidth', 0.5);
-            end
-            k = k+1;
-        end
-        ylabel('Trials', 'FontSize', 14);
-        A2.Box = 'off';
-        A2.XAxis.Visible = 'off';
-        A2.YAxis.FontSize = 12;
+% %         A2 = subplot(2,1,2);
+% 
+%         k = 0.5;
+%         for j = 1:P(i).complete_trials
+%             l = find(P(i).raster(j,:)==1);
+%             spike_time = l/fs;
+%             for m = 1:length(spike_time)
+%                 line([spike_time(m) spike_time(m)], [k k+0.5], 'Color', 'k', 'LineWidth', 0.5);
+%             end
+%             k = k+1;
+%         end
+%         A2.YAxis.FontSize = 12;
+%         ylabel('Trials', 'FontSize', 14);
+%         
+%         A2.Box = 'off';
+%         A2.XAxis.Visible = 'on';
+        
         
             
 %         A3 = subplot(4,1,4); %plot(time(1:single_trial_length), P(i).norm_gcfr, 'Color', [0.2,0.3,0.49]);
-        A3 = subplot(3,1,3);
-          % A3 = subplot(2,1,2);
-%         A3 = subplot(4,1,4); 
+%         A3 = subplot(3,1,3);
+%           % A3 = subplot(2,1,2);
+        A3 = subplot(2,1,2); 
         [lineOut, ~] = stdshade(P(i).gcfr,0.2,[0.4660 0.6740 0.1880],time(1:single_trial_length)); 
         lineOut.LineWidth  = 1;
         ylabel('Firing rate (Hz)','FontSize', 14);
@@ -50,17 +54,25 @@ function plot_data(single_trial_length,no_of_protocols, fs, time, filename,  P)
         A3.YAxis.FontSize = 12;
         A3.XAxis.FontSize = 12;
         
-        % A4 = subplot(2,1,1);
-        A4 = subplot(3,1,1);
+        A4 = subplot(2,1,1);
+%         A4 = subplot(3,1,1);
 %         A4 = subplot(4,1,1); %plot(time(1:single_trial_length), mean(P(i).antennal_movement), 'Color', [0.6, 0.2,0]);
         [lineOut, ~] = stdshade(-P(i).antennal_movement,0.2,[0.6, 0.2,0],time(1:single_trial_length));
-        
         lineOut.LineWidth = 1;
         A4.Box = 'off';
         A4.XAxis.Visible = 'off';
+        A4.XAxis.FontSize = 12;
 %         ylabel('Indenter feedback voltage');
         ylabel('Stimulus (deg)','FontSize', 14);
         A4.YAxis.FontSize = 12;
+        
+        velocity = diff(-P(i).mean_movement)*fs;
+        vel_filtered = filtfilt(b,a,velocity);
+        yyaxis right; plot(time(2:single_trial_length),vel_filtered, 'LineWidth',2,'Color', [0.9290 0.6940 0.1250], 'LineStyle',':');
+        A4.YAxis(2).LineWidth =1;
+        A4.YAxis(2).FontSize = 12;
+        ylabel('Velocity (deg/s)', 'FontSize', 14);
+        
         
         if (P(i).stim_name == "sin" || P(i).stim_name == "sqr" || P(i).stim_name == "sum_sine")
             title((join(split(P(i).stim_name,"_")," ")) +" Hz");
@@ -69,8 +81,8 @@ function plot_data(single_trial_length,no_of_protocols, fs, time, filename,  P)
         end
         
 %         linkaxes([A1,A2,A3,A4], 'x');
-        linkaxes([A2,A3,A4], 'x');
-          % linkaxes([A3,A4], 'x');
+%         linkaxes([A1,A2,A4], 'x');
+          linkaxes([A3,A4], 'x');
     
 %         savefigures(filename, P(i).stim_name, fig, P(i).date);
     end
