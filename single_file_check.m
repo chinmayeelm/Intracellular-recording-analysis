@@ -97,6 +97,9 @@ valid_trials = no_of_protocols * no_of_trials;
 
 % clear nwb_in
 
+start_stim = OFF_dur*fs;
+stop_stim = (ON_dur+OFF_dur)*fs;
+
 if clip_data_flag == 1
     
     start_stim = OFF_dur*fs;
@@ -240,6 +243,8 @@ end
 % Plot data
 % figure;
 % plot_data(single_trial_length,no_of_protocols, fs, time, filename,  P);
+
+%%
 
 
 % Phase plot             Not working
