@@ -12,7 +12,7 @@ ramp_dur = str2double(extractAfter(stim_name, "ramp "));
 P = P(idx);
 n = numel(idx);
 
-%{
+
 [b,a] = butter(3,4/(fs/2), 'low');
 
 
@@ -55,12 +55,13 @@ for i=1:length(P)
     ax1 = subplot(3,1,1); plot(time, -P(i).mean_movement, 'LineWidth',1.5, 'Color', newColors(i,:)); hold on;
     %     lgd = legend(["1 s", "2 s","0.5 s", "0.5 s"],"Location","northeast","NumColumns",1);
     %     title(lgd, "Ramp duration");
-    ylabel('Antennal position (deg)', 'FontSize',12);
+    ylabel('Position (deg)', 'FontSize',14, 'Rotation',0);
 %     yyaxis right; ax5 = plot(time, P(i).intendedStimulus(1,:), '--', 'LineWidth', 0.5);
 %     ylabel('Generated position stimulus (a.u)');
-    title(replace([P(1).date P(1).filename], '_','-'));
+    % title(replace([P(1).date P(1).filename], '_','-'));
     ax1.Box = 'off';
     ax1.XAxis.Visible = 'off';
+    ax1.FontSize = 12;
 %     colormap(winter) 
     %grid on;
     
@@ -68,9 +69,10 @@ for i=1:length(P)
     velocity = diff(-P(i).mean_movement)*fs;
     vel_filtered = filtfilt(b,a,velocity);
     ax2 = subplot(3,1,2); plot(time(2:end),vel_filtered,'Color', newColors(i,:), 'LineWidth', 1.5); hold on;
-    ylabel('Velocity (deg/s)', 'FontSize',12);
+    ylabel('Velocity (deg/s)', 'FontSize',14, 'Rotation',0);
     ax2.Box = 'off';
     ax2.XAxis.Visible = 'off';
+    ax2.FontSize = 12;
     
     
     %grid on;
@@ -82,9 +84,10 @@ for i=1:length(P)
 %     %grid on;
     
     ax4 = subplot(3,1,3); plot(time, P(i).avg_gcfr, 'LineWidth',1.5, 'Color', newColors(i,:)); hold on;
-    ylabel('Mean Firing rate (Hz)', 'FontSize',12);
+    ylabel('Mean Firing rate (Hz)', 'FontSize',14, 'Rotation',0);
     xlabel('Time (s)', 'FontSize',12);
     ax4.Box = 'off';
+    ax4.FontSize = 12;
 %     colormap(winter) 
     
 %     linkaxes([ax1 ax2 ax3 ax4], 'x');
@@ -92,7 +95,7 @@ for i=1:length(P)
     xlim([3 Inf]);
     
 end
-%}
+
 
 % legend(ax1, arrayfun(@(x) replace(x.stim_name, "_"," "), P), 'Location', 'best');
 % legend(ax1, 'boxoff');
@@ -100,7 +103,7 @@ end
 % cd('F:\Work\Analysis outputs\ramp_adaptation');
 % saveas(gcf, filename, 'png');
 %FR Vs Velocity
-% figure;
+figure;
 
 
 max_FR = [];
@@ -146,16 +149,17 @@ vel = log10(vel);
 
 % velocity_sorted = num2str(velocity_sorted, '%.3f');
 % figure;
-% boxchart(velocity_sorted, max_FR_sorted,'BoxFaceColor',c, 'BoxWidth', 0.03, 'MarkerStyle',"+", "WhiskerLineColor",'#B2BEB5'); hold on;
-plot(vel, meanMaxFR, 'Color',c, 'LineWidth',1);  hold on;
-scatter(velocity_sorted, max_FR_sorted, 10,'filled','MarkerFaceColor',c,'MarkerFaceAlpha',1);
+boxchart(velocity_sorted, max_FR_sorted,'BoxFaceColor',c, 'BoxWidth', 0.03, 'MarkerStyle',"+", "WhiskerLineColor",'#B2BEB5'); hold on;
+ax = plot(vel, meanMaxFR, 'Color',c, 'LineWidth',0.25);  hold on;
+scatter(velocity_sorted, max_FR_sorted, 10,'filled','MarkerFaceColor',c,'MarkerFaceAlpha',0.3);
 % boxplot(max_FR_sorted, velocity_sorted);
 % ylim([0 100]);
 ylabel('Peak firing rate (Hz)', 'FontSize',14);
 xlabel('Angular velocity (deg/s) (log10)', 'FontSize',14);
+ax.LineWidth =1;
 % title(replace([P(1).date P(1).filename], '_','-'));
 
-FR =reshape(max_FR_sorted, P(i).complete_trials, []);
-p = ranksum(FR(:,1), FR(:,end));
+% FR =reshape(max_FR_sorted, P(i).complete_trials, []);
+% p = ranksum(FR(:,1), FR(:,end));
 
 end

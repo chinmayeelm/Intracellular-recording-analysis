@@ -2,7 +2,7 @@
 function savefigures(P, addlabel, figureHandle, imageFlag)
     
 %     dir_path = 'F:\Chinmayee\Work\Recordings\Intracellular recording\analysis';
-    dir_path = 'F:\Work\Figures for presentation';
+    dir_path = 'D:\Work\Figures for presentation';
     cd(dir_path)
 %     svg_name = sprintf("%s_%s_%s", string(join(split(date,'.'),'_')), filename, stim_name);
 %     prompt = 'Enter file name';

@@ -28,37 +28,50 @@ figure('Color', 'w');
 
 ax1 = subplot(2,1,1); plot(time, stimulus, 'k'); hold on;
 patch(x,y_stim,[0.8500 0.3250 0.0980], 'FaceAlpha' , 0.3, 'EdgeColor', 'none');
-ylabel('Antennal position (deg)', 'FontSize',12);
+ylabel('Position (deg)', 'Rotation',0);
 % yyaxis right; plot(time, P.intendedStimulus(1,:), 'r', 'LineWidth', 0.5);
-ylabel('Generated position stimulus (a.u)');
-title(join([replace([P.date P(1).filename], '_','-')], '   '));
-grid on;
+% ylabel('Generated position stimulus (a.u)');
+% title(join([replace([P.date P(1).filename], '_','-')], '   '));
+ax1.FontSize = 12;
+ax1.XLabel.FontSize = 14;
+ax1.YLabel.FontSize = 14;
+ax1.XAxis.Visible = 'off';
+ax1.Box = "off";
 
 ax2 = subplot(2,1,2);
 [lineOut, ~] = stdshade(P.gcfr,0.2,'k',time); %10 = (fs/L)*gcfr Hz
 lineOut.LineWidth  = 0.05;
 patch(x,y_gcfr, [0.8500 0.3250 0.0980], 'FaceAlpha' , 0.3, 'EdgeColor', 'none');
-grid on;
-ylabel('Avg. GCFR (Hz)','FontSize',12);
+ylabel('Mean firing rate (Hz)','Rotation',0);
 xlabel('Time (s)','FontSize',12);
-
-xlim([0 90]);
+ax2.FontSize = 12;
+ax2.XLabel.FontSize = 14;
+ax2.YLabel.FontSize = 14;
+ax2.Box = "off";
+xlim([0 Inf]);
 linkaxes([ax1 ax2], 'x');
 
 
-%     figure;
-%
-%     ax1 = subplot(2,1,1); plot(time(1:P.single_trial_length/2), stimulus(1:mid_point)); hold on;
-%     plot(time(1:P.single_trial_length/2), fliplr(stimulus(mid_point+1:end)));
-%     ylabel('Antennal position (deg)', 'FontSize',12);
-%     title(join([num2str(j) replace([P(1).date P(1).filename], '_','-')], '   '));
-%
-%     ax2 = subplot(2,1,2); plot(time(1:P.single_trial_length/2), P.avg_gcfr(1:mid_point)); hold on;
-%     plot(time(1:P.single_trial_length/2), fliplr(P.avg_gcfr(mid_point+1:end)));
-%     ylabel('Avg. GCFR (Hz)',"FontSize",12);
-%     xlabel('Time (s)',"FontSize",12);
-%
-%     %     xlim([0 23]);
-%     linkaxes([ax1 ax2], 'x');
+ figure;
+    
+ ax1 = subplot(2,1,1); plot(time(1:P.single_trial_length/2), stimulus(1:mid_point), "Color",'k', "LineWidth",1); hold on;
+ plot(time(1:P.single_trial_length/2), fliplr(stimulus(mid_point+1:end)), "LineWidth",1, "Color",[0.502,0.502,0.502]);
+ ylabel('Position (deg)', 'FontSize',14, 'Rotation',0);
+ % title(join([num2str(j) replace([P(1).date P(1).filename], '_','-')], '   '));
+ ax1.LineWidth = 1;
+ ax1.FontSize = 12;
+ ax1.Box  ="off";
+ ax1.XAxis.Visible = "off";
+
+ ax2 = subplot(2,1,2); plot(time(1:P.single_trial_length/2), P.avg_gcfr(1:mid_point), "Color",'k', "LineWidth",1); hold on;
+ plot(time(1:P.single_trial_length/2), fliplr(P.avg_gcfr(mid_point+1:end)), "LineWidth",1, "Color",[0.502,0.502,0.502]);
+ ylabel('Mean firing rate (Hz)',"FontSize",14,"Rotation",0);
+ xlabel('Time (s)',"FontSize",14);
+ ax2.FontSize = 12;
+ ax2.LineWidth = 1;
+ ax2.Box = "off";
+ xlim([0 Inf]);
+ linkaxes([ax1 ax2], 'x');
+
 end
 

@@ -6,7 +6,7 @@ expt_date = expt_date(4);
 
 expt_date = datetime(replace(expt_date, '.','-'),'Format','dd-MM-uuuu');
 
-filename = "M2_N1_blwgn";
+filename = "M2_N5_ramp";
 filename_str = sprintf("%s.nwb", filename);
 nwb_in = nwbRead(filename_str); 
 clip_data_flag =0;
@@ -293,15 +293,15 @@ for i = 1:no_of_protocols
         
         inc_frq_chirp_f = linspace(1,max_chirp_frq,ON_dur*fs+1);
         P(i).inc_frq_chirp_f = inc_frq_chirp_f;
-%         figure;
-%         [lineOut, ~] = stdshade(P(i).gcfr(:,start_stim:stop_stim),0.2,'k',P(i).inc_frq_chirp_f);
-%         inc_chirp_gcfr = P(i).gcfr(:,start_stim:stop_stim);
-%         lineOut.LineWidth  = 0.05;
-%         lineOut.LineWidth  = 0.01;
-%         ylabel 'Firing rate (Hz)';
-%         xlabel 'Frequency (Hz)';
-%         title ('Response to increasing frequency chirp');
-%         
+        figure;
+        [lineOut, ~] = stdshade(P(i).gcfr(:,start_stim:stop_stim),0.2,'k',P(i).inc_frq_chirp_f);
+        inc_chirp_gcfr = P(i).gcfr(:,start_stim:stop_stim);
+        lineOut.LineWidth  = 0.05;
+        lineOut.LineWidth  = 0.01;
+        ylabel 'Firing rate (Hz)';
+        xlabel 'Frequency (Hz)';
+        title ('Response to increasing frequency chirp');
+
     elseif P(i).stim_type == "dec"
         P(i).dec_frq_chirp_f = linspace(max_chirp_frq,1,ON_dur*fs+1);
         
