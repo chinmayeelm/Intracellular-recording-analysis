@@ -5,8 +5,23 @@ function chirpGCFRplots(P_chirp_sweep)
 P = P_chirp_sweep(end);
 total_trial_dur = P(1).ON_dur+2*P(1).OFF_dur;
 time = linspace(0,total_trial_dur,P(1).single_trial_length);
-figure('Color', 'w');
+% figure('Color', 'w');
+start_stim = P.OFF_dur * P.fs;
+stop_stim = (P.OFF_dur + P.ON_dur) * P.fs;
 
+inc_frq_chirp_f = linspace(1,P.max_chirp_frq,P.ON_dur*P.fs+1);
+inc_chirp_gcfr = P.gcfr(:,start_stim:stop_stim);
+
+figure;
+[lineOut, ~] = stdshade(inc_chirp_gcfr,0.2,'k',inc_frq_chirp_f);
+
+lineOut.LineWidth  = 0.05;
+lineOut.LineWidth  = 0.01;
+ylabel 'Firing rate (Hz)';
+xlabel 'Frequency (Hz)';
+title ('Response to increasing frequency chirp');
+
+%{
 for i=1:length(P)
     
     ax1 = subplot(3,1,1); plot(time, -P(i).mean_movement, 'k', 'LineWidth',1); hold on;
@@ -46,10 +61,11 @@ for i=1:length(P)
     ax4.XAxis.FontSize = 12;
     ax4.YAxis.FontSize = 12;
     
-    linkaxes([ax1 ax3 ax4], 'x');
+    linkaxes([ax1 ax4], 'x');
     xlim([3 Inf]);
     
 end
+%}
 % legend(ax1, arrayfun(@(x) replace(x.stim_name, "_"," "), P), 'Location', 'best');
 % legend(ax1, 'boxoff');
 

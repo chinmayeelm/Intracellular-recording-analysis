@@ -36,12 +36,12 @@ function STA = STA_analysis(raster, stim, window, fs,start_stim, stop_stim)
     avg_stim = mean(stimulus_prior,1);
 
     STA = mean(all_spike_triggers-avg_stim,1);
-    plot(STA);
+    % plot(STA);
     t_STA = linspace(-(window*1000),0,length(STA));%-100:0.1:0;
-    figure(); plot(t_STA, STA); %hold on;
-    title ('Spike triggered average');
-    ylabel 'Antennal movement (mm)';
-    xlabel 'time (ms)';    
+    % figure(); plot(t_STA, STA); %hold on;
+    % title ('Spike triggered average');
+    % ylabel 'Antennal movement (deg)';
+    % xlabel 'time (ms)';    
 
 end
 

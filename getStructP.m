@@ -56,7 +56,7 @@ mothId = filenameParts(1);
 rowId = join([string(datetime(replace(expt_date, '.','-'),'Format','dd-MM-uuuu')) mothId],'_');
 try 
     movementRadius = table2array(flag_meas_table(rowId,'Lengthmm'));
-    disp('flagellum measurement exists')
+    % disp('flagellum measurement exists')
 
 catch
     disp('Taking default radius')

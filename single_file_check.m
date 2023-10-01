@@ -6,7 +6,8 @@ expt_date = expt_date(4);
 
 expt_date = datetime(replace(expt_date, '.','-'),'Format','dd-MM-uuuu');
 
-filename = "M2_N5_ramp";
+
+filename = "M1_N3_ramp";
 filename_str = sprintf("%s.nwb", filename);
 nwb_in = nwbRead(filename_str); 
 clip_data_flag =0;
@@ -208,7 +209,7 @@ single_trial_length = length(rec_protocols_sorted);
 %}
 
 % Create structs
-d_ref = datetime('2021.06.01', 'InputFormat', 'yyyy.MM.dd');
+d_ref = datetime('2021.06.01', 'InputFormat', 'yyyy.MM.dd') ;
 d_check = datetime(expt_date, 'InputFormat', 'yyyy.MM.dd');
 
 if d_check < d_ref
