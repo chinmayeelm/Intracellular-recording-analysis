@@ -25,25 +25,29 @@ x = x/P.fs;
 y_stim = repmat([-1.2 -1.2 1.2 1.2]', 1,length(x));
 y_gcfr = repmat([0 0 150 150]', 1,length(x));
 
-figHandle = figure('Color', 'w', 'Visible','off');
+figHandle = figure('Color', 'w', 'Visible','on');
 
-% ax1 = subplot(2,1,1); plot(time, stimulus, 'k'); hold on;
+ax1 = subplot(2,1,1);
+sdfill(P.time(1:P.single_trial_length), -P.mean_movement, std(-P.antennal_movement,[],1), [0.6, 0.2,0])
+% plot(time, stimulus, 'k'); hold on;
 % patch(x,y_stim,[0.8500 0.3250 0.0980], 'FaceAlpha' , 0.3, 'EdgeColor', 'none');
-% % ylabel('Position (deg)', 'Rotation',0);
-% % yyaxis right; plot(time, P.intendedStimulus(1,:), 'r', 'LineWidth', 0.5);
-% % ylabel('Generated position stimulus (a.u)');
-% % title(join([replace([P.date P(1).filename], '_','-')], '   '));
-% xlim([0 Inf]);
-% ax1.FontSize = tickLabelSize;
-% ax1.XLabel.FontSize = labelFontSize;
-% ax1.YLabel.FontSize = labelFontSize;
-% ax1.XAxis.Visible = 'off';
-% ax1.FontName = 'Calibri';
-% ax1.Box = "off";
+patch(x,y_stim,[0 0 0], 'FaceAlpha' , 0.3, 'EdgeColor', 'none');
+% ylabel('Position (deg)', 'Rotation',0);
+% yyaxis right; plot(time, P.intendedStimulus(1,:), 'r', 'LineWidth', 0.5);
+% ylabel('Generated position stimulus (a.u)');
+% title(join([replace([P.date P(1).filename], '_','-')], '   '));
+xlim([0 Inf]);
+ax1.FontSize = tickLabelSize;
+ax1.XLabel.FontSize = labelFontSize;
+ax1.YLabel.FontSize = labelFontSize;
+ax1.XAxis.Visible = 'off';
+ax1.FontName = 'Calibri';
+ax1.Box = "off";
 
 
 ax2 = subplot(2,1,2);
-[lineOut, ~] = stdshade(P.gcfr,0.2,'k',time); %10 = (fs/L)*gcfr Hz
+sdfill(P.time(1:P.single_trial_length), mean(P.gcfr,1), std(P.gcfr,[],1), [0.4660 0.6740 0.1880]);
+% [lineOut, ~] = stdshade(P.gcfr,0.2,'k',time); %10 = (fs/L)*gcfr Hz
 lineOut.LineWidth  = 0.05;
 % patch(x,y_gcfr, [0.8500 0.3250 0.0980], 'FaceAlpha' , 0.3, 'EdgeColor', 'none');
 % ylabel('Mean firing rate (Hz)','Rotation',0, 'FontSize',labelFontSize);
@@ -53,7 +57,7 @@ ax2.FontName = 'Calibri';
 ax2.Box = "off";
 xlim([0 Inf]);
 ylim([0 150]);
-% linkaxes([ax1 ax2], 'x');
+linkaxes([ax1 ax2], 'x');
 
 %{
  figure;
