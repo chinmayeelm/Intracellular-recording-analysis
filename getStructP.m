@@ -1,4 +1,4 @@
-function P = getStructP(dataDirectory,filename,clip_data_flag)
+function P = getStructP(dataDirectory,filename,clip_data_flag, downsampleFactor)
 %UNTITLED Summary of this function goes here
 %   Detailed explanation goes here
 
@@ -16,6 +16,11 @@ data = rec.data.load;
 time = rec.timestamps.load;
 stim = nwb_in.stimulus_presentation.get('mechanical_stimulus');
 intendedStimulus = stim.data.load;
+
+data = downsample(data, downsampleFactor);
+stim = downsample(stim,downsampleFactor);
+time = downsample(time, downsampleFactor);
+intendedStimulus = downsample(intendedStimulus, downsampleFactor);
 
 
 max_chirp_frq =  150;
@@ -42,6 +47,8 @@ else
     
     disp('No parameters in the file');
 end
+
+fs = fs/downsampleFactor;
 
 gauss_win_L = fs/5;
 gauss_win_sigma = 0.03; % 30 ms % fs is multiplied in the code later.

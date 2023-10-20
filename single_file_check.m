@@ -7,7 +7,7 @@ expt_date = expt_date(4);
 expt_date = datetime(replace(expt_date, '.','-'),'Format','dd-MM-uuuu');
 
 
-filename = "M1_N3_ramp";
+filename = "M1_N1_stair";
 filename_str = sprintf("%s.nwb", filename);
 nwb_in = nwbRead(filename_str); 
 clip_data_flag =0;

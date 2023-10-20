@@ -1,19 +1,19 @@
 cd 'D:\Work\Code\Intracellular-recording-analysis\LUTs';
-% rampData = readlines('validRampList.txt');
+% rampData = readlines('rampDataList.txt');
 % dataDirectory_ramp = extractBefore(rampData, '_');
 % filename_ramp = extractAfter(rampData, "_");
 % nfiles = length(filename_ramp);
 
-stepData = readlines('stepDataList.txt');
-% stepData = stepData_(posEncodingNeurons,:);
-dataDirectory_step = extractBefore(stepData, '_');
-filename_step = extractAfter(stepData, "_");
-nfiles = length(filename_step);
+% stepData = readlines('stepDataList.txt');
+% % stepData = stepData_(posEncodingNeurons,:);
+% dataDirectory_step = extractBefore(stepData, '_');
+% filename_step = extractAfter(stepData, "_");
+% nfiles = length(filename_step);
 
-% stairData = readlines('allStairList.txt');
-% dataDirectory_stair = extractBefore(stairData, '_');
-% filename_stair = extractAfter(stairData, "_");
-% nfiles = length(filename_stair);
+stairData = readlines('allStairList.txt');
+dataDirectory_stair = extractBefore(stairData, '_');
+filename_stair = extractAfter(stairData, "_");
+nfiles = length(filename_stair);
 
 % chirpData = readlines('chirpPartialList.txt');
 % chirpData = chirp_pos;
@@ -33,15 +33,16 @@ nfiles = length(filename_step);
 % ignorefiles = [];
 % velocity = [];
 % FR = [];
+% velocityEncodingNeurons = [];
 % staList = [];
-posEncodingNeurons = [];
+% posEncodingNeurons = [];
 
 % figure;
 c = parula(nfiles);
 ci = 0;
-goodfits = [];
-slopes = [];
-rsquares = [];
+% goodfits = [];
+% slopes = [];
+% rsquares = [];
 
 labelFontSize = 14;
 tickLabelSize = 12;
@@ -54,26 +55,32 @@ for irow = 1:nfiles
     ci = ci+1;
     % try
     % P_ramp = getStructP(dataDirectory_ramp(irow), filename_ramp(irow),0);
-    P_step = getStructP(dataDirectory_step(irow), filename_step(irow),0);
-    % P_stair = getStructP(dataDirectory_stair(irow), filename_stair(irow),0);
+    % P_step = getStructP(dataDirectory_step(irow), filename_step(irow),0);
+    P_stair = getStructP(dataDirectory_stair(irow), filename_stair(irow),0);
     % P_chirp = getStructP(dataDirectory_chirp(irow), filename_chirp(irow),0);
     % me_chirp(irow),0);
     % P_wn = getStructP(dataDirectory_wn(irow), filename_wn(irow),0);
     % title(irow)
 
     %     S(irow) = jitter_func(P_wn, irow);
-    % [vel, meanMaxFR] = rampGCFRplots(P_ramp, c(irow,:));
+    % [vel, meanMaxFR, p1, rsq] = rampGCFRplots(P_ramp, c(irow,:));
+
+    % if p1>= 30 && rsq >= 0.8
+    %     velocityEncodingNeurons = [velocityEncodingNeurons rampData(irow)];
+    % end
     % velocity = [velocity; vel];
     % FR = [FR; meanMaxFR'];
-    [pvalA, pvalAB, ssFR, blFR] = stepGCFRplots(P_step,c(irow,:));
-
-    if ~isempty(find(pvalA <= 0.008)) 
-        pvalA;
-        posEncodingNeurons = [posEncodingNeurons irow];
-    end
+    % [pvalA, pvalAB, steadystateFR, baselineFR_mat] = stepGCFRplots(P_step);
+    % 
+    % if ~isempty(find(pvalA <= 0.008)) 
+    %     pvalA;
+    %     posEncodingNeurons = [posEncodingNeurons irow];
+    % end
     % pause;
-    % stairGCFRplots(P_stair);
-
+    stairGCFRplots(P_stair);
+    cd('D:\Work\Recordings\plots\stair');
+    saveas(gcf,num2str(irow),'png');
+    close all;
     % chirpGCFRplots(P_chirp);
     % try
     % [adaptation_coeff(irow), rsquare(irow)] = calcAdaptation(P_ramp);
@@ -124,9 +131,9 @@ for irow = 1:nfiles
     % plot(fitresult,'k--');  hold on;
     plot(vel, meanMaxFR, 'Color',c_alpha,'LineWidth',1); hold on;
 
-
+%}
     % pause;
-    %}
+    
 end
 % ax = gca;
 % ylabel('Mean peak firing rate (Hz)', 'FontSize',labelFontSize, 'FontName','Calibri');
