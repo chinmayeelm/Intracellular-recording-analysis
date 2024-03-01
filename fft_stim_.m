@@ -10,7 +10,7 @@ function [stim_freq, power_fft, frq_fft] = fft_stim_(stim_matrix, Fs)
         Y = fft(stim_matrix);
 
 %         figure()
-%         plot(stim_matrix(i, :));
+        % plot(stim_matrix);
 
         P2 = abs(Y/L);
         P1 = P2(1:floor(L/2+1));
@@ -22,12 +22,12 @@ function [stim_freq, power_fft, frq_fft] = fft_stim_(stim_matrix, Fs)
 %         f = f(2:end-1);
         length(f);
 %         figure();
-        % yyaxis right; 
+        yyaxis right; 
         semilogx(f(2:end-1),P1(2:end-1), 'LineWidth',1); hold on;
         % plot(f,P1); %hold on;
         title('FFT of Stimulus')
         xlabel('f (Hz)')
-        ylabel('Magnitude')
+        ylabel('Power')
 %         xlim([0 350]);
 
 %         [~,loc] = max(P1(2:end-1));
