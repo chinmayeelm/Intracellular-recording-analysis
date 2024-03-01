@@ -1,4 +1,4 @@
-function P = getStructP(dataDirectory,filename,clip_data_flag, downsampleFactor)
+function P = getStructP(dataDirectory,filename, clip_data_points, downsampleFactor)
 %UNTITLED Summary of this function goes here
 %   Detailed explanation goes here
 
@@ -6,6 +6,7 @@ expt_date = replace(dataDirectory, '-','.');
 filenameParts = split(filename, '_');
 mothId = filenameParts(1);
 cd (join(['D:\Work\Recordings\' string(expt_date) '\' 'raw\' mothId '\'], ''))
+
 
 filename_str = sprintf("%s.nwb", filename);
 % filepath = join(['E:\Recordings\' string(expt_date) '\' 'raw\' mothId '\' filename_str], '');
@@ -15,7 +16,7 @@ rec = nwb_in.acquisition.get('response_to_JO_stimulation');
 data = rec.data.load;
 time = rec.timestamps.load;
 stim = nwb_in.stimulus_presentation.get('mechanical_stimulus');
-intendedStimulus = stim.data.load;
+intendedStimulus = reshape(stim.data.load, [],1);
 
 data = downsample(data, downsampleFactor);
 stim = downsample(stim,downsampleFactor);
@@ -29,6 +30,7 @@ amp_sweep_frq = 5;
 blwgn_fc = 300;
 
 parameters = nwb_in.general_stimulus.load;
+
 if length(parameters) == 5
    
     ON_dur = str2num(parameters(3));
@@ -47,6 +49,7 @@ else
     
     disp('No parameters in the file');
 end
+
 
 fs = fs/downsampleFactor;
 
@@ -77,8 +80,11 @@ stim_order_vector = string(split(stim.stimulus_description, ','));
 no_of_protocols = length(unique(stim_order_sorted));
 valid_trials = no_of_protocols * no_of_trials;
 
+if isnan(clip_data_points(2))
+        clip_data_points(2) = length(data)/fs;
+end
 
-if clip_data_flag == 1
+if ~isnan(clip_data_points)
     
     start_stim = OFF_dur*fs;
     stop_stim = (ON_dur+OFF_dur)*fs;
@@ -87,16 +93,26 @@ if clip_data_flag == 1
         single_trial_length = start_stim + stop_stim+1;
     end
 
-    prompt1 = 'Enter start point for data';
-    prompt2 = 'Enter stop point for data';
+    % prompt1 = 'Enter start point for data';
+    % prompt2 = 'Enter stop point for data';
         
-    start_point = input(prompt1)*fs;
-    stop_point = input(prompt2)*fs;
+    % start_point = input(prompt1)*fs;
+    % stop_point = input(prompt2)*fs;
+    
+    start_point = clip_data_points(1)*fs;
+    stop_point = clip_data_points(2)*fs;
+
+    if isnan(stop_point)
+        stop_point = length(data);
+    end
+    
+
     start_clip_point = start_point-mod(start_point,single_trial_length)+1;
     stop_clip_point = stop_point-mod(stop_point,single_trial_length);
     
     
     data = data(start_clip_point:stop_clip_point,:);
+    intendedStimulus = intendedStimulus(start_clip_point:stop_clip_point,:);
     time = time(1:length(data));
     valid_trials = round(length(data)/single_trial_length);
     
@@ -126,6 +142,7 @@ elseif time(end)==0
     clip_point = stop_point-mod(stop_point,single_trial_length);
     
     data = data(1:clip_point,:);
+    intendedStimulus = intendedStimulus(1:clip_point,:);
     time = time(1:clip_point);
     valid_trials = round(length(data)/single_trial_length);
     
@@ -150,7 +167,7 @@ d_rec = designfilt('bandpassiir','FilterOrder',rec_filt_order, ...
 
 filtered_data_bp = filtfilt(d_rec, rec_data);
 
-
+% 
 % fig_handle = consolidated_plot(time, filtered_data_bp, hes_data, stim_fb, fs);
 % title(join([expt_date replace(filename, '_', '')]));
  
@@ -158,14 +175,21 @@ filtered_data_bp = filtfilt(d_rec, rec_data);
 rec_protocols_reshaped = reshape_data(filtered_data_bp, single_trial_length, no_of_protocols, valid_trials);
 stim_protocols_hes_reshaped = reshape_data(hes_data, single_trial_length, no_of_protocols, valid_trials); %hes data not filtered. Antennal movement not calculated
 stim_protocols_ifb_reshaped = reshape_data(stim_fb, single_trial_length, no_of_protocols, valid_trials);
+intendedStimulus_reshaped = reshape_data(intendedStimulus, single_trial_length, no_of_protocols, valid_trials);
 
 % sort reshaped data
 
-rec_protocols_sorted = sort_data(rec_protocols_reshaped,idx);
-stim_protocols_hes_sorted = sort_data(stim_protocols_hes_reshaped, idx); %hes data not filtered. Antennal movement not calculated
-stim_protocols_ifb_sorted = sort_data(stim_protocols_ifb_reshaped, idx);
-intended_stimulus_sorted = sort_data(intendedStimulus', idx);
-
+if no_of_protocols == 1
+    rec_protocols_sorted = rec_protocols_reshaped;
+    stim_protocols_hes_sorted =stim_protocols_hes_reshaped;
+    stim_protocols_ifb_sorted = stim_protocols_ifb_reshaped;
+    intended_stimulus_sorted = intendedStimulus_reshaped;
+else
+    rec_protocols_sorted = sort_data(rec_protocols_reshaped,idx);
+    stim_protocols_hes_sorted = sort_data(stim_protocols_hes_reshaped, idx); %hes data not filtered. Antennal movement not calculated
+    stim_protocols_ifb_sorted = sort_data(stim_protocols_ifb_reshaped, idx);
+    intended_stimulus_sorted = sort_data(intendedStimulus_reshaped, idx);
+end
 % Clip 2s of baseline activity in the beginning and end of trials
 %{
 start_clip_point = 2*fs+1;
@@ -202,5 +226,11 @@ P = create_structs(rec_protocols_sorted,stim_protocols_hes_sorted,fs, stim_proto
 [P(:).no_of_protocols] = deal(no_of_protocols);
 [P(:).single_trial_length] = deal(single_trial_length);
 
+for i=length(P)
+    if P(i).complete_trials <3
+        P(i) = [];
+        disp([P(i).stim_name "deleted"]);
+    end
+end
 
 end
