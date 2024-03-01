@@ -8,14 +8,19 @@ function P = create_structs(rec_protocols_sorted,stim_protocols_hes_sorted,fs, s
 %         P(i).stim_name = stim_order_sorted(i*no_of_trials);
         P(i).stim_name = stim_names(i);
         
-        no_of_trials = length(find(stim_order_sorted == P(i).stim_name));
+        
+        if length(stim_order_sorted) == 1 && no_of_trials > 1
+            no_of_trials;
+        else
+            no_of_trials = length(find(stim_order_sorted == P(i).stim_name));
+        end
         
 %         P(i).rec = 100*( rec_protocols_sorted(1+(i-1)*no_of_trials:no_of_trials*i,:)); %voltages will be in mV
 %         P(i).hes_data_unfilt = stim_protocols_hes_sorted(1+(i-1)*no_of_trials:no_of_trials*i,:);
 %         P(i).stim_ifb = stim_protocols_ifb_sorted(1+(i-1)*no_of_trials:no_of_trials*i,:);
         
         trial_idx = find(stim_order_sorted == P(i).stim_name,1);
-        
+        [trial_idx  trial_idx+ no_of_trials-1];
         P(i).rec = 100*(rec_protocols_sorted(trial_idx: trial_idx+ no_of_trials-1, :));
         P(i).hes_data_unfilt = stim_protocols_hes_sorted(trial_idx: trial_idx+ no_of_trials-1, :);
         P(i).stim_ifb = stim_protocols_ifb_sorted(trial_idx: trial_idx+ no_of_trials-1, :);
@@ -29,6 +34,9 @@ function P = create_structs(rec_protocols_sorted,stim_protocols_hes_sorted,fs, s
         P(i).complete_trials = complete_trials;
         
         P(i).hes_data_unfilt(invalid_trials,:) = [];
+        P(i).stim_ifb(invalid_trials, :) = [];
+        P(i).rec(invalid_trials,:) = [];
+        P(i).intendedStimulus(invalid_trials,:) = [];
         
         type_frq = split(P(i).stim_name, '_');
         P(i).stim_type = type_frq(1);
@@ -68,9 +76,9 @@ function P = create_structs(rec_protocols_sorted,stim_protocols_hes_sorted,fs, s
             P(i).antennal_movement = rad2deg((P(i).antennal_movement - mean(P(i).antennal_movement(:,1:2*fs),2))./movementRadius);
             
         elseif P(i).stim_type == "blwgn" || P(i).stim_type == "blwgn2"
-            order=4;
+            order=10;
             for j=1:complete_trials
-                P(i).antennal_movement(j,:) = butter_filtfilt(P(i).hes_data_unfilt(j,:), blwgn_fc*2, fs, order, a, b, c);
+                P(i).antennal_movement(j,:) = butter_filtfilt(P(i).hes_data_unfilt(j,:), blwgn_fc, fs, order, a, b, c);
                 P(i).blwgn_fc = blwgn_fc;
             end
             P(i).antennal_movement = rad2deg((P(i).antennal_movement - mean(P(i).antennal_movement(:,1:2*fs),2))./movementRadius);
@@ -89,7 +97,7 @@ function P = create_structs(rec_protocols_sorted,stim_protocols_hes_sorted,fs, s
             order=4;
             for j=1:complete_trials
 %                 P(i).antennal_movement(j,:) =  butter_filtfilt(P(i).hes_data_unfilt(j,:), 2/str2double(type_frq(2)), fs, order, a, b, c);
-                P(i).antennal_movement(j,:) =  butter_filtfilt(P(i).hes_data_unfilt(j,:), 8, fs, order, a, b, c);
+                P(i).antennal_movement(j,:) =  butter_filtfilt(P(i).hes_data_unfilt(j,:), 20, fs, order, a, b, c); %20 % 8 before 30.11.2023
             end
             P(i).antennal_movement = rad2deg((P(i).antennal_movement - mean(P(i).antennal_movement(:,1:2*fs),2))./movementRadius);
 
@@ -98,7 +106,7 @@ function P = create_structs(rec_protocols_sorted,stim_protocols_hes_sorted,fs, s
             order=4;
             for j=1:complete_trials
 %                 P(i).antennal_movement(j,:) =  butter_filtfilt(P(i).hes_data_unfilt(j,:), 2/str2double(type_frq(2)), fs, order, a, b, c);
-                P(i).antennal_movement(j,:) =  butter_filtfilt(P(i).hes_data_unfilt(j,:), 10, fs, order, a, b, c);
+                P(i).antennal_movement(j,:) =  butter_filtfilt(P(i).hes_data_unfilt(j,:), 20, fs, order, a, b, c); % fc was 10 earlier
             end
             P(i).antennal_movement = rad2deg((P(i).antennal_movement - mean(P(i).antennal_movement(:,1:2*fs),2))./movementRadius);
             
