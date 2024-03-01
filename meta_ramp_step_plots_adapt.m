@@ -1,144 +1,157 @@
 cd 'D:\Work\Code\Intracellular-recording-analysis\LUTs';
-% rampData = readlines('rampDataList.txt');
-% dataDirectory_ramp = extractBefore(rampData, '_');
-% filename_ramp = extractAfter(rampData, "_");
-% nfiles = length(filename_ramp);
+%
+% filepath = readlines('stepDataList.txt');
+% filepath = readlines('allStairList.txt');
+% filepath = readlines('chirpPartialList.txt');
+% filepath = readlines('blwgnValidData.txt');
+% filepath = readlines('ramp_forAdaptation.txt');
+% filepath = readlines('validRampList.txt');
+% filepath = readlines('rampDataListNew.txt');
 
-% stepData = readlines('stepDataList.txt');
-% % stepData = stepData_(posEncodingNeurons,:);
-% dataDirectory_step = extractBefore(stepData, '_');
-% filename_step = extractAfter(stepData, "_");
-% nfiles = length(filename_step);
+dataDirectory = extractBefore(filepath, '_');
+filename = extractAfter(filepath, "_");
+nfiles = length(filename);
 
-stairData = readlines('allStairList.txt');
-dataDirectory_stair = extractBefore(stairData, '_');
-filename_stair = extractAfter(stairData, "_");
-nfiles = length(filename_stair);
+% c = parula(nfiles);
+% T_tonic = table(); %('neuronID', 'velocity', 'Tphasic', 'Ttonic', 'pvalTphasic', 'pvalTtonic');
+% T_ramp_gcfr_std = table();
+T= table();
 
-% chirpData = readlines('chirpPartialList.txt');
-% chirpData = chirp_pos;
-% dataDirectory_chirp = extractBefore(chirpData, '_');
-% filename_chirp = extractAfter(chirpData, "_");
-% nfiles = length(filename_chirp);
-
-% wnData = readlines('blwgnValidData.txt');
-% wnData = blwgn_vel;
-% dataDirectory_wn = extractBefore(wnData, '_');
-% filename_wn = extractAfter(wnData, "_");
-% nfiles = length(filename_wn);
-
-% adaptation_coeff = zeros(1, nfiles);
-% rsquare = zeros(1, nfiles);
-
-% ignorefiles = [];
-% velocity = [];
-% FR = [];
-% velocityEncodingNeurons = [];
-% staList = [];
-% posEncodingNeurons = [];
-
-% figure;
-c = parula(nfiles);
-ci = 0;
-% goodfits = [];
-% slopes = [];
-% rsquares = [];
-
-labelFontSize = 14;
-tickLabelSize = 12;
 
 for irow = 1:nfiles
-
     irow
-    %     close all;
-
-    ci = ci+1;
-    % try
-    % P_ramp = getStructP(dataDirectory_ramp(irow), filename_ramp(irow),0);
-    % P_step = getStructP(dataDirectory_step(irow), filename_step(irow),0);
-    P_stair = getStructP(dataDirectory_stair(irow), filename_stair(irow),0);
-    % P_chirp = getStructP(dataDirectory_chirp(irow), filename_chirp(irow),0);
-    % me_chirp(irow),0);
-    % P_wn = getStructP(dataDirectory_wn(irow), filename_wn(irow),0);
-    % title(irow)
-
-    %     S(irow) = jitter_func(P_wn, irow);
-    % [vel, meanMaxFR, p1, rsq] = rampGCFRplots(P_ramp, c(irow,:));
-
-    % if p1>= 30 && rsq >= 0.8
-    %     velocityEncodingNeurons = [velocityEncodingNeurons rampData(irow)];
-    % end
-    % velocity = [velocity; vel];
-    % FR = [FR; meanMaxFR'];
-    % [pvalA, pvalAB, steadystateFR, baselineFR_mat] = stepGCFRplots(P_step);
-    % 
-    % if ~isempty(find(pvalA <= 0.008)) 
-    %     pvalA;
-    %     posEncodingNeurons = [posEncodingNeurons irow];
-    % end
-    % pause;
-    stairGCFRplots(P_stair);
-    cd('D:\Work\Recordings\plots\stair');
-    saveas(gcf,num2str(irow),'png');
     close all;
-    % chirpGCFRplots(P_chirp);
-    % try
-    % [adaptation_coeff(irow), rsquare(irow)] = calcAdaptation(P_ramp);
-    % catch
-    %     disp("Not enough duration to fit curve");
-    %     ignorefiles = [ignorefiles irow];
-    % end
-    %
-    % catch
-    %     ignorefiles = [ignorefiles irow];
-    % end
-    % if P_wn.fs ~= 20000
-    %     continue;
-    % end
-    % STA_window = 0.03;
-    % start_stim = P_wn.OFF_dur*P_wn.fs;
-    % stop_stim = (P_wn.ON_dur+P_wn.OFF_dur)*P_wn.fs;
-    % STA  = STA_analysis(P_wn.raster, P_wn.antennal_movement, STA_window, P_wn.fs, start_stim, stop_stim);
-    % % staList = [staList; STA];
-    % t = linspace(-30,0, length(STA));
-    % % figure;
-    % plot(t, STA, 'LineWidth',1); hold on;
-    % box off;
-    % ylabel('Antennal movement (deg)');
-    % xlabel('Time before spike (ms)');
-    % title(replace(join([P_wn.date ' ' P_wn.filename], ''), '_', ' '));
-    % pause;
-    % close all;
-    % end
-    
-    %{
-    [xData, yData] = prepareCurveData( vel, meanMaxFR );
-    ft = fittype( 'poly1' );
-    [fitresult, gof] = fit( xData, yData, ft );
 
-    slopes = [slopes fitresult.p1];
-    rsquares = [rsquares gof.rsquare];
-    if fitresult.p1 >= 40 && gof.rsquare >= 0.9
-        goodfits = [goodfits irow];
-        alphaval = 1;
-        c_alpha  = [0.4660 0.6740 0.1880 alphaval];
-    else
-        alphaval = 0.3;
-        c_alpha  = [0 0 0 alphaval];
+    P = getStructP(dataDirectory(irow), filename(irow), [nan nan], 1);
+
+
+    % 
+    
+
+    % pause;
+
+
+
+    % figure('WindowState','fullscreen'); protocolPlot(P);
+    % savefigures(P(1), "traces", gcf, "fig", 'D:\Work\Figures for presentation\step_traces');
+    % savefigures(P(1), "traces", gcf, "png", 'D:\Work\Figures for presentation\step_traces');
+
+    %Estimating adaptation
+
+    % if contains(P(1).stim_name, "ramp")
+    % stim_name = string(extractfield(P, 'stim_name'));
+    % ramp_dur = str2double(extractAfter(stim_name, "ramp "));
+    % [~,idx] = sort(ramp_dur);
+    % P = P(idx);
+    % protocolPlot(P);
+    % baseline_sd = [];
+    % ss_sd = [];
+    % for i=1:length(P)
+    %     [onLoc, offLoc] = miscFuncs.findSSbounds(P(i).mean_movement, 0.9, 10, P(i).fs);
+    %     ssBounds = [offLoc-1.5*P(i).fs  offLoc-0.5*P(i).fs];
+    %     baselineBounds = [(P(i).OFF_dur-1.5)*P(i).fs+1 (P(i).OFF_dur-0.5)*P(i).fs];
+    % 
+    %     baseline_sd = [baseline_sd; std(P(i).gcfr(:, baselineBounds(1):baselineBounds(2)), [], "all")];
+    %     ss_sd = [ss_sd; std(P(i).gcfr(:, ssBounds(1):ssBounds(2)), [], "all")];
+    % 
+    % 
+    % end
+    %     neuronName = extractBefore(P(i).filename, "_ramp");
+    %     nID = replace(join([P(i).date neuronName], ""), "_", "");
+    %     nPrtcls = length(baseline_sd);
+    %     neuronID = repmat(nID, nPrtcls,1);
+    % 
+    %     Trow = table(baseline_sd, ss_sd, neuronID);
+    %     T_ramp_gcfr_std = [T_ramp_gcfr_std; Trow];
+    %{
+        Tphasic = [];
+        rsqExp = [];
+        velocity = [];
+        peakFR = [];
+
+        for i=1:length(P)
+
+            [max_FR, vel, fitresult, gof ] = estimatePhasicAdaptation(P(i));
+            % Tphasic = [Tphasic; (1/mdl_phasic_exp.Coefficients.Estimate(2))];
+            % pvalTphasic = [pvalTphasic; mdl_phasic_exp.Coefficients.pValue(2)];
+            % rsqExp = [rsqExp; mdl_phasic_exp.Rsquared.Ordinary];
+            Tphasic = [Tphasic; (1/fitresult.b)];
+            rsqExp = [rsqExp; gof.rsquare];
+            
+            velocity = [velocity; vel];
+            peakFR = [peakFR; max_FR];
+
+        end
+
+        neuronName = extractBefore(P(i).filename, "_ramp");
+        nID = replace(join([P(i).date neuronName], ""), "_", "");
+        nPrtcls = length(velocity);
+        neuronID = repmat(nID, nPrtcls,1);
+        Trow = table(neuronID, velocity, Tphasic, peakFR, rsqExp);
+        T_phasic = [T_phasic;Trow];
     end
 
+    if contains(P(1).stim_name, "step")
 
-    % plot(fitresult,'k--');  hold on;
-    plot(vel, meanMaxFR, 'Color',c_alpha,'LineWidth',1); hold on;
+        stim_name = string(extractfield(P, 'stim_name'));
+        px = str2double(extractAfter(stim_name, "amp_"));
+        [~,idx] = sort(px);
+        P = P(idx);
 
-%}
+        Ttonic = [];
+        pvalTtonic = [];
+        rsqExp = [];
+        position = [];
+        ssFR = [];
+        
+
+        for i=1:length(P)
+            [ss_FR, pos, fitresult, gof ] = estimateTonicAdaptation(P(i));
+            % Ttonic = [Ttonic; (1/mdl_tonic_exp.Coefficients.Estimate(2))];
+            % pvalTtonic = [pvalTtonic; mdl_tonic_exp.Coefficients.pValue(2)];
+            % rsqExp = [rsqExp; mdl_tonic_exp.Rsquared.Ordinary];
+            Ttonic = [Ttonic; (1/fitresult.b)];
+            rsqExp = [rsqExp; gof.rsquare];
+
+            position = [position; pos];
+            ssFR = [ssFR; ss_FR];
+
+        end
+
+        neuronName = extractBefore(P(i).filename, "_step");
+
+        nID = replace(join([P(i).date neuronName], ""), "_", "");
+        nPrtcls = length(position);
+        neuronID = repmat(nID, nPrtcls,1);
+        Trow = table(neuronID, position, Ttonic, ssFR, rsqExp);
+        T_tonic = [T_tonic;Trow];
+    end
+    %}
+
+    % [gcfrDecay, tDecay, phasicGCFR, tPhasic] = getPhasicDecayGCFR(P(1));
+    % [dist1,dist2] = distanceToFit(t1, gcfr, rampEndIdx/P(i).fs, P(i).fs);
+    % [velocity, amp, maxFR] = rampGCFRplots(P,c(irow, :));
+
+    % bounds = [(P(1).OFF_dur-1)*P(1).fs (P(1).OFF_dur+5)*P(1).fs];
+    % if contains(P(1).stim_name, "1")
+    % % Trow = table({velocity}, {maxFR});
+    % Trow = table(P(1).mean_movement(bounds(1):bounds(2)),P(1).avg_gcfr(bounds(1):bounds(2)));
+    % T(irow, :) = Trow;
+    % end
+
+
+    % [pvalA, pvalAB, steadystateFR, baselineFR_mat] = stepGCFRplots(P,c(irow, :));
+
+    % stairGCFRplots(P(i));
+    % if P(end).max_chirp_frq == 150 && P(end).ON_dur == 15 && P(end).OFF_dur == 5
+    %     irow
+    %     chirpGCFRplots(P(end));
+    % end
+    % figure;
+
+
+
     % pause;
-    
+
 end
-% ax = gca;
-% ylabel('Mean peak firing rate (Hz)', 'FontSize',labelFontSize, 'FontName','Calibri');
-% xlabel('Angular velocity (deg/s) (log10)', 'FontSize',labelFontSize, 'FontName','Calibri');
-% ax.LineWidth =1;
-% ax.FontSize = tickLabelSize;
-% ax.FontName = 'Calibri';
-% ax.Box = 'off';
+
