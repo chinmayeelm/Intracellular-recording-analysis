@@ -1,213 +1,134 @@
-function [vel, meanMaxFR, p1, rsq] = rampGCFRplots(P, c)
+function [vel_sorted,amplitude_sorted, max_FR_sorted] = rampGCFRplots(P,c)
 %UNTITLED2 Summary of this function goes here
 %   Detailed explanation goes here
 
 fs = P(1).fs;
-total_dur = P(1).single_trial_length/fs;
-time = linspace(0,total_dur,P(1).single_trial_length);
 
-% colormap('winter');
+
 stim_name = string(extractfield(P, 'stim_name'));
 ramp_dur = str2double(extractAfter(stim_name, "ramp "));
 [~,idx] = sort(ramp_dur);
 P = P(idx);
 n = numel(idx);
-n = 4;
+% n = 4;
 
 [b,a] = butter(3,4/(fs/2), 'low');
 
-labelFontSize = 14;
-tickLabelSize = 12;
-
-
-% figure('Color', 'w', 'WindowState', 'normal');
-
-switch n
-
-    case 7
-        newColors = [0.1765    0.1804    0.5137 1
-            0.1765    0.1804    0.5137 0.7
-            0.1765    0.1804    0.5137 0.5
-            0.1765    0.1804    0.5137 0.3
-            0.9137    0.3059    0.1059 0.5
-            0.9137    0.3059    0.1059 0.7
-            0.9137    0.3059    0.1059 1];
-    case 6
-        newColors = [0.1765    0.1804    0.5137 1
-            0.1765    0.1804    0.5137 0.7
-            0.1765    0.1804    0.5137 0.5
-            0.9137    0.3059    0.1059 0.5
-            0.9137    0.3059    0.1059 0.7
-            0.9137    0.3059    0.1059 1];
-    case 5
-        newColors = [0.1765    0.1804    0.5137 1
-            0.1765    0.1804    0.5137 0.7
-            0.1765    0.1804    0.5137 0.5
-            0.9137    0.3059    0.1059 0.7
-            0.9137    0.3059    0.1059 1];
-    otherwise
-        % newColors = [0.1765    0.1804    0.5137 1
-        %              0.1765    0.1804    0.5137 0.5
-        %              0.9137    0.3059    0.1059 0.5
-        %              0.9137    0.3059    0.1059 1];
-        newColors = [0 0 0 1
-            0 0 0 0.5
-            0.8 0 0 0.5
-            0.8 0 0 1];
-
-        alphaVal = [1 0.85 0.70 0.55];
-end
-% colororder(newColors);
-
-
-for i=1:length(P)
-    if i < 5
-        k = 0;
-    else
-        k = 1;
-    end
-    % if contains(P(i).stim_name, "var_ramp 0.2")
-    % disp(i)
-    %{
-        ax1 = subplot(3,1,1); plot(time, -P(i).mean_movement, 'LineWidth',1.5, 'Color', newColors(i,:)); hold on;
-        %     lgd = legend(["1 s", "2 s","0.5 s", "0.5 s"],"Location","northeast","NumColumns",1);
-        %     title(lgd, "Ramp duration");
-        ylabel('Position (deg)', 'FontSize',labelFontSize, 'Rotation',0);
-        %     yyaxis right; ax5 = plot(time, P(i).intendedStimulus(1,:), '--', 'LineWidth', 0.5);
-        %     ylabel('Generated position stimulus (a.u)');
-        % title(replace([P(1).date P(1).filename], '_','-'));
-        ax1.Box = 'off';
-        ax1.XAxis.Visible = 'off';
-        ax1.FontSize = tickLabelSize;
-        ax1.FontName = 'Calibri';
-        % xlim([3 Inf]);
-        %     colormap(winter)
-        %grid on;
-
-
-        velocity = diff(-P(i).mean_movement)*fs;
-        vel_filtered = filtfilt(b,a,velocity);
-        ax2 = subplot(3,1,2); plot(time(2:end),vel_filtered,'Color', newColors(i,:), 'LineWidth', 1.5); hold on;
-        ylabel('Velocity (deg/s)', 'FontSize',labelFontSize, 'Rotation',0);
-        ax2.Box = 'off';
-        ax2.XAxis.Visible = 'off';
-        ax2.FontSize = tickLabelSize;
-        ax2.FontName = 'Calibri';
-        % xlim([3 Inf]);
-
-
-        %grid on;
-        %
-        %     ax3 = subplot(4,1,3); plot(time(3:end),diff(P(i).intendedStimulus(1,:),2), 'LineWidth', 1); hold on;
-        %     ylabel('Accelaration (a.u)', 'FontSize',11);
-        %     ax3.Box = 'off';
-        %     ax3.XAxis.Visible = 'off';
-        %     %grid on;
-
-        ax4 = subplot(3,1,3); plot(time, P(i).avg_gcfr, 'LineWidth',1.5, 'Color', newColors(i,:)); hold on;
-        ylabel('Mean Firing rate (Hz)', 'FontSize',labelFontSize, 'Rotation',0);
-        xlabel('Time (s)', 'FontSize',labelFontSize);
-        ax4.Box = 'off';
-        ax4.FontSize = tickLabelSize;
-        ax4.FontName = 'Calibri';
-        %     colormap(winter)
-
-        %     linkaxes([ax1 ax2 ax3 ax4], 'x');
-        linkaxes([ax1 ax2 ax4], 'x');
-        xlim([3 Inf]);
-    %}
-    % end
-end
-
-
-% legend(ax1, arrayfun(@(x) replace(x.stim_name, "_"," "), P), 'Location', 'best');
-% legend(ax1, 'boxoff');
-% filename = join([replace(string(P(1).date), ".", "-") P(1).filename], '_');
-% cd('F:\Work\Analysis outputs\ramp_adaptation');
-% saveas(gcf, filename, 'png');
 %FR Vs Velocity
-% figure;
 
-max_FR = [];
-velocity = [];
-max_FR_sorted = [];
-velocity_sorted = [];
-% raster = P.raster(start_stim:stop_stim);
-auc = zeros(1,length(P));
-nSpikes = zeros(1,length(P));
-avg_spikes = [];
+
+max_FR_mat = [];
+velocity_mat = [];
+delta_t_mat = [];
+accel = [];
+t_peakFR_mat= [];
 
 for i=1:length(P)
-    start_point = P(i).OFF_dur*P(i).fs+1;
-    % stim_end_point = (P(i).OFF_dur+P(i).ON_dur)*P(i).fs;
+
+    [onLoc, offLoc] = miscFuncs.findSSbounds(P(i).mean_movement, 0.9, 10, P(i).fs);
+    ssBounds = [offLoc-1.5*P(i).fs  offLoc-0.5*P(i).fs];
+    start_point = P(i).OFF_dur*fs+1;
+    baselineBounds = [(P(i).OFF_dur-1.5)*fs+1 (P(i).OFF_dur-0.5)*fs];
+    P(i).mean_vel_filtered = filtfilt(b,a,(diff(P(i).mean_movement)).*fs);
     stim_name = split(P(i).stim_name);
     delta_t = str2double(stim_name(2));
-    baselineFR = mean(P(i).avg_gcfr(1:3*P(i).fs),"all");
-    pos_ref = mean(-P(i).mean_movement(1:3*P(i).fs));
-    pos_stim = mean(-P(i).mean_movement(start_point + delta_t*P(i).fs + 1*P(i).fs:start_point + delta_t*P(i).fs + 3*P(i).fs));
-    amplitude = abs(pos_ref - pos_stim);
-    velocity_values = repmat((amplitude/delta_t), [P(i).complete_trials,1]);
-    velocity = [velocity; velocity_values];
-    spikes = sum(P(i).raster(:,start_point:start_point+delta_t*P(i).fs),2)./delta_t;
+  
+    baselineFR = mean(P(i).avg_gcfr(baselineBounds(1):baselineBounds(2)),"all");
+    pos_ref = mean(P(i).mean_movement(baselineBounds(1):baselineBounds(2)));
+    % pos_stim = mean(P(i).mean_movement(start_point + delta_t*P(i).fs + 1*P(i).fs:start_point + delta_t*P(i).fs + 3*P(i).fs));
+    pos_stim = abs(mean(P(i).mean_movement(ssBounds(1):ssBounds(2))));
+    amplitude = pos_ref - pos_stim;
+    P(i).amplitude = amplitude;
 
-    max_FR = [max_FR; max(P(i).gcfr, [], 2)];
-    avg_spikes = [avg_spikes; spikes];
+    
+    rampEndIdx = start_point+delta_t*fs;
+    [xData, yData] = prepareCurveData((start_point:rampEndIdx)/fs, abs(P(i).mean_movement(start_point:rampEndIdx)));
+    [ramp_fitresult, ramp_gof] = fit(xData, yData, 'poly1');
+    velocity_value =  abs(ramp_fitresult.p1);
+    ramp_fit_rsq = ramp_gof.rsquare;
 
-end
+    % figure; plot(ramp_fitresult, (start_point:rampEndIdx)/fs, P(i).mean_movement(start_point:rampEndIdx));
 
-[velocity_sorted, idx] = sort(velocity, 'ascend');
-max_FR_sorted = max_FR(idx);
-avg_spikes_sorted = avg_spikes(idx);
-meanMaxFR = median(reshape(max_FR_sorted, P(i).complete_trials, []),1);
-meanSpikes = mean(reshape(avg_spikes_sorted, P(i).complete_trials, []),1);
+    velocity_mat = [velocity_mat velocity_value];
 
-vel = unique(velocity_sorted);
-[vel_sorted,idx] = sort(unique(velocity), 'ascend');
-auc = auc(idx);
-nSpikes = nSpikes(idx);
+    acceleration = diff(P(i).mean_vel_filtered)*fs;
+    P(i).mean_acc_filtered = filtfilt(b, a, acceleration);
 
-velocity_sorted = log10(velocity_sorted);
-vel = log10(vel)
+    max_FR  = max(P(i).gcfr(:,start_point:onLoc), [], 2);
+    max_FR_mat = [max_FR_mat max_FR];
 
+    [mean_max_FR, t_peakFR] = max(P(i).avg_gcfr(:,start_point:onLoc));
+    t_peakFR_mat = [t_peakFR_mat t_peakFR/fs];
 
-% velocity_sorted = num2str(velocity_sorted, '%.3f');
-% figure;
-% boxchart(velocity_sorted, max_FR_sorted,'BoxFaceColor',c, 'BoxWidth', 0.03, 'MarkerStyle',"+", "WhiskerLineColor",'#B2BEB5'); hold on;
-[xData, yData] = prepareCurveData( vel, meanMaxFR );
-ft = fittype( 'poly1' );
-[fitresult, gof] = fit( xData, yData, ft );
-p1 = fitresult.p1
-rsq = gof.rsquare
-
-if rsq >=0.75 && p1 >= 30
-    %
-    % end
     % figure;
-    % plot(fitresult,'k');  hold on;
-    plot(vel, meanMaxFR, 'Color',[0.4660 0.6740 0.1880],'LineWidth',1); hold on;
-    % scatter(velocity_sorted, max_FR_sorted, 10,'filled','MarkerFaceColor',[0.7843,0,0],'MarkerFaceAlpha',1);
+    % protocolPlot(P(i)); hold on;
+    % xline((start_point+t_peakFR)/fs, 'k--');
+    % yline(mean_max_FR, 'k--');
 
-elseif rsq >= 0.75 
-    plot(vel, meanMaxFR, 'Color',[0 0 0 0.3],'LineWidth',1); hold on;
-    % plot(fitresult,'k--');  hold on;
 
 end
-%
-%
-%
-% % boxplot(max_FR_sorted, velocity_sorted);
-% % ylim([0 100]);
-ax = gca;
-ylabel('Mean peak firing rate (Hz)', 'FontSize',labelFontSize, 'FontName','Calibri');
-xlabel('Angular velocity (deg/s) (log10)', 'FontSize',labelFontSize, 'FontName','Calibri');
-ax.LineWidth =1;
-ax.FontSize = tickLabelSize;
-ax.FontName = 'Calibri';
-ax.Box = 'off';
-legend('');
-% title(replace([P(1).date P(1).filename], '_','-'));
 
-% FR =reshape(max_FR_sorted, P(i).complete_trials, []);
-% p = ranksum(FR(:,1), FR(:,end));
+velocity_mat =  repmat(velocity_mat, [P(i).complete_trials,1]);
+
+% fig1 = plotPosVelAccGCFR(P, n, 0, 0, 0);
+% title(replace(join([string(P(1).date) P(1).filename], " "), "_"," "));
+% savefigures(P(1), "traces", fig1, "fig", 'D:\Work\Figures for presentation\uncategorized');
+% savefigures(P, "traces", fig1, 1);
+
+[~, idx] = sort(velocity_mat(1,:), 'ascend');
+vel_sorted = velocity_mat(:,idx);
+vel = vel_sorted(1,:);
+max_FR_sorted = max_FR_mat(:,idx);
+t_peakFR_sorted = t_peakFR_mat(:,idx);
+
+% if mean(P(end).avg_gcfr(start_point:onLoc)) > 0
+%         figure(26); scatter(vel_sorted(end), t_peakFR_sorted(end), 'filled'); hold on;
+% end
+
+meanMaxFR = mean(max_FR_sorted, 1);
+err = std(max_FR_sorted, [],1);
+
+amps = [P.amplitude];
+amplitude_sorted = amps(idx);
+
+
+[xData, yData] = prepareCurveData( vel_sorted, max_FR_sorted);
+[fit_power, gof_power] = fit(xData, yData, 'power1');
+k=fit_power.b;
+pBounds = predint(fit_power, xData, 0.95, 'functional', 'on');
+% err = std(max_FR_sorted, [],1);
+yfit = fit_power(xData);
+
+if gof_power.rsquare >=0.8
+    % figure('WindowState', 'minimized');
+    loglog(xData,yData, 'Color', [c 0.5],'Marker','.', 'MarkerSize',10, 'LineStyle','none'); hold on;
+    loglog(xData, yfit, 'Color', c);
+    if fit_power.b >=0
+        fill([unique(xData); flip(unique(xData))], [unique(pBounds(:,1)); flip(unique(pBounds(:,2)))],...
+            c, 'FaceAlpha',0.2, 'EdgeColor','none');
+    else
+        fill([unique(xData); flip(unique(xData))], [flip(unique(pBounds(:,1))); (unique(pBounds(:,2)))],...
+            'k', 'FaceAlpha',0.2, 'EdgeColor','none');
+    end
+    % text(1,100, string(gof_power.rsquare));
+    % y_pred= feval(mdl, cell2mat(T_vel_fr.velocity(irow,:)));
+    % plot(cell2mat(T_vel_fr.velocity(irow,:)), y_pred); hold on;
+    % errorbar(cell2mat(T_vel_fr.velocity(irow)), cell2mat(T_vel_fr.fr(irow)), err, 'ro',"MarkerSize",3,...
+    % "MarkerEdgeColor","none","MarkerFaceColor",'k');
+
+ax=gca;
+ax.XAxis.Scale = "log";
+ax.YAxis.Scale = "log";
+legend('', 'Box', 'off');
+xlim([0.1 5])
+xticks([0.1 0.5 1 2 3 4 5])
+ylim([25 250])
+yticks([25 50 100 150 200 250])
+box off
+
+ylabel('Peak firing rate (Hz)');
+xlabel('Angular velocity ({\circ}/s)');
+% savefigures(P(1), "stats", gcf, "png", 'D:\Work\Figures for presentation\uncategorized');
+end
 
 end
