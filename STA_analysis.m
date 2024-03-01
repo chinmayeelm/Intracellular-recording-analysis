@@ -1,7 +1,7 @@
 function STA = STA_analysis(raster, stim, window, fs,start_stim, stop_stim)
     
     raster_data = raster(:,start_stim : stop_stim);
-    stimulus = -stim(:,start_stim : stop_stim);
+    stimulus = stim(:,start_stim : stop_stim);
     
     [m,~] = size(raster_data);
     STA_freq = [];
@@ -36,12 +36,16 @@ function STA = STA_analysis(raster, stim, window, fs,start_stim, stop_stim)
     avg_stim = mean(stimulus_prior,1);
 
     STA = mean(all_spike_triggers-avg_stim,1);
-    % plot(STA);
+    sd = std(all_spike_triggers-avg_stim,[],1);
+    sem = sd./sqrt(size(all_spike_triggers,1));
     t_STA = linspace(-(window*1000),0,length(STA));%-100:0.1:0;
-    % figure(); plot(t_STA, STA); %hold on;
-    % title ('Spike triggered average');
-    % ylabel 'Antennal movement (deg)';
-    % xlabel 'time (ms)';    
+    figure(); %plot(t_STA, STA); hold on;
+    sdfill(t_STA, STA, sd, 'k')
+    
+    subtitle ('Spike triggered average');
+    ylabel 'Antennal movement (deg)';
+    xlabel 'time (ms)';    
+
 
 end
 
