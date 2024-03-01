@@ -1,4 +1,4 @@
-function [jitter] = jitter_SD(raster, stim_window, spike_window, min_no_trials_required, fs)
+function spikeProb = fidelity(raster, stim_window, spike_window)
 %JITTER_SD Summary of this function goes here
 %   Detailed explanation goes here
 
@@ -7,7 +7,7 @@ function [jitter] = jitter_SD(raster, stim_window, spike_window, min_no_trials_r
 locs_ref = find(raster(m,:)==1);
 
 % ref = locs_ref(1);
-jitter = [];
+spikeProb = [];
 
 for j = 1:length(locs_ref)
 
@@ -24,17 +24,9 @@ for j = 1:length(locs_ref)
         [rows, locs] = find(raster(:,ref-spike_window : ref+spike_window)==1);
         mult_spike_idx = ismember(rows, rows_with_multiple_ones);
         locs(mult_spike_idx) = [];
-        locs_trials = ref+locs-spike_window-1; % 11 to get the actual location from raster
+        % locs_trials = ref+locs-spike_window-1; % 11 to get the actual location from raster
 
-
-        if length(locs_trials)<min_no_trials_required || std(locs_trials)==0
-            % disp(length(locs_trials));
-            % disp(std(locs_trials));
-            continue;
-        end
-
-        SD = (std(locs));
-        jitter = [jitter; SD*1000/fs]; % * 1000 to convert to ms
+        spikeProb = [spikeProb; length(locs)/m]; % * 1000 to convert to ms
     end
 end
 end
