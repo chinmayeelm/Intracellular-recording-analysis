@@ -6,7 +6,7 @@
 % 12.07.2022 M1 N3
 
 % miscFuncList = miscFuncs;
-dataDirectory = '2022.06.12';
+dataDirectory = '2022.07.12';
 filename = "M1_N3"
 gen_stim = stim.data.load;
 gen_stim_1 = -gen_stim(:,1);
@@ -37,7 +37,7 @@ ax.YAxis.Visible = 'off';
 % 22.07.2022 M1_N1_stair
 % 07.07.2022 M1_N1_stair
 
-dataDirectory = "2022.07.22";
+dataDirectory = "2022.07.13";
 filename = "M1_N1_ramp";
 P = getStructP(dataDirectory, filename,[nan nan],1);
 %%
@@ -161,89 +161,12 @@ end
 dataDirectory = '2022.08.09';
 filename = 'M1_N2_ramp';
 P = getStructP(dataDirectory, filename,[nan nan],1);
-%%
-i=7;
-
-[b,a] = butter(3,4/(P(i).fs/2), 'low');
-
-tickLabelSize = 10;
-labelFontSize = 12;
-
-figure;
-% Stimulus
-A4 = subplot(4,1,1);
-patch([P(i).OFF_dur,P(i).OFF_dur,P(i).OFF_dur+7,P(i).OFF_dur+7],[-1,0.2,0.2,-1], [0.96,0.9,0.9]); hold on;
-sdfill(P(i).time(1:P(i).single_trial_length), P(i).mean_movement, std(P(i).antennal_movement,[],1), [0.6, 0.2,0])
-
-A4.Box = 'off';
-A4.XAxis.Visible = 'off';
-A4.FontSize = tickLabelSize;
-A4.LineWidth =1;
-ylabel('Position (deg)','FontSize', labelFontSize);
-ylim([-1 0.2]);
-% A4.FontName = 'Calibri';
-
-% Velocity profile
-A5 = subplot(4,1,2);
-% velocity = diff(P(i).mean_movement)*fs;
-velocity = diff(P(i).antennal_movement, 1, 2)*P(i).fs;
-velocity = [velocity velocity(:,end)]; % Too make the length of velocity matrix same as time matrix
-vel_filtered = filtfilt(b,a,velocity'); % Matrix transposed for filtfilt function
-vel_filtered = vel_filtered';
-% plot(time(2:single_trial_length),vel_filtered, 'LineWidth',2,'Color', [0.8824 0.6314 0], 'LineStyle',':');
-sdfill(P(i).time(1:P(i).single_trial_length), mean(vel_filtered, 1), std(vel_filtered,[],1), [0.6, 0.2,0])
-ylabel('Velocity (deg/s)', 'FontSize', labelFontSize);
-ylim([-3.3 3])
-yticks([-3 0 3])
-A5.LineWidth =1;
-A5.FontSize = tickLabelSize;
-A5.Box = 'off';
-A5.XAxis.Visible = 'off';
-% A5.XLimitMethod = 'padded';
-% A5.YLimitMethod = 'padded';
-% A5.FontName = 'Calibri';
-
-A2 = subplot(4,1,3);
-
-k = 0.5;
-for j = 1:P(i).complete_trials
-    l = find(P(i).raster(j,:)==1);
-    spike_time = l/P(i).fs;
-    for m = 1:length(spike_time)
-        line([spike_time(m) spike_time(m)], [k k+0.5], 'Color', 'k', 'LineWidth', 1);
-    end
-    k = k+1;
-end
-ylabel("Trials");
-A2.XAxis.Visible = 'off';
-
-
-% GCFR
-A3 = subplot(4,1,4);
-sdfill(P(i).time(1:P(i).single_trial_length), mean(P(i).gcfr,1), std(P(i).gcfr,[],1), [0.4660 0.6740 0.1880]); hold on;
-yline(mean(P(i).avg_gcfr(1*P(i).fs : 3*P(i).fs)), 'k--');
-[val,ind] = max(P(i).avg_gcfr);
-% text(ind/P(i).fs, val+50, '\downarrow', 'Color','k' );
-% text((ind/P(i).fs)+3, val+50, '\downarrow', 'Color','k' );
-ylim([-10 200])
-A3.Box = 'off';
-% A3.XAxis.Visible = 'off';
-A3.FontSize = tickLabelSize;
-A3.LineWidth =1;
-% A3.FontName = 'Calibri';
-ylabel('Firing rate (Hz)','FontSize', labelFontSize);
-xlabel('Time(s)','FontSize', labelFontSize);
-
-
-linkaxes([A4, A5, A2, A3], 'x');
-A4.XLim = [P(i).OFF_dur-2 P(i).OFF_dur+7];
-%         linkaxes([A1,A2,A4], 'x');
-% linkaxes([A3,A4,A5], 'x');
 
 %% Range of adaptations
 
 cd 'D:\Work\Code\Intracellular-recording-analysis\LUTs';
-rampData = readlines('ramp_forAdaptation.txt');
+rampData = readlines('validRampList.txt');
+% rampData = readlines('ramp_forAdaptation.txt');
 dataDirectory_ramp = extractBefore(rampData, '_');
 filename_ramp = extractAfter(rampData, "_");
 nfiles = length(filename_ramp);
@@ -297,8 +220,8 @@ for irow = 1:nfiles
         end
         T(irow,varNames) = table(dataDirectory_ramp(irow), filename_ramp(irow), Stimulus, FiringRate, ssStim, peakFR, baselineFR, ssFR, P(i).fs);
 
+        
         %{
-
             t = linspace(0, totalDur, length(Stimulus));
             ax1 = subplot(2,1,1);
             % plot(t, stim_norm, 'Color', [0.6, 0.2,0]); hold on;
@@ -333,96 +256,45 @@ T(ind,:)=[];
 select_neurons = find(T.ssStim < median(T.ssStim)+0.05 & T.ssStim > median(T.ssStim)-0.05);
 
 %%
-idx = kmeans(T.Stimulus, 3);
-c = [[0 0 0 0.8];...
-     [0 0 0 0.5];...
-     [1 0 0 0.8]];
-totalDur = 6;
-figure;
-t = linspace(0, totalDur, length(T.FiringRate(1,:)));
-for irow = 1:height(T) %select_neurons
-    ax1 = subplot(3,1,1);
-    hold on;
-    plot(t, T.Stimulus(irow,:), 'Color', c(idx(irow),:)); %, 'Color', [0.6, 0.2,0])); hold on;
-    % plot(t, P(i).mean_movement(startPt:stopPt)); %, 'Color', [0.6, 0.2,0]);
-    ylabel('Angular position ({\circ})');
-    ax1.XAxis.Visible = 'off';
-    box off;
-    
-    ax2 = subplot(3,1,2);
-    hold on;
-    plot(t, T.FiringRate(irow,:), 'Color', c(idx(irow),:)); %, 'Color', [0.4660 0.6740 0.1880])); hold on;
-    % plot(t, P(i).avg_gcfr(startPt:stopPt)); %, 'Color',[0.4660 0.6740 0.1880]); hold on;
-    ylim([0 250]);
-    % ylim([-0.1 1.1]);
-    ylabel('Firing rate (Hz)');    
-    box off;
-    linkaxes([ax1 ax2], 'x');
-
-    ax3 = subplot(3,1,3)
-    hold on;
-    plot(t, T.FiringRate(irow,:)-T.FiringRate(irow,1), 'Color', c(idx(irow),:)); %, 'Color', [0.4660 0.6740 0.1880])); hold on;
-    % plot(t, P(i).avg_gcfr(startPt:stopPt)); %, 'Color',[0.4660 0.6740 0.1880]); hold on;
-    ylim([0 250]);
-    % ylim([-0.1 1.1]);
-    ylabel({'Baseline subtracted'; 'Firing rate (Hz)'});
-    xlabel('Time (s)');
-    box off;
-    linkaxes([ax1 ax2], 'x');
-
-    
-end
-
-
-%% clustered data into subplots
-ngrp = 3;
-% idx = kmeans(T.FiringRate-T.FiringRate(:,1),ngrp);
-[idx,C] = kmeans(T.ssStim, ngrp);
-X=T.ssStim;
-figure
-gscatter(X(:,1),X(:,2),idx,'bgm')
-hold on
-plot(C(:,1),C(:,2),'kx')
-legend('Cluster 1','Cluster 2','Cluster 3','Cluster Centroid')
-
-c = lines(ngrp);
-% c = [[0 0 0 0.8]; [1 0 0 0.8]];
-figure;
-t = linspace(0, totalDur, length(T.FiringRate(1,:)));
-for irow=1:height(T)
- 
-    ax1 = subplot(2,ngrp,idx(irow));
-    hold on;
-    plot(t, T.Stimulus(irow,:), 'Color', c(idx(irow),:)); %, 'Color', [0.6, 0.2,0])); hold on;
-    % ylabel('Angular position ({\circ})');
-    ax1.XAxis.Visible = 'off';
-    ylim([-1.1 0.1]);
-    box off;
-
-    ax2 = subplot(2,ngrp,idx(irow)+ngrp);
-    hold on;
-    plot(t, T.FiringRate(irow,:)-T.FiringRate(irow,1), 'Color', c(idx(irow),:)); %, 'Color', [0.4660 0.6740 0.1880])); hold on;
-    
-    ylim([-50 200]);
-    
-    % ylabel({'Baseline subtracted'; 'Firing rate (Hz)'});
-    xlabel('Time (s)');
-    box off;
-   
-    linkaxes([ax1 ax2], 'x');
-
-    
-    % pause;
-
-end
-ssStim_grp4 = T.ssStim(idx==4)
-std(ssStim_grp4)
-ssStim_grp3 = T.ssStim(idx==3)
-std(ssStim_grp3)
-ssStim_grp2 = T.ssStim(idx==2)
-std(ssStim_grp2)
-ssStim_grp1 = T.ssStim(idx==1)
-std(ssStim_grp1)
+% idx = kmeans(T.Stimulus, 3);
+% c = [[0 0 0 0.8];...
+%      [0 0 0 0.5];...
+%      [1 0 0 0.8]];
+% totalDur = 6;
+% figure;
+% t = linspace(0, totalDur, length(T.FiringRate(1,:)));
+% for irow = 1:height(T) %select_neurons
+%     ax1 = subplot(3,1,1);
+%     hold on;
+%     plot(t, T.Stimulus(irow,:), 'Color', c(idx(irow),:)); %, 'Color', [0.6, 0.2,0])); hold on;
+%     % plot(t, P(i).mean_movement(startPt:stopPt)); %, 'Color', [0.6, 0.2,0]);
+%     ylabel('Angular position ({\circ})');
+%     ax1.XAxis.Visible = 'off';
+%     box off;
+% 
+%     ax2 = subplot(3,1,2);
+%     hold on;
+%     plot(t, T.FiringRate(irow,:), 'Color', c(idx(irow),:)); %, 'Color', [0.4660 0.6740 0.1880])); hold on;
+%     % plot(t, P(i).avg_gcfr(startPt:stopPt)); %, 'Color',[0.4660 0.6740 0.1880]); hold on;
+%     ylim([0 250]);
+%     % ylim([-0.1 1.1]);
+%     ylabel('Firing rate (Hz)');    
+%     box off;
+%     linkaxes([ax1 ax2], 'x');
+% 
+%     ax3 = subplot(3,1,3)
+%     hold on;
+%     plot(t, T.FiringRate(irow,:)-T.FiringRate(irow,1), 'Color', c(idx(irow),:)); %, 'Color', [0.4660 0.6740 0.1880])); hold on;
+%     % plot(t, P(i).avg_gcfr(startPt:stopPt)); %, 'Color',[0.4660 0.6740 0.1880]); hold on;
+%     ylim([0 250]);
+%     % ylim([-0.1 1.1]);
+%     ylabel({'Baseline subtracted'; 'Firing rate (Hz)'});
+%     xlabel('Time (s)');
+%     box off;
+%     linkaxes([ax1 ax2], 'x');
+% 
+% 
+% end
 
 
 %% groups data by close values
@@ -434,8 +306,10 @@ ylabel('Counts');
 xlabel('Angular position ({\circ})');
 
 % Choosing the middle group - between -0.82 and -0.72
-idx = find(T.ssStim > -0.82 & T.ssStim < -0.72);
+% idx = find(T.ssStim > -0.82 & T.ssStim < -0.72);
+idx = find(T.ssStim > -0.9 & T.ssStim < -0.8);
 c = parula(height(T));
+T.neuronID = replace(join([T.dataDirectory, T.filename], " "), "_", " ");
 i=1;
 for irow= idx
     c(irow,:)
@@ -446,6 +320,7 @@ for irow= idx
     ylim([-1.1 0.1]);
     box off;
 
+    
     ax2 = subplot(2,1,2); hold on;
     plot(t, T.FiringRate(idx,:)-T.FiringRate(idx,1), 'Color', [0.4660 0.6740 0.1880]);
     ylim([-50 150]);    
@@ -455,76 +330,19 @@ for irow= idx
     linkaxes([ax1 ax2], 'x');
     i=i+1;
 end
-
-%% Quantifying adaptation
-i=1;
-t = P(i).time(1:P(i).single_trial_length);
-[~,maxFRLoc] = max(P(i).avg_gcfr);
-stim = P(i).mean_movement(maxFRLoc:maxFRLoc+3*P(i).fs);
-gcfr = P(i).avg_gcfr(maxFRLoc:maxFRLoc+3*P(i).fs);
-t1 = linspace((1/P(i).fs), 3, length(gcfr));
-start_point = P(i).OFF_dur*P(i).fs+1;
-stim_name_parts = split(P(i).stim_name); 
-delta_t = str2double(stim_name_parts(2));
-rampEndIdx = start_point+delta_t*P(i).fs - maxFRLoc;
-
-
-[xData, yData] = prepareCurveData( t1', gcfr' );
-% fo = fitoptions('Method', 'NonlinearLeastSquares', ...
-%     'Robust', 'off');
-% [fitresult, gof] = fit( xData, yData, 'power1', fo );
-% tau1 = fitresult.b
-% % tau2 = fitresult.d
-% rsquare = gof.rsquare
-
-model = @(b,xData) (b(1)*xData.^(-b(2)));
-% model = @(b,xData) b(1)*exp(b(2)*xData);
-beta0_empirical_phasic = [max(yData), 0.1];
-beta0_refined_phasic = fminsearch(@(beta) norm(yData - model(beta, xData)), beta0_empirical_phasic);
-mdl_phasic = fitnlm(xData, yData, model, beta0_refined_phasic);
-y_pred = feval(mdl_phasic, t1); 
-figure; plot(t1, gcfr, t1, y_pred);
-
-% str = sprintf("{\\tau}_{1} = %0.3f \n{\\tau}_{2} = %0.3f \nrsquare = %0.3f", tau1, tau2, rsquare);
-figure;
-plot( fitresult, xData, yData ); hold on;
-% ylim([0 200]);
-% xlim([0 3]);
-% yticks(0:40:200);
-text(t1(end)-2,max(gcfr)-10, str);
-ylabel('Mean firing rate (Hz)');
-xlabel('Time (s)');
-legend off;
-box off;
-
-
-% [xData, yData] = prepareCurveData( t1(1:rampEndIdx), gcfr(1:rampEndIdx) );
-% fo = fitoptions('Method', 'NonlinearLeastSquares', ...
-%     'Robust', 'off');
-% [fitresult, gof] = fit( xData, yData, 'exp1', fo );
-% tau1_separate = fitresult.b;
-% plot(fitresult, 'c');
-% xline(rampEndIdx/P(i).fs, 'k--');
-% 
-% [xData, yData] = prepareCurveData( t1(rampEndIdx+1:end), gcfr(rampEndIdx+1:end) );
-% fo = fitoptions('Method', 'NonlinearLeastSquares', ...
-%     'Robust', 'off');
-% [fitresult, gof] = fit( xData, yData, 'exp1', fo );
-% tau2_separate = fitresult.b;
-% plot(fitresult, 'g');
-% 
-
+legend(T.neuronID(idx))
 
 
 %% Fig 3 velocity encoding
 
-% new - 14.07.2022 M1_N1_ramp
+% v4 - 14.07.2022 M1_N1_ramp
+% v5 - 18.07.2022 M1_N4_ramp
 
-dataDirectory = '2022.07.14';
-filename = 'M1_N1_ramp';
+dataDirectory = '2022.07.12';
+filename = 'M1_N3_ramp';
 P = getStructP(dataDirectory, filename,[nan nan],1);
     
-[velocities,amplitude_sorted, medMaxFR, k] = rampGCFRplots(P);
+[velocities,amplitude_sorted, medMaxFR, trow] = rampGCFRplots(P);
 %%
 figure;  hold on;
 c = parula(height(T_vel_fr));
@@ -612,16 +430,17 @@ xlabel("Angular position ({\circ})");
 % filename = 'M1_N4_step';
 
 close all
-dataDirectory = '2022.08.24';
-filename = 'M1_N4_ramp';
-filename_ramp = 'M1_N4_ramp';
+dataDirectory = '2022.07.18';
+filename = 'M1_N4_step';
 
-rampGCFRplots(P)
+P = getStructP(dataDirectory, filename,[nan nan],1);
+% rampGCFRplots(P)
+stepGCFRplots(P, [0 0 0])
 
 %% Unusual neurons
 % 2022.07.12_M1_N3_step
 % 2022.07.12_M1_N3_ramp
-% 18.07.2022 M1_N4_step and _ramp
+% 17.08.2022 M2_N3_step and _ramp
 
 dataDirectory = '2022.08.24';
 filename = 'M1_N4_step';
@@ -648,14 +467,18 @@ end
 figure;
 scatter(ss_pos_sub, max_gcfr_sub);
 
-[p,tbl,stats] = kruskalwallis(max_gcfr_sub)
-multcompare(stats)
+% [p,tbl,stats] = kruskalwallis(max_gcfr_sub)
+% multcompare(stats)
+[p,tbl,stats] = friedman(max_gcfr_sub,1, 'on');
+[pvalA, pvalAB] = miscFuncs.returnPvals(max_gcfr_sub,[]);
+ 
 
 %% Fig 5 Stair protocol
 % 01.07.2022 M1_N1_stair2 %old
 
 % 22.07.2022 M1_N1_stair
 % 07.07.2022 M1_N1_stair
+% 21.07.2022 M2_N2_stair % newly added highest hysteresis
 
 dataDirectory_stair = '2022.07.07';
 filename_stair = 'M1_N1_stair'; 
@@ -666,13 +489,14 @@ stairGCFRplots(P_stair);
 % exportgraphics(figHandle, 'Fig5Ai-bottom.eps', 'ContentType', 'vector');
 
 
+
 %% Adaptation figure
 % 18.07 M1N4
 % 07.07 M2N3
 % 07.07 M1N1
 
-dataDirectory = '2022.07.12';
-filename = 'M1_N3_step';
+dataDirectory = '2022.07.07';
+filename = 'M1_N1_ramp';
 P = getStructP(dataDirectory, filename,[nan nan],1);
 % stim_name = string(extractfield(P, 'stim_name'));
 % ramp_dur = str2double(extractAfter(stim_name, "ramp "));

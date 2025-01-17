@@ -1,4 +1,4 @@
-function stairGCFRplots(P)
+function hysteresis_area = stairGCFRplots(P)
 %UNTITLED7 Summary of this function goes here
 %   Detailed explanation goes here
 total_trial_dur = P.single_trial_length/P.fs;
@@ -6,8 +6,8 @@ time = linspace(0,total_trial_dur,P(1).single_trial_length);
 
 stimulus = P.mean_movement;
 mid_point = length(stimulus)/2;
-labelFontSize = 14;
-tickLabelSize = 12;
+labelFontSize = 11;
+tickLabelSize = 10;
 
 S = abs(diff(P.intendedStimulus(1,1:P.single_trial_length)));
 
@@ -31,11 +31,13 @@ y_gcfr = repmat([-10 -10 150 150]', 1,length(x));
 
 
 % Stimulus and response
-figHandle = figure('Color', 'w', 'Visible','on');
+%{
+figHandle = figure('Color', 'w', 'Visible','on');%, 'WindowState','minimized');
 ax1 = subplot(2,1,1);
-sdfill(P.time(1:P.single_trial_length), P.mean_movement, std(P.antennal_movement,[],1), [0.6, 0.2,0])
+plot(P.time(1:P.single_trial_length), P.mean_movement, 'Color', [0.6, 0.2,0]);
+sdfill(P.time(1:P.single_trial_length), P.mean_movement, std(P.antennal_movement,[],1), [0.6, 0.2,0], "")
 
-% patch(x,y_stim,[0 0 0], 'FaceAlpha' , 0.3, 'EdgeColor', 'none');
+patch(x,y_stim,[0 0 0], 'FaceAlpha' , 0.3, 'EdgeColor', 'none');
 % ylabel('Position (deg)', 'Rotation',0);
 % yyaxis right; plot(time, P.intendedStimulus(1,:), 'r', 'LineWidth', 0.5);
 % ylabel('Generated position stimulus (a.u)');
@@ -51,17 +53,20 @@ ax1.Box = "off";
 
 
 ax2 = subplot(2,1,2);
-sdfill(P.time(1:P.single_trial_length), mean(P.gcfr,1), std(P.gcfr,[],1), [0.4660 0.6740 0.1880]); hold on;
-patch(x,y_gcfr,[0 0 0], 'FaceAlpha' , 0.3, 'EdgeColor', 'none');
+plot(P.time(1:P.single_trial_length), mean(P.gcfr,1), 'Color', [0.4660 0.6740 0.1880]);
+sdfill(P.time(1:P.single_trial_length), mean(P.gcfr,1), std(P.gcfr,[],1), [0.4660 0.6740 0.1880], ""); hold on;
+% patch(x,y_gcfr,[0 0 0], 'FaceAlpha' , 0.3, 'EdgeColor', 'none');
 ax2.FontSize = tickLabelSize;
 ax2.FontName = 'Calibri';
 ax2.Box = "off";
 xlim([0 Inf]);
-ylim([-10 150]);
+% ylim([-10 150]);
 linkaxes([ax1 ax2], 'x');
+savefigures(P(1), "stim_resp", gcf, "png", 'D:\Work\Figures for presentation\stair');
 
 
 % Split and overlapped stimulus and response
+
 figure;
 
 ax1 = subplot(2,1,1); 
@@ -87,7 +92,7 @@ xlim([0 Inf]);
 linkaxes([ax1 ax2], 'x');
 
 
-
+%}
 
 % Hysteresis
 S = abs(diff(P.intendedStimulus(1,1:P.single_trial_length)));
@@ -118,23 +123,40 @@ end
 % Hysteresis plot
 
 err = std(ssFR, [],1);
-c = gray(length(positions));
+c = gray(length(positions(4:14)));
+pos_fr_onecycle = pos_fr(4:14);
+figure;%('WindowState','minimized');
 
-figure;
+% errorbar(positions, pos_fr, err, 'k-'); hold on;
+% scatter(positions, pos_fr, 40, "filled", "CData", c, "MarkerEdgeColor","k");
 
-errorbar(positions, pos_fr, err, 'k-'); hold on;
-scatter(positions, pos_fr, 40, "filled", "CData", c, "MarkerEdgeColor","k");
+% errorbar(positions(4:14), pos_fr(4:14), err(4:14), 'k-'); hold on;
+% fill(positions(4:14), pos_fr(4:14), [0.4660 0.6740 0.1880], 'FaceAlpha',0.2, 'EdgeColor','none'); hold on;
+% scatter(positions(4:14), pos_fr(4:14), 30, "filled", "CData", c, "MarkerEdgeColor","k");
+
+errorbar(positions(4:14), pos_fr_onecycle, err(4:14), 'k-'); hold on;
+fill(positions(4:14), pos_fr_onecycle, [0.4660 0.6740 0.1880], 'FaceAlpha',0.2, 'EdgeColor','none'); hold on;
+scatter(positions(4:14), pos_fr_onecycle, 30, "filled", "CData", c, "MarkerEdgeColor","k");
+
+% polyin = polyshape(positions(4:14), pos_fr(4:14), 'Simplify',1);
+polyin = polyshape(positions(4:14), pos_fr_onecycle, 'Simplify',1);
+% polyout = convhull(polyin);
+% plot(polyout);
+hysteresis_area = area(polyin);
+
 colormap(c)
 colorbar(gca, "eastoutside","Box","off", "Ticks", [0 1], "TickLabels", {"Start", "end"}, "Direction","reverse")
 
 xlim([-1.5 1.5]);
-ylim([0 100]);
-yticks(0:20:100);
-ylabel('Mean steady state firing rate (Hz)');
+ylim([0 Inf]);
+yticks(0:25:200);
+ylabel('Normalised Mean steady state firing rate (Hz)');
 xlabel('Angular position (deg)');
 box off;
+text(-1,50, string(hysteresis_area));
 
 
+% savefigures(P(1), "hysteresis_area", gcf, "png", 'D:\Work\Figures for presentation\stair\images');
 
 % Relative position and firing rate
 %{

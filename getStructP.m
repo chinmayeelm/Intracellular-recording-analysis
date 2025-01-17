@@ -1,6 +1,10 @@
-function P = getStructP(dataDirectory,filename, clip_data_points, downsampleFactor)
+function P = getStructP(dataDirectory,filename, clip_data_points, downsampleFactor, varargin)
 %UNTITLED Summary of this function goes here
 %   Detailed explanation goes here
+
+
+narginchk(4, 6)
+
 
 expt_date = replace(dataDirectory, '-','.');
 filenameParts = split(filename, '_');
@@ -53,8 +57,13 @@ end
 
 fs = fs/downsampleFactor;
 
-gauss_win_L = fs/5;
-gauss_win_sigma = 0.03; % 30 ms % fs is multiplied in the code later.
+if nargin > 4
+    gauss_win_L = cell2mat(varargin(1));
+    gauss_win_sigma = cell2mat(varargin(2));
+else
+    gauss_win_L = fs/5;
+    gauss_win_sigma = 0.03; %0.03; % 30 ms % fs is multiplied in the code later.
+end 
 
 flag_meas_table = readtable('D:\Work\Recordings\Antenna flagellum measurements\flagellum-length-measurements.xlsx', 'VariableNamingRule','preserve');
 flag_meas_table.Date = datetime(flag_meas_table.Date, 'format', 'dd-MM-uuuu');

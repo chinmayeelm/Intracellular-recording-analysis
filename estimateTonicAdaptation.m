@@ -40,7 +40,7 @@ plot(tT, gcfrTonic,	'g', tT, y_pred_exp, 'k--');
 
 % plot(fitresult, tT, gcfrTonic, 'm');
 % str1 = sprintf("{\\tau}_{1} (tonic adaptation) = %0.3f \np-value = %0.3f, %0.3f \nrsquare = %0.3f", abs(tau), a_pval, b_pval, mdl_exp.Rsquared.Ordinary);
-str1 = sprintf("%0.3f", abs(tau));
+str1 = sprintf("%0.3f", (tau));
 text(tT(end)/2,gcfrTonic(round(length(gcfrTonic)/2)),str1);
 ylabel("Mean firing rate (Hz)");
 xlabel("Time (s)");
@@ -49,7 +49,7 @@ ylim([0 150])
 box off;
 linkaxes([ax1 ax2],'x');
 % legend(['' '' str1], 'Box','off');
-savefigures(P, 'expfits', gcf, "png", 'D:\Work\Figures for presentation\expfits\step_toOffLoc');
+% savefigures(P, 'expfits', gcf, "png", 'D:\Work\Figures for presentation\expfits\step_toOffLoc');
 % close all;
 
 

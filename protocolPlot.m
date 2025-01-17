@@ -90,8 +90,8 @@ for i=1:length(P)
     linkaxes([A3,A4], 'x');
     A3.XLim = [3 20];
 
-    savefigures(P(i), "traces_sd", gcf, "png", 'D:\Work\Figures for presentation\step_protocols_separate');
-    close all;
+    % savefigures(P(i), "traces_sd", gcf, "png", 'D:\Work\Figures for presentation\step_protocols_separate');
+    % close all;
 end
 
 end

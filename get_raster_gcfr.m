@@ -12,6 +12,7 @@ function [raster_data,avg_gcfr,no_of_true_trials, gcfr, invalid_trials]   = get_
         for i=1:no_of_trials
 %             p=[]; l=[];
             if max(P_rec(i,:)) > 100
+                max(P_rec(i,:))
                 invalid_trials = [invalid_trials; i]
                 continue;
             end

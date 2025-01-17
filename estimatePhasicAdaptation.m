@@ -60,7 +60,7 @@ ax2 = subplot(2,1,2); plot(t, gcfr,'Color', c);  hold on;
 xline(rampEndIdx/P.fs, 'k--','EoR','LabelHorizontalAlignment','right', 'LabelOrientation','horizontal');
 plot(tPhasic, gcfrPhasic, 'g', tPhasic, y_pred_exp, 'm');
 % str1 = sprintf("{\\tau}_{1} (phasic adaptation) = %0.3f \np-value = %0.3f, %0.3f \nrsquare = %0.3f", abs(tau_phasic), a_pval_phasic, b_pval_phasic, mdl_exp.Rsquared.Ordinary);
-str1 = sprintf("{\\tau}_{1} = %0.3f", abs(tau_phasic));
+str1 = sprintf("{\\tau}_{1} = %0.3f", (tau_phasic));
 % legend(['' '' str1], 'Box','off');
 text(tPhasic(end),max(gcfrPhasic),str1);
 ylabel("Mean firing rate (Hz)");

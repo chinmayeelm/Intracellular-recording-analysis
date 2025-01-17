@@ -22,16 +22,16 @@ for i=1:length(P)
 end
 
 fig1 = plotPosVelAccGCFR(P, length(P), 0,0,0);
-% savefigures(P(1), "traces", fig1, "fig", 'D:\Work\Figures for presentation\uncategorized');
+% savefigures(P(1), "traces", fig1, "png", 'D:\Work\Figures for presentation\step');
 %Steady state firing rate Vs Position
 
 % figure('WindowState','minimized');
 % hold on;
-steadystateFR = [];
+steadystateFR = nan(P(1).no_of_trials, length(P));
 position = [];
-baselineFR_mat = [];
-ss_position = [];
-baseline_position = [];
+baselineFR_mat = nan(P(1).no_of_trials, length(P));
+ss_position = nan(P(1).no_of_trials, length(P));
+baseline_position = nan(P(1).no_of_trials, length(P));
 % FRsorted = [];
 % position_sorted = [];
 meanFR = [];
@@ -57,15 +57,15 @@ for i=1:length(P)
     position_values = repmat(mean(amplitude), [P(i).complete_trials,1]);
     baseline_pos = repmat(mean(pos_ref), [P(i).complete_trials,1]);
 
-    ss_position = [ss_position position_values];
-    baseline_position = [baseline_position baseline_pos];
+    ss_position(1:length(position_values),i) = position_values;
+    baseline_position(1:length(baseline_pos),i) = baseline_pos;
 
     baselineFR =  mean(P(i).gcfr(:,baselineBounds(1):baselineBounds(2)),2);
-    baselineFR_mat = [baselineFR_mat baselineFR];
+    baselineFR_mat(1:length(baselineFR), i) = baselineFR;
     ssFR = mean(P(i).gcfr(:,ssBounds(1):ssBounds(2)),2);
     % ssFR = mean(P(i).gcfr(:,(ssLoc+1)*P(1).fs:(ssLoc+2)*P(1).fs),2); % earlier 1 s
     % ssFR = mean(P(i).gcfr(:,(ssLoc+2.5)*P(1).fs:(ssLoc+3.5)*P(1).fs),2);
-    steadystateFR = [steadystateFR ssFR];
+    steadystateFR(1:length(ssFR), i) = ssFR;
 
 
 end
@@ -76,14 +76,18 @@ pvalAB = nan;
 
 [xData, yData] = prepareCurveData([ss_position baseline_position], [steadystateFR baselineFR_mat]);
 [fitresult, gof] = fit(xData, yData, 'poly1');
+
 pBounds = predint(fitresult, xData, 0.95, 'functional', 'on');
 % err = std(max_FR_sorted, [],1);
 yfit = fitresult(xData);
-
-if gof.rsquare >=0.8
-    % figure;
+rho = corr(xData, yData, 'type','Spearman')
+if abs(rho) >=0.8
+    figure;
     plot(xData,yData, 'Color', c,'Marker','.', 'MarkerSize',10, 'LineStyle','none'); hold on;
-    plot(xData, yfit, 'Color', c, 'LineStyle', '--');
+    plot(fitresult);
+    % plot(fitresult, xData, yData, 'Color', c, 'LineStyle', '--');
+
+    
     if fitresult.p1 >=0
     fill([unique(xData); flip(unique(xData))], [unique(pBounds(:,1)); flip(unique(pBounds(:,2)))],...
         c, 'FaceAlpha',0.2, 'EdgeColor','none');
@@ -91,11 +95,15 @@ if gof.rsquare >=0.8
         fill([unique(xData); flip(unique(xData))], [flip(unique(pBounds(:,1))); (unique(pBounds(:,2)))],...
         c, 'FaceAlpha',0.2, 'EdgeColor','none');
     end
-% end
-% text(0,100, string(gof.rsquare));
-xticks([-1 -0.5 0 0.5 1]);
+    
+
+text(mean(xData),max(yData)-10, {string(gof.rsquare) string(fitresult.p1)});
+% xticks([-1 -0.5 0 0.5 1]);
+ylim([0 100]);
 legend('', 'Box', 'off');
 box off
+end
+% savefigures(P(1), 'linear_fit', gcf, "png", 'D:\Work\Figures for presentation\step\');
 
 %{
 
@@ -131,7 +139,7 @@ for i=2:length(pvalA)
             yshift=yshift+1;
         end
     end
-end
+        end
 
 for i=1:length(pvalAB)
     if pvalAB(i)<0.01
@@ -151,7 +159,7 @@ ax.FontSize = tickLabelSize;
 ax.FontName = 'Calibri';
 ax.Box = 'off';
 
-savefigures(P(1), 'stats', gcf, "png", 'D:\Work\Figures for presentation\uncategorized');
+
 
 % end
 %}

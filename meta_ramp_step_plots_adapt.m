@@ -1,27 +1,31 @@
 cd 'D:\Work\Code\Intracellular-recording-analysis\LUTs';
 %
 % filepath = readlines('stepDataList.txt');
-% filepath = readlines('allStairList.txt');
-% filepath = readlines('chirpPartialList.txt');
+% filepath = readlines('allStepList.txt');
+% filepath = readlines('validStairList.txt');
+% filepath = readlines('chirpFullList.txt');
 % filepath = readlines('blwgnValidData.txt');
 % filepath = readlines('ramp_forAdaptation.txt');
-% filepath = readlines('validRampList.txt');
+filepath = readlines('validRampList.txt');
+% filepath = readlines('allRampList.txt');
 % filepath = readlines('rampDataListNew.txt');
 
+  
 dataDirectory = extractBefore(filepath, '_');
 filename = extractAfter(filepath, "_");
 nfiles = length(filename);
 
-% c = parula(nfiles);
+c = parula(nfiles);
 % T_tonic = table(); %('neuronID', 'velocity', 'Tphasic', 'Ttonic', 'pvalTphasic', 'pvalTtonic');
 % T_ramp_gcfr_std = table();
 T= table();
-
+hyst_area = nan(nfiles,1);
 
 for irow = 1:nfiles
     irow
-    close all;
-
+    
+    % close all;
+    % figure;
     P = getStructP(dataDirectory(irow), filename(irow), [nan nan], 1);
 
 
@@ -29,7 +33,7 @@ for irow = 1:nfiles
     
 
     % pause;
-
+     
 
 
     % figure('WindowState','fullscreen'); protocolPlot(P);
@@ -37,33 +41,31 @@ for irow = 1:nfiles
     % savefigures(P(1), "traces", gcf, "png", 'D:\Work\Figures for presentation\step_traces');
 
     %Estimating adaptation
-
-    % if contains(P(1).stim_name, "ramp")
-    % stim_name = string(extractfield(P, 'stim_name'));
-    % ramp_dur = str2double(extractAfter(stim_name, "ramp "));
-    % [~,idx] = sort(ramp_dur);
-    % P = P(idx);
-    % protocolPlot(P);
-    % baseline_sd = [];
-    % ss_sd = [];
-    % for i=1:length(P)
-    %     [onLoc, offLoc] = miscFuncs.findSSbounds(P(i).mean_movement, 0.9, 10, P(i).fs);
-    %     ssBounds = [offLoc-1.5*P(i).fs  offLoc-0.5*P(i).fs];
-    %     baselineBounds = [(P(i).OFF_dur-1.5)*P(i).fs+1 (P(i).OFF_dur-0.5)*P(i).fs];
-    % 
-    %     baseline_sd = [baseline_sd; std(P(i).gcfr(:, baselineBounds(1):baselineBounds(2)), [], "all")];
-    %     ss_sd = [ss_sd; std(P(i).gcfr(:, ssBounds(1):ssBounds(2)), [], "all")];
-    % 
-    % 
-    % end
-    %     neuronName = extractBefore(P(i).filename, "_ramp");
-    %     nID = replace(join([P(i).date neuronName], ""), "_", "");
-    %     nPrtcls = length(baseline_sd);
-    %     neuronID = repmat(nID, nPrtcls,1);
-    % 
-    %     Trow = table(baseline_sd, ss_sd, neuronID);
-    %     T_ramp_gcfr_std = [T_ramp_gcfr_std; Trow];
     %{
+    if contains(P(1).stim_name, "ramp")
+    stim_name = string(extractfield(P, 'stim_name'));
+    ramp_dur = str2double(extractAfter(stim_name, "ramp "));
+    [~,idx] = sort(ramp_dur);
+    P = P(idx);
+    protocolPlot(P);
+    baseline_sd = [];
+    ss_sd = [];
+    for i=1:length(P)
+        [onLoc, offLoc] = miscFuncs.findSSbounds(P(i).mean_movement, 0.9, 10, P(i).fs);
+        ssBounds = [offLoc-1.5*P(i).fs  offLoc-0.5*P(i).fs];
+        baselineBounds = [(P(i).OFF_dur-1.5)*P(i).fs+1 (P(i).OFF_dur-0.5)*P(i).fs];
+
+        baseline_sd = [baseline_sd; std(P(i).gcfr(:, baselineBounds(1):baselineBounds(2)), [], "all")];
+        ss_sd = [ss_sd; std(P(i).gcfr(:, ssBounds(1):ssBounds(2)), [], "all")];
+   
+        neuronName = extractBefore(P(i).filename, "_ramp");
+        nID = replace(join([P(i).date neuronName], ""), "_", "");
+        nPrtcls = length(baseline_sd);
+        neuronID = repmat(nID, nPrtcls,1);
+
+        Trow = table(baseline_sd, ss_sd, neuronID);
+        T_ramp_gcfr_std = [T_ramp_gcfr_std; Trow];
+    
         Tphasic = [];
         rsqExp = [];
         velocity = [];
@@ -91,6 +93,7 @@ for irow = 1:nfiles
         T_phasic = [T_phasic;Trow];
     end
 
+    
     if contains(P(1).stim_name, "step")
 
         stim_name = string(extractfield(P, 'stim_name'));
@@ -130,7 +133,13 @@ for irow = 1:nfiles
 
     % [gcfrDecay, tDecay, phasicGCFR, tPhasic] = getPhasicDecayGCFR(P(1));
     % [dist1,dist2] = distanceToFit(t1, gcfr, rampEndIdx/P(i).fs, P(i).fs);
-    % [velocity, amp, maxFR] = rampGCFRplots(P,c(irow, :));
+    [velocity, amp, maxFR, trow] = rampGCFRplots(P,c(irow, :));
+    % T.maxvel(irow) = max(velocity,[],"all");
+    % T.minvel(irow) = min(velocity, [],"all");
+    % T.maxFR(irow) = max(mean(maxFR,1));
+    % T.minFR(irow) = min(mean(maxFR,1));
+    T.fileID(irow) = filepath(irow);
+    T(irow,2:4) = trow;
 
     % bounds = [(P(1).OFF_dur-1)*P(1).fs (P(1).OFF_dur+5)*P(1).fs];
     % if contains(P(1).stim_name, "1")
@@ -140,9 +149,11 @@ for irow = 1:nfiles
     % end
 
 
+
     % [pvalA, pvalAB, steadystateFR, baselineFR_mat] = stepGCFRplots(P,c(irow, :));
 
-    % stairGCFRplots(P(i));
+    % hyst_area(irow) = stairGCFRplots(P(1));
+    % close all;
     % if P(end).max_chirp_frq == 150 && P(end).ON_dur == 15 && P(end).OFF_dur == 5
     %     irow
     %     chirpGCFRplots(P(end));

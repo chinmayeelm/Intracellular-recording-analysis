@@ -1,9 +1,9 @@
 function plot_data(P, varargin)
-
+% Valid varargin: stimulus, velocity, membrane potential, raster, gcfr
 waveforms = string(varargin)
 disp(nargin)
 
-nplots = nargin-1;
+nplots = nargin-1
 isubplot = 0;
 
 for i=1:length(P)
@@ -17,11 +17,12 @@ for i=1:length(P)
     if sum(contains(waveforms, "stimulus"))
         isubplot = isubplot+1;
         a(isubplot) = subplot(nplots,1,isubplot);
-        sdfill(P(i).time(1:P(i).single_trial_length), P(i).mean_movement, std(P(i).antennal_movement,[],1), [0.6, 0.2,0])
+        % sdfill(P(i).time(1:P(i).single_trial_length), mean(P(i).stim_ifb,1), std(P(i).stim_ifb,[],1), [0.6, 0.2,0], "none")
+        sdfill(P(i).time(1:P(i).single_trial_length), P(i).mean_movement, std(P(i).antennal_movement,[],1), [0.6, 0.2,0], "")
         a(isubplot).Box = 'off';
         a(isubplot).XAxis.Visible = 'off';
         ylabel('Position (deg)');
-        ylim([-1 1]);
+        % ylim([-1 1]);
     end
 
     if sum(contains(waveforms, "velocity"))
@@ -72,10 +73,10 @@ for i=1:length(P)
 
         isubplot = isubplot + 1;
         a(isubplot) = subplot(nplots,1,isubplot);
-        sdfill(P(i).time(1:P(i).single_trial_length), mean(P(i).gcfr,1), std(P(i).gcfr,[],1), [0.4660 0.6740 0.1880])
+        sdfill(P(i).time(1:P(i).single_trial_length), mean(P(i).gcfr,1), std(P(i).gcfr,[],1), [0.4660 0.6740 0.1880], "none") 
         ylabel('Firing rate (Hz)');
         xlabel('Time (s)');
-        ylim([0 200])
+        % ylim([0 200])
         a(isubplot).Box = 'off';
         a(isubplot).XAxis.Visible = 'off';
     end
@@ -88,7 +89,7 @@ for i=1:length(P)
     %     title_str = ((join(split(P(i).stim_name,"_"))));
     % end
 
-    title_str = replace([string(P.date) filename], "_", " ");
+    title_str = replace([string(P(i).date) P(i).filename], "_", " ");
 
     a(1).Title.String = title_str;
     a(end).XAxis.Visible = 'on';

@@ -6,8 +6,8 @@ expt_date = expt_date(4);
 
 expt_date = datetime(replace(expt_date, '.','-'),'Format','dd-MM-uuuu');
 
-dataDirectory = '2022.08.18';
-filename = "M2_N2_blwgn";
+dataDirectory = '2024.06.21';
+filename = "M2_N4_blwgn";
 filename_str = sprintf("%s.nwb", filename);
 nwb_in = nwbRead(filename_str); 
 clip_data_flag =0;
@@ -92,8 +92,13 @@ stim = nwb_in.stimulus_presentation.get('mechanical_stimulus');
 stim_order_vector = string(split(stim.stimulus_description, ','));
 % [stim_order_sorted, idx] = sortfromnwb(stim_order_vector);
 % stim_order_vector = LUT_intra.stim_order(2);
+
 [stim_order_sorted,idx] = sort(stim_order_vector);
+
+
+% [stim_order_sorted,idx] = sort(stim_order_vector_from_text);
 no_of_protocols = length(unique(stim_order_sorted));
+
 valid_trials = no_of_protocols * no_of_trials;
 
 % clear nwb_in
@@ -253,9 +258,9 @@ for i=1:no_of_protocols
 end
 
 % Plot data
-% figure;
+figure;
 % plot_data(single_trial_length,no_of_protocols, fs, time, filename,  P);
-
+plot_data(P,"stimulus", "membrane potential", "raster", "gcfr");
 %%
 
 
@@ -281,7 +286,7 @@ for i = 1:no_of_protocols
             if P(i).stim_type == "frq" || P(i).stim_type =="dec"
     
     
-                 [I_spike_phase, II_spike_phase, III_spike_phase, I_spike_freq, II_spike_freq, III_spike_freq] = spike_phase(P(i).antennal_movement(1,:), P(i).raster(1,:), fs, ON_dur, OFF_dur);
+                 % [I_spike_phase, II_spike_phase, III_spike_phase, I_spike_freq, II_spike_freq, III_spike_freq] = spike_phase(P(i).antennal_movement(1,:), P(i).raster(1,:), fs, ON_dur, OFF_dur);
 %                  figure(); scatter(I_spike_freq,I_spike_phase,100, 'k.'); hold on;
 %                  pmin = min(I_spike_phase);
 %                  pmax = max(I_spike_phase);
@@ -306,7 +311,8 @@ for i = 1:no_of_protocols
         inc_frq_chirp_f = linspace(1,max_chirp_frq,ON_dur*fs+1);
         P(i).inc_frq_chirp_f = inc_frq_chirp_f;
         figure;
-        [lineOut, ~] = stdshade(P(i).gcfr(:,start_stim:stop_stim),0.2,'k',P(i).inc_frq_chirp_f);
+        sdfill(P(i).inc_frq_chirp_f, mean(P(i).gcfr(:,start_stim:stop_stim),1), std(P(i).gcfr(:,start_stim:stop_stim),[],1), [0 0 0], "fill") 
+        % [lineOut, ~] = stdshade(P(i).gcfr(:,start_stim:stop_stim),0.2,'k',P(i).inc_frq_chirp_f);
         inc_chirp_gcfr = P(i).gcfr(:,start_stim:stop_stim);
         lineOut.LineWidth  = 0.05;
         lineOut.LineWidth  = 0.01;

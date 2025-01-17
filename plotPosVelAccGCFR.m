@@ -50,7 +50,7 @@ fs = P(1).fs;
 total_dur = P(1).single_trial_length/fs;
 time = linspace(0,total_dur,P(1).single_trial_length);
 
-figHandle = figure;%("WindowState","minimized");
+figHandle = gcf; % figure("WindowState","normal");
 nSubplots = 2+velFlag+accFlag;
 
 

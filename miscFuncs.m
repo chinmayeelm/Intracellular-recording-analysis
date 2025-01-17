@@ -11,23 +11,34 @@ classdef miscFuncs
             sMax = max(signal,[],2);
             sMin = min(signal, [],2);
 
-            normSignal = (signal - sMin)./(sMax - sMin);
+            normSignal = ((signal - sMin)./(sMax - sMin));
+        end
+
+        function normSignal = minmaxNorm_Minus1ToPlus1(signal)
+            % assumes rows to be trials
+
+            sMax = max(signal,[],2);
+            sMin = min(signal, [],2);
+
+            normSignal = ((signal - sMin)./(sMax - sMin))*2 -1;
         end
 
 
-        function animateplot(x,y,xlab,ylab,linecolor,linewidth,markercolor,saveflag)
+        function animateplot(x,y,step_size, xlab,ylab,linecolor,linewidth,markercolor,saveflag)
 
-
+            figure("WindowState", "maximized");
+            pause(1e-6)
             plot(x,y,'Color','none');
             hold on;
 
             p = plot(x,y,'Color',linecolor,'LineWidth',linewidth);
-            m = scatter(x, y, 'filled',markercolor);
+            m = scatter(x, y, 'filled','o','MarkerFaceColor',markercolor, 'LineWidth',1);
             xlabel(xlab);
             ylabel(ylab);
+            a= gca; a.XAxis.Visible="off"; a.YAxis.Visible="off";
+            box off;
 
-
-            for k = 1:20:length(x)
+            for k = 1:step_size:length(x)
 
                 p.XData = x(1:k);
                 p.YData = y(1:k);
@@ -38,9 +49,10 @@ classdef miscFuncs
                 pause(1e-6)
 
 
+
                 % Saving the figure
                 if saveflag==1
-                    filename = 'animation';
+                    filename = 'animation.gif';
                     frame = getframe(gcf);
                     im = frame2im(frame);
                     [imind,cm] = rgb2ind(im,256);
@@ -67,10 +79,15 @@ classdef miscFuncs
 
             for i = 1:ncol
                 for j = 1:ncol
-                    pvalA(i,j) = ranksum(A(:,i), A(:,j));
+                    pvalA(i,j) = signrank(A(:,i), A(:,j));
                 end
 
-                pvalAB(i) = ranksum(A(:,i),B(:,i));
+                if ~isempty(B)
+                    pvalAB(i) = signrank(A(:,i),B(:,i));
+                else
+                    pvalAB = [];
+                    continue;
+                end
             end
         end
 
@@ -134,7 +151,7 @@ classdef miscFuncs
             fallingLocs = zeros([1 length(signal)]);
             signalFlipped = flip(signal);
             for isample = (nPts+1):(length(signal)-nPts)
-                
+
                 if mean(signal((isample-nPts):isample)) <  threshold && mean(signal((isample+1):(isample+nPts))) > threshold
                     risingLocs(isample) = 1;
                 end
@@ -167,7 +184,52 @@ classdef miscFuncs
             vel_filtered = filtfilt(b,a,velocity);
             vel = max(vel_filtered);
         end
+
+        function [low, high, med] = getWhisker(data)
+
+        iqr_data = iqr(data);
+
+        low = prctile(data,25) - 1.5*iqr_data;
+        high = prctile(data, 75) + 1.5*iqr_data;
+        med = median(data);
+
+        end
+
+        function f = getFreqFit(stim, fs, ON_dur)
+
+            stim_smooth = sgolayfilt(stim,2,101);
+            [c, midlev] = midcross(stim_smooth, fs, 'Tolerance',2);
+            t = linspace(0,ON_dur, length(stim));
+            % figure;
+            % plot(t, stim_smooth); hold on;
+            % plot(c',midlev,'rx')
+            
+            c = [0 c];
+            T_half = diff(c);
+            freq = 1./(2*T_half);
+            t_f = T_half./2;
+            t_f = c(1:end-1)+T_half./2;
+            
+            % figure; plot(t,stim_smooth); xline(t_f, 'k--');
+            
+            f = fit(t_f',freq','poly1');
+            % figure; plot(f,t_f,freq);
+
+        end
+
+        function [p_wt, f_wt] = getPSD(signal, fs, FreqLims)
+            
+            [wt, f_wt] = cwt(signal, "amor", fs, VoicesPerOctave=48, FrequencyLimits = FreqLims);
+
+            % figure;
+            % cwt(signal, "amor", fs);
+            
+            p_wt = mean(abs(wt), 2);
+        end
+
     end
+
+    
 end
 
 

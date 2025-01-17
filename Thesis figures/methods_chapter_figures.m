@@ -72,7 +72,7 @@ for iFile = 1:nFiles
             if contains(P(i).stim_name, protocol_names(iPrtcl))
               
                 subplot(nPrtcls,1,iPrtcl);
-                plot(P(i).time(1:P(i).single_trial_length), -P(i).intendedStimulus(1,:), 'k'); hold on;
+                plot(P(i).time(1:P(i).single_trial_length), P(i).intendedStimulus(1,:), 'k'); hold on;
                 line([1 2], [0 0],'Color', 'k', 'LineWidth', 2);
                 text(4.5, 0.002, '1 s');
                 ax = gca;
@@ -92,19 +92,18 @@ end
 
 dataDirectory = '2022.07.20';
 file_names = ["stair"; "ramp"; "step"; "sweep_sqr"; "sine"];
-% file_names = ["chirp"; "blwgn"];
 % file_names = "sweep_sqr";
 protocol_names = ["stair"; "ramp"; "step"; "sweep"; "sqr"; "sin"];
-% protocol_names = ["chirp"; "blwgn"];
+
 nFiles = length(file_names);
 nPrtcls = length(protocol_names);
-figure;
+
 
 for iFile = 1:nFiles
     filename = sprintf('M1_N3_%s', file_names(iFile));
     disp(filename);
-    P = getStructP(dataDirectory, filename,0,1);
-
+    P = getStructP(dataDirectory, filename,[nan nan],1);
+    figure;
     for iPrtcl = 1:nPrtcls
         for i=1:length(P)
             if contains(P(i).stim_name, protocol_names(iPrtcl))
@@ -117,7 +116,7 @@ for iFile = 1:nFiles
                 set(gca, "YLimMode", "auto");    
                 % yyaxis left; 
                 plot(P(i).time(1*P(i).fs:P(i).single_trial_length-(1*P(i).fs)), P(i).antennal_movement(1,1*P(i).fs:end-(1*P(i).fs)), 'Color', [0.6, 0.2,0], 'LineStyle','-','Marker','none'); 
-                % sdfill(P(i).time(1*P(i).fs:P(i).single_trial_length-(1*P(i).fs)), P(i).antennal_movement(1,1*P(i).fs:end-(1*P(i).fs)), std(-P(i).antennal_movement(1,1*P(i).fs:end-(1*P(i).fs)),[],1), [0.6, 0.2,0])
+                % sdfill(P(i).time(1*P(i).fs:P(i).single_trial_length-(1*P(i).fs)), P(i).antennal_movement(1,1*P(i).fs:end-(1*P(i).fs)), std(P(i).antennal_movement(1,1*P(i).fs:end-(1*P(i).fs)),[],1), [0.6, 0.2,0])
                 % set(gca, "YLimMode", "auto");
                 
                 % ylim([min(P(i).antennal_movement(1,1*P(i).fs:end - (1*P(i).fs))) max(P(i).antennal_movement(1,1*P(i).fs:end - (1*P(i).fs)))]);
@@ -138,25 +137,25 @@ end
 
 %% Chirp/blwgn zoom comparison with generate
 
-dataDirectory = "2022.11.08";
-filename = "M1_N1_blwgn";
+dataDirectory = "2022.07.20";
+filename = "M1_N3_chirp";
 
 P = getStructP(dataDirectory, filename,[nan nan],1);
-plot_data(P(1));
-%%
+% plot_data(P(1));
+
 i=1%:length(P)
 figure;
 
 scalingFactor = max(P(i).antennal_movement(1,1*P(i).fs:end-(1*P(i).fs))) - min(P(i).antennal_movement(1,1*P(i).fs:end-(1*P(i).fs)));
 intended_pp = max(P(i).intendedStimulus(1,1*P(i).fs:end-(1*P(i).fs))) - min(P(i).intendedStimulus(1,1*P(i).fs:end-(1*P(i).fs)));
 
-subplot(2,1,1);
-% subplot(3,1,1);
+% subplot(2,1,1);
+subplot(3,1,1);
 hold on;
 patch([P(i).OFF_dur P(i).OFF_dur P(i).OFF_dur+P(i).ON_dur P(i).OFF_dur+P(i).ON_dur], [-2 2 2 -2],[0 0 0], 'FaceAlpha' , 0.1, 'EdgeColor', 'none');
 plot(P(i).time(1:P(i).single_trial_length), (scalingFactor/intended_pp)*P(i).intendedStimulus, 'Color', 'k');
 for itrial = 1%:P(i).complete_trials
-    plot(P(i).time(1:P(i).single_trial_length), -P(i).antennal_movement(itrial, :), 'Color', [0.6, 0.2,0], 'LineWidth',1);
+    plot(P(i).time(1:P(i).single_trial_length), P(i).antennal_movement(itrial, :), 'Color', [0.6, 0.2,0], 'LineWidth',1);
 end
 
 
@@ -174,14 +173,14 @@ ax.FontName = 'Calibri';
 % ylabel('Angular position (deg)');
 box off;
 
-subplot(2,1,2);
-% subplot(3,1,2);
+% subplot(2,1,2);
+subplot(3,1,2);
 
 hold on;
 patch([P(i).OFF_dur P(i).OFF_dur P(i).OFF_dur+P(i).ON_dur P(i).OFF_dur+P(i).ON_dur], [-2 2 2 -2],[0 0 0], 'FaceAlpha' , 0.1, 'EdgeColor', 'none');
 plot(P(i).time(1:P(i).single_trial_length), (scalingFactor/intended_pp)*P(i).intendedStimulus, 'Color','k');
 for itrial = 1%:5%P(i).complete_trials
-    plot(P(i).time(1:P(i).single_trial_length), -P(i).antennal_movement(itrial, :), 'Color', [0.6, 0.2,0], 'LineWidth',1);
+    plot(P(i).time(1:P(i).single_trial_length), P(i).antennal_movement(itrial, :), 'Color', [0.6, 0.2,0], 'LineWidth',1);
 end
 
 % line([4.5 5],[-0.6 -0.6], 'Color','k', 'LineWidth', 2);
@@ -197,36 +196,44 @@ ax = gca;
 ax.FontName = 'Calibri'; 
 box off;
 
-% subplot(3,1,3);
-% hold on;
-% patch([5 5 20 20], [-1 1 1 -1],[0 0 0], 'FaceAlpha' , 0.1, 'EdgeColor', 'none');
-% plot(P(i).time(1:P(i).single_trial_length), (scalingFactor/intended_pp)*P(i).intendedStimulus, 'Color', 'k');
-% for itrial = 1%:P(i).complete_trials
-%     plot(P(i).time(1:P(i).single_trial_length), -P(i).antennal_movement(itrial, :), 'Color', [0.6, 0.2,0], 'LineWidth',1);
-% end
-% 
-% % line([4.5 5],[-0.6 -0.6], 'Color','k', 'LineWidth', 2);
-% % text(4.5, -0.75, '0.5 s');
-% % line([4.5 4.5],[-0.6 -0.1], 'Color','k', 'LineWidth', 2);
-% % text(4.25, -0.4, '0.5deg' );
-% ylim([-1 1]);
-% xlim_zoom = miscFuncs.range_converter(xlim_main, P(i).OFF_dur+P(i).ON_dur, 150);
-% xlim(xlim_zoom);
-% xlabel('Time (s)');
-% % ylabel('Angular position (deg)');
-% ax = gca;
-% ax.FontName = 'Calibri'; 
-% box off;
+subplot(3,1,3);
+hold on;
+patch([5 5 20 20], [-1 1 1 -1],[0 0 0], 'FaceAlpha' , 0.1, 'EdgeColor', 'none');
+plot(P(i).time(1:P(i).single_trial_length), (scalingFactor/intended_pp)*P(i).intendedStimulus, 'Color', 'k');
+for itrial = 1%:P(i).complete_trials
+    plot(P(i).time(1:P(i).single_trial_length), P(i).antennal_movement(itrial, :), 'Color', [0.6, 0.2,0], 'LineWidth',1);
+end
+
+% line([4.5 5],[-0.6 -0.6], 'Color','k', 'LineWidth', 2);
+% text(4.5, -0.75, '0.5 s');
+% line([4.5 4.5],[-0.6 -0.1], 'Color','k', 'LineWidth', 2);
+% text(4.25, -0.4, '0.5deg' );
+ylim([-1 1]);
+xlim_zoom = miscFuncs.range_converter(xlim_main, P(i).OFF_dur+P(i).ON_dur, 10);
+xlim(xlim_zoom);
+xlabel('Time (s)');
+% ylabel('Angular position (deg)');
+ax = gca;
+ax.FontName = 'Calibri'; 
+box off;
 
 
-%% Comparison of frequency spectrum
+%% Comparison of frequency spectrum WN
 dataDirectory = "2022.07.20";
 filename = "M1_N3_blwgn";
 
 P = getStructP(dataDirectory, filename,[nan nan],1);
 
-[pxx_gen, f_gen] = pwelch(P.intendedStimulus(1,P.OFF_dur*P.fs+1:(P.OFF_dur+P.ON_dur)*P.fs),[],[],[], P.fs);
-[pxx_hes, f_hes] = pwelch(P.antennal_movement(1,P.OFF_dur*P.fs+1:(P.OFF_dur+P.ON_dur)*P.fs),[],[],[], P.fs);
+startPt = P.OFF_dur*P.fs+1;
+stopPt = (P.OFF_dur+P.ON_dur)*P.fs;
+stim_length = length(P.intendedStimulus(startPt:stopPt));
+win_length = stim_length/10;
+overlap = 0.9*win_length;
+[pxx_gen, f_gen] = pwelch(P.intendedStimulus(1,startPt:stopPt),win_length,overlap,[], P.fs);
+[pxx_hes, f_hes] = pwelch(P.antennal_movement(1,startPt:stopPt),win_length,overlap,[], P.fs);
+
+% [pxx_gen, f_gen] = pwelch(P.intendedStimulus(1,P.OFF_dur*P.fs+1:(P.OFF_dur+P.ON_dur)*P.fs),[],[],[], P.fs);
+% [pxx_hes, f_hes] = pwelch(P.antennal_movement(1,P.OFF_dur*P.fs+1:(P.OFF_dur+P.ON_dur)*P.fs),[],[],[], P.fs);
 
 figure;
 hold on;
@@ -234,15 +241,37 @@ plot(f_gen, 10*log10(pxx_gen/max(pxx_gen)), 'k');
 plot(f_hes, 10*log10(pxx_hes/max(pxx_hes)), 'Color', [0.6, 0.2,0]);
 ylabel('Normalized Power spectral density (dB/Hz)');
 xlabel('Frequency (Hz)');
-xlim([0 1000]);
+xlim([0 400]);
 set(gca, 'FontName', 'Calibri');
 
+%% Comparison of frequency spectrum WN
+dataDirectory = "2022.07.20";
+filename = "M1_N3_chirp";
+
+P = getStructP(dataDirectory, filename,[nan nan],1);
+P = P(2);
+startPt = P.OFF_dur*P.fs+1;
+stopPt = (P.OFF_dur+P.ON_dur)*P.fs;
+stim_length = length(P.intendedStimulus(startPt:stopPt));
+win_length = stim_length/10;
+overlap = 0.8*win_length;
+[pxx_gen, f_gen] = pwelch(P.intendedStimulus(1,startPt:stopPt),win_length,overlap,[], P.fs);
+[pxx_hes, f_hes] = pwelch(P.antennal_movement(1,startPt:stopPt),win_length,overlap,[], P.fs);
+
+figure;
+hold on;
+plot(f_gen, 10*log10(pxx_gen/max(pxx_gen)), 'k');
+plot(f_hes, 10*log10(pxx_hes/max(pxx_hes)), 'Color', [0.6, 0.2,0]);
+ylabel('Normalized Power spectral density (dB/Hz)');
+xlabel('Frequency (Hz)');
+xlim([0 200]);
+set(gca, 'FontName', 'Calibri');
 
 %% Repeatability
 
 dataDirectory = '2022.07.20';
 filename = "M1_N3_blwgn"
-P = getStructP(dataDirectory, filename,0,1);
+P = getStructP(dataDirectory, filename,[nan nan],1);
 
     
 i=1%:length(P)
@@ -251,10 +280,10 @@ figure;
 subplot(2,1,1);
 hold on;
 patch([P(i).OFF_dur P(i).OFF_dur P(i).OFF_dur+P(i).ON_dur P(i).OFF_dur+P(i).ON_dur], [-2 2 2 -2],[0 0 0], 'FaceAlpha' , 0.1, 'EdgeColor', 'none');
-for itrial = 1:P(i).complete_trials
-    plot(P(i).time(1:P(i).single_trial_length), -P(i).antennal_movement(itrial, :), 'Color', [0.6, 0.2,0, 0.2], 'LineWidth',1);
+for itrial = 1:5%P(i).complete_trials
+    plot(P(i).time(1:P(i).single_trial_length), P(i).antennal_movement(itrial, :), 'Color', [0.6, 0.2,0, 0.2], 'LineWidth',1);
 end
-plot(P(i).time(1:P(i).single_trial_length), -P(i).mean_movement, 'Color', [0.6, 0.2,0], 'LineWidth',1);
+plot(P(i).time(1:P(i).single_trial_length), P(i).mean_movement, 'Color', [0.6, 0.2,0], 'LineWidth',1);
 
 % line([4 5],[-0.6 -0.6], 'Color','k', 'LineWidth', 2);
 % text(4, -0.75, '1 s');
@@ -276,9 +305,9 @@ subplot(2,1,2);
 hold on;
 patch([P(i).OFF_dur P(i).OFF_dur P(i).OFF_dur+P(i).ON_dur P(i).OFF_dur+P(i).ON_dur], [-2 2 2 -2],[0 0 0], 'FaceAlpha' , 0.1, 'EdgeColor', 'none');
 for itrial = 1:5%P(i).complete_trials
-    plot(P(i).time(1:P(i).single_trial_length), -P(i).antennal_movement(itrial, :), 'Color', [0.6, 0.2,0, 0.2], 'LineWidth',1);
+    plot(P(i).time(1:P(i).single_trial_length), P(i).antennal_movement(itrial, :), 'Color', [0.6, 0.2,0, 0.2], 'LineWidth',1);
 end
-plot(P(i).time(1:P(i).single_trial_length), -P(i).mean_movement, 'Color', [0.6, 0.2,0], 'LineWidth',1);
+plot(P(i).time(1:P(i).single_trial_length), P(i).mean_movement, 'Color', [0.6, 0.2,0], 'LineWidth',1);
 % line([4.5 5],[-0.6 -0.6], 'Color','k', 'LineWidth', 2);
 % text(4.5, -0.75, '0.5 s');
 % line([4.5 4.5],[-0.6 -0.1], 'Color','k', 'LineWidth', 2);
@@ -299,9 +328,9 @@ box off;
 % hold on;
 % patch([5 5 20 20], [-1 1 1 -1],[0 0 0], 'FaceAlpha' , 0.2, 'EdgeColor', 'none');
 % for itrial = 1:P(i).complete_trials
-%     plot(P(i).time(1:P(i).single_trial_length), -P(i).antennal_movement(itrial, :), 'Color', [0.6, 0.2,0, 0.3], 'LineWidth',1);
+%     plot(P(i).time(1:P(i).single_trial_length), P(i).antennal_movement(itrial, :), 'Color', [0.6, 0.2,0, 0.3], 'LineWidth',1);
 % end
-% plot(P(i).time(1:P(i).single_trial_length), -P(i).mean_movement, 'Color', [0.6, 0.2,0], 'LineWidth',1);
+% plot(P(i).time(1:P(i).single_trial_length), P(i).mean_movement, 'Color', [0.6, 0.2,0], 'LineWidth',1);
 % % line([4.5 5],[-0.6 -0.6], 'Color','k', 'LineWidth', 2);
 % % text(4.5, -0.75, '0.5 s');
 % % line([4.5 4.5],[-0.6 -0.1], 'Color','k', 'LineWidth', 2);

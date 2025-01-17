@@ -65,7 +65,8 @@ function P = create_structs(rec_protocols_sorted,stim_protocols_hes_sorted,fs, s
                 P(i).antennal_movement(j, :) =  butter_filtfilt(P(i).hes_data_unfilt(j,:), 2*max_chirp_frq, fs, order, a, b, c);
                 P(i).max_chirp_frq = max_chirp_frq;
             end
-            P(i).antennal_movement = rad2deg((P(i).antennal_movement - mean(P(i).antennal_movement(:,1:2*fs),2))./movementRadius);
+            % P(i).antennal_movement = rad2deg((P(i).antennal_movement - mean(P(i).antennal_movement(:,1:2*fs),2))./movementRadius);
+            P(i).antennal_movement = rad2deg((P(i).antennal_movement - P(i).antennal_movement(1,1))./movementRadius);
             
         elseif P(i).stim_type == "impulse"
             P(i).imp_dur = impulse_dur;
@@ -90,6 +91,7 @@ function P = create_structs(rec_protocols_sorted,stim_protocols_hes_sorted,fs, s
                 P(i).amp_sweep_frq = amp_sweep_frq; 
                 P(i).stim_period = 1/amp_sweep_frq;
             end
+            % P(i).antennal_movement = rad2deg((P(i).antennal_movement - mean(P(i).antennal_movement(:,1:2*fs),2))./movementRadius);
             P(i).antennal_movement = rad2deg((P(i).antennal_movement - mean(P(i).antennal_movement(:,1:2*fs),2))./movementRadius);
             
         elseif (P(i).stim_type == "step" || type_frq(2) == "ramp" || P(i).stim_type == "var" )
